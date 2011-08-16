@@ -71,6 +71,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-enabled-themes (quote (wombat)))
  '(custom-safe-themes (quote ("bf8c80820d13f0cd019c797c0b053222f87245a5" default))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -173,7 +174,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Visual Tweaks
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(load-theme 'minalt)
 
 ; Remove menu when not using window-system
 (if (eq window-system 'nil)
