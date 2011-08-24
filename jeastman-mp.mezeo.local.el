@@ -8,8 +8,8 @@
 (setq markdown-command "/usr/bin/mmd")
 
 ; Erlang paths
-(add-to-list 'load-path "/usr/local/erlang/R14B03/lib/erlang/lib/tools-2.6.6.4/emacs")
-(setq erlang-root-dir "/usr/local/erlang/R14B03")
+(add-to-list 'load-path "/usr/local/lib/erlang/lib/tools-2.6.6.1/emacs")
+(setq erlang-root-dir "/usr/local/lib/erlang")
 
 ; lintnode location
 (setq lintnode-location "/home/jeastman/Projects/l/lintnode")
@@ -27,3 +27,7 @@
 ; Org mode
 (setq org-directory "~/Documents/Dropbox/org")
 (setq org-mobile-directory "~/Documents/Dropbox/MobileOrg")
+
+; Set to use chromium as browser
+(setq browse-url-browser-function 'browse-url-generic
+      browse-url-generic-program "chromium-browser")

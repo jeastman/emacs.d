@@ -5,4 +5,5 @@ vendor/markdown-mode.el
 vendor/multi-term.el
 vendor/coffee-mode
 vendor/flymake-jslint.el
+vendor/edit-server.el
 .DS_Store
