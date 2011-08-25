@@ -473,3 +473,7 @@
 (require 'server)
 (when (and (functionp 'server-running-p) (not (server-running-p)))
 (server-start))
+
+;; Support for Chrome 'edit with emacs' extension
+(require 'edit-server)
+(edit-server-start)
