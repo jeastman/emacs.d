@@ -6,4 +6,17 @@ vendor/multi-term.el
 vendor/coffee-mode
 vendor/flymake-jslint.el
 vendor/edit-server.el
+vendor/auto-complete/*el
+vendor/auto-complete/*elc
+vendor/auto-complete/ac-dict/c++-mode
+vendor/auto-complete/ac-dict/c-mode
+vendor/auto-complete/ac-dict/clojure-mode
+vendor/auto-complete/ac-dict/css-mode
+vendor/auto-complete/ac-dict/java-mode
+vendor/auto-complete/ac-dict/javascript-mode
+vendor/auto-complete/ac-dict/php-mode
+vendor/auto-complete/ac-dict/python-mode
+vendor/auto-complete/ac-dict/ruby-mode
+vendor/auto-complete/ac-dict/scheme-mode
+vendor/auto-complete/ac-dict/tcl-mode
 .DS_Store
