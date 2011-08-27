@@ -168,8 +168,8 @@
 
 (setq-default flymake-no-changes-timeout '3) ; timeout for flymake
 
-(require 'autopair)
-(autopair-global-mode)                 ; enable autopair in all buffers
+(when (require 'autopair nil 'noerror)
+  (autopair-global-mode))              ; enable autopair in all buffers
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Visual Tweaks
@@ -268,24 +268,24 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Dired
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'dired-single)
+(when (require 'dired-single nil 'noerror)
 
-;Make sure each dired buffer doesn't spawn new dired buffers
-(defun my-dired-init ()
-  "Bunch of stuff to run for dired, either immediately or when it's
+  ;Make sure each dired buffer doesn't spawn new dired buffers
+  (defun my-dired-init ()
+    "Bunch of stuff to run for dired, either immediately or when it's
   loaded."
-  ;; <add other stuff here>
-  (define-key dired-mode-map [return] 'joc-dired-single-buffer)
-  (define-key dired-mode-map [mouse-1] 'joc-dired-single-buffer-mouse)
-  (define-key dired-mode-map "^"
-    (function
-     (lambda nil (interactive) (joc-dired-single-buffer "..")))))
-;; if dired's already loaded, then the keymap will be bound
-(if (boundp 'dired-mode-map)
-    ;; we're good to go; just add our bindings
-    (my-dired-init)
-  ;; it's not loaded yet, so add our bindings to the load-hook
-  (add-hook 'dired-load-hook 'my-dired-init))
+    ;; <add other stuff here>
+    (define-key dired-mode-map [return] 'joc-dired-single-buffer)
+    (define-key dired-mode-map [mouse-1] 'joc-dired-single-buffer-mouse)
+    (define-key dired-mode-map "^"
+      (function
+       (lambda nil (interactive) (joc-dired-single-buffer "..")))))
+  ;; if dired's already loaded, then the keymap will be bound
+  (if (boundp 'dired-mode-map)
+      ;; we're good to go; just add our bindings
+      (my-dired-init)
+    ;; it's not loaded yet, so add our bindings to the load-hook
+    (add-hook 'dired-load-hook 'my-dired-init)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Text mode hooks
@@ -295,9 +295,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Markdown
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'markdown-mode)
-(add-to-list 'auto-mode-alist '("\\.markdown$" . markdown-mode))
-(add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
+(when (require 'markdown-mode nil 'noerror)
+  (add-to-list 'auto-mode-alist '("\\.markdown$" . markdown-mode))
+  (add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Org
@@ -314,47 +314,47 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Erlang
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'erlang-start)
-(require 'erlang-flymake)
+(require 'erlang-start nil 'noerror)
+(require 'erlang-flymake nil 'noerror)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; JavaScript
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'flymake-jslint)
-(add-hook 'js-mode-hook (lambda () (flymake-mode t)))
+( when (require 'flymake-jslint nil 'noerror)
+(add-hook 'js-mode-hook (lambda () (flymake-mode t))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Coffee Script
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Set the node path
-(require 'coffee-mode)
-(add-to-list 'auto-mode-alist '("\\.coffee$" . coffee-mode))
-(add-to-list 'auto-mode-alist '("Cakefile" . coffee-mode))
+(when (require 'coffee-mode nil 'noerror)
+  (add-to-list 'auto-mode-alist '("\\.coffee$" . coffee-mode))
+  (add-to-list 'auto-mode-alist '("Cakefile" . coffee-mode))
 
-(defun coffee-custom ()
-  "coffee-mode-hook"
+  (defun coffee-custom ()
+    "coffee-mode-hook"
 
-  ;; CoffeeScript uses two spaces.
-  (set (make-local-variable 'tab-width) 2)
+    ;; CoffeeScript uses two spaces.
+    (set (make-local-variable 'tab-width) 2)
 
-  ;; If you don't have js2-mode
-  (setq coffee-js-mode 'javascript-mode)
+    ;; If you don't have js2-mode
+    (setq coffee-js-mode 'javascript-mode)
 
-  ;; If you don't want your compiled files to be wrapped
-  (setq coffee-args-compile '("-c" "--bare"))
+    ;; If you don't want your compiled files to be wrapped
+    (setq coffee-args-compile '("-c" "--bare"))
 
-  ;; *Messages* spam
-  (setq coffee-debug-mode t)
+    ;; *Messages* spam
+    (setq coffee-debug-mode t)
 
-  ;; Emacs key binding
-  (define-key coffee-mode-map [(meta r)] 'coffee-compile-buffer)
+    ;; Emacs key binding
+    (define-key coffee-mode-map [(meta r)] 'coffee-compile-buffer)
 
-  ;; Compile '.coffee' files on every save
-  (and (file-exists-p (buffer-file-name))
-       (file-exists-p (coffee-compiled-file-name))
-       (coffee-cos-mode t)))
+    ;; Compile '.coffee' files on every save
+    (and (file-exists-p (buffer-file-name))
+         (file-exists-p (coffee-compiled-file-name))
+         (coffee-cos-mode t)))
 
-(add-hook 'coffee-mode-hook 'coffee-custom)
+  (add-hook 'coffee-mode-hook 'coffee-custom))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Pyhton
@@ -475,5 +475,5 @@
 (server-start))
 
 ;; Support for Chrome 'edit with emacs' extension
-(require 'edit-server)
-(edit-server-start)
+(when (require 'edit-server nil 'noerror)
+  (edit-server-start))
