@@ -16,3 +16,9 @@
 [submodule "vendor/pretty-mode"]
 	path = vendor/pretty-mode
 	url = git://github.com/emacsmirror/pretty-mode.git
+[submodule "vendor/js-comint"]
+	path = vendor/js-comint
+	url = git://github.com/emacsmirror/js-comint.git
+[submodule "vendor/rainbow-mode"]
+	path = vendor/rainbow-mode
+	url = git://github.com/emacsmirror/rainbow-mode.git

@@ -327,7 +327,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; JavaScript
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-( when (require 'flymake-jslint nil 'noerror)
+(when (require 'js-comint nil 'noerror)
+  (setq inferior-js-program-command "node"))
+(when (require 'flymake-jslint nil 'noerror)
 (add-hook 'js-mode-hook (lambda () (flymake-mode t))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -483,6 +485,12 @@
   (ac-config-default)
   (setq ac-comphist-file (concat metafiles-dir "/ac-comphist.dat"))
   (define-key ac-mode-map (kbd "M-TAB") 'auto-complete))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Support for color code color  display in files
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (require 'rainbow-mode nil 'noerror)
+  (add-hook 'css-mode-hook 'rainbow-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Start the Server
