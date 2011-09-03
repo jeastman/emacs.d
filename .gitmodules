@@ -22,3 +22,6 @@
 [submodule "vendor/rainbow-mode"]
 	path = vendor/rainbow-mode
 	url = git://github.com/emacsmirror/rainbow-mode.git
+[submodule "vendor/pianobar"]
+	path = vendor/pianobar
+	url = git://github.com/agrif/pianobar.el.git
