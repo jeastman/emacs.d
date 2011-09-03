@@ -214,6 +214,8 @@
 ;(define-fringe-bitmap 'empty-line [0 0 #x3c #x3c #x3c #x3c 0 0])
 (set-default 'indicate-empty-lines t) ; show fringe bitmap in left edge
 
+(require 'pretty-mode nil 'noerror)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Specific key-bindings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -293,6 +295,11 @@
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Magit
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'magit nil 'noerror)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Markdown
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (when (require 'markdown-mode nil 'noerror)
@@ -354,7 +361,8 @@
          (file-exists-p (coffee-compiled-file-name))
          (coffee-cos-mode t)))
 
-  (add-hook 'coffee-mode-hook 'coffee-custom))
+  (add-hook 'coffee-mode-hook 'coffee-custom)
+  (add-hook 'coffee-mode-hook '(lambda () (flymake-coffee-load))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Pyhton
