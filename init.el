@@ -270,6 +270,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Dired
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; prefer dired over dumping directory to buffer
+(global-set-key "\C-x\C-d" 'dired)
+
 (when (require 'dired-single nil 'noerror)
 
   ;Make sure each dired buffer doesn't spawn new dired buffers
