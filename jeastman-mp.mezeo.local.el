@@ -27,6 +27,7 @@
 ; Org mode
 (setq org-directory "~/Documents/Dropbox/org")
 (setq org-mobile-directory "~/Documents/Dropbox/MobileOrg")
+(setq my-notes "~/Documents/Dropbox/notes")
 
 ; Set to use chromium as browser
 (setq browse-url-browser-function 'browse-url-generic

@@ -27,3 +27,4 @@
 ; Org mode
 (setq org-directory "~/Dropbox/org")
 (setq org-mobile-directory "~/Dropbox/MobileOrg")
+(setq my-notes "~/Dropbox/notes")

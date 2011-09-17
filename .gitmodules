@@ -28,3 +28,24 @@
 [submodule "vendor/smex"]
 	path = vendor/smex
 	url = git://github.com/nonsequitur/smex.git
+[submodule "vendor/emacs-w3m"]
+	path = vendor/emacs-w3m
+	url = git://github.com/emacs-pkg-mirrors/emacs-w3m.git
+[submodule "vendor/multi-term"]
+	path = vendor/multi-term
+	url = git://github.com/emacsmirror/multi-term.git
+[submodule "vendor/deft"]
+	path = vendor/deft
+	url = git://jblevins.org/git/deft.git
+[submodule "vendor/flim"]
+	path = vendor/flim
+	url = git://github.com/wanderlust/flim.git
+[submodule "vendor/semi"]
+	path = vendor/semi
+	url = git://github.com/wanderlust/semi.git
+[submodule "vendor/apel"]
+	path = vendor/apel
+	url = git://github.com/wanderlust/apel.git
+[submodule "vendor/wanderlust"]
+	path = vendor/wanderlust
+	url = git://github.com/wanderlust/wanderlust.git

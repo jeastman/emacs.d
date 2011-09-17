@@ -6,7 +6,6 @@ git submodule update
 cd ~/.emacs.d/vendor
 
 wget http://www.northbound-train.com/emacs/dired-single.el
-wget http://www.emacswiki.org/emacs/download/multi-term.el
 
 cd /tmp
 wget http://cx4a.org/pub/auto-complete/auto-complete-1.3.1.tar.bz2
