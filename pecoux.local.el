@@ -8,8 +8,13 @@
 (setq markdown-command "/usr/local/bin/mmd")
 
 ; Erlang paths
-(add-to-list 'load-path "/usr/local/Cellar/erlang/R14B03/lib/erlang/lib/tools-2.6.6.4/emacs")
-(setq erlang-root-dir "/usr/local/Cellar/erlang/R14B03")
+(add-to-list 'load-path "/usr/local/Cellar/erlang/R15B01/lib/erlang/lib/tools-2.6.7/emacs")
+(setq erlang-root-dir "/usr/local/Cellar/erlang/R15B01")
+(setq erlang-man-dirs
+  '(("Man - Commands" "share/man/man1" t)
+    ("Man - Modules" "share/man/man3" t)
+    ("Man - Files" "share/man/man4" t)
+    ("Man - Applications" "share/man/man6" t)))
 
 ; lintnode location
 (setq lintnode-location "/Users/jeastman/Projects/l/lintnode")

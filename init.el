@@ -6,7 +6,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Fix up path - make sure usr/local is at top
-(setenv "PATH" (concat "/usr/local/bin:/usr/local/sbin:" (getenv "PATH")))
+(setenv "PATH" (concat "/usr/local/bin:/usr/local/sbin:/usr/texbin:" (getenv "PATH")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Library Paths
@@ -72,7 +72,8 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-enabled-themes (quote (wombat)))
- '(custom-safe-themes (quote ("bf8c80820d13f0cd019c797c0b053222f87245a5" default))))
+ '(custom-safe-themes (quote ("bf8c80820d13f0cd019c797c0b053222f87245a5" default)))
+ '(safe-local-variable-values (quote ((erlang-indent-level . 4) (after-save-hook archive-done-tasks)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -234,6 +235,10 @@
 ;(define-fringe-bitmap 'empty-line [0 0 #x3c #x3c #x3c #x3c 0 0])
 (set-default 'indicate-empty-lines t) ; show fringe bitmap in left edge
 
+; cause Emacs to fully redraw the display before it processes queued
+; input events - slight performance tweak for newer machines
+(setq redisplay-dont-pause t)
+
 (require 'pretty-mode nil 'noerror)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -334,6 +339,12 @@
 ;; Org
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (load-library "jme-org")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; LaTeX
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun flymake-get-tex-args (file-name)
+    (list "/usr/texbin/chktex" (list "-q" "-I" "-H" "-v0" file-name)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Lisp mode hooks
