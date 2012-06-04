@@ -49,3 +49,9 @@
 [submodule "vendor/wanderlust"]
 	path = vendor/wanderlust
 	url = git://github.com/wanderlust/wanderlust.git
+[submodule "vendor/nosemacs"]
+	path = vendor/nosemacs
+	url = https://github.com/emacsmirror/nose.git
+[submodule "vendor/pycoverage.el"]
+	path = vendor/pycoverage.el
+	url = https://github.com/mattharrison/pycoverage.el.git
