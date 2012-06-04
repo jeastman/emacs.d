@@ -2,6 +2,9 @@
 ;; Path specific configuration for pecoux
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; Prevent finder from open new frame
+(setq ns-pop-up-frames 'nil)
+
 ; Use aspell instead of ispell
 (setq-default ispell-program-name "/usr/local/bin/aspell")
 ; Use multi-markdown instead of markdown
