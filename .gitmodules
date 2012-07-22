@@ -1,42 +1,12 @@
-[submodule "vendor/coffee-mode"]
-	path = vendor/coffee-mode
-	url = git://github.com/defunkt/coffee-mode.git
 [submodule "vendor/markdown-mode"]
 	path = vendor/markdown-mode
 	url = git://github.com/defunkt/markdown-mode.git
-[submodule "vendor/magit"]
-	path = vendor/magit
-	url = git://github.com/technomancy/magit.git
-[submodule "vendor/autopair"]
-	path = vendor/autopair
-	url = git://github.com/emacsmirror/autopair.git
-[submodule "vendor/flymake-coffee"]
-	path = vendor/flymake-coffee
-	url = git://github.com/purcell/flymake-coffee.git
-[submodule "vendor/pretty-mode"]
-	path = vendor/pretty-mode
-	url = git://github.com/emacsmirror/pretty-mode.git
-[submodule "vendor/js-comint"]
-	path = vendor/js-comint
-	url = git://github.com/emacsmirror/js-comint.git
-[submodule "vendor/rainbow-mode"]
-	path = vendor/rainbow-mode
-	url = git://github.com/emacsmirror/rainbow-mode.git
 [submodule "vendor/pianobar"]
 	path = vendor/pianobar
 	url = git://github.com/agrif/pianobar.el.git
 [submodule "vendor/smex"]
 	path = vendor/smex
 	url = git://github.com/nonsequitur/smex.git
-[submodule "vendor/emacs-w3m"]
-	path = vendor/emacs-w3m
-	url = git://github.com/emacs-pkg-mirrors/emacs-w3m.git
-[submodule "vendor/multi-term"]
-	path = vendor/multi-term
-	url = git://github.com/emacsmirror/multi-term.git
-[submodule "vendor/deft"]
-	path = vendor/deft
-	url = git://jblevins.org/git/deft.git
 [submodule "vendor/flim"]
 	path = vendor/flim
 	url = git://github.com/wanderlust/flim.git
@@ -49,9 +19,9 @@
 [submodule "vendor/wanderlust"]
 	path = vendor/wanderlust
 	url = git://github.com/wanderlust/wanderlust.git
-[submodule "vendor/nosemacs"]
-	path = vendor/nosemacs
-	url = https://github.com/emacsmirror/nose.git
 [submodule "vendor/pycoverage.el"]
 	path = vendor/pycoverage.el
 	url = https://github.com/mattharrison/pycoverage.el.git
+[submodule "vendor/bind-key"]
+	path = vendor/bind-key
+	url = git://github.com/jwiegley/bind-key.git

@@ -1,8 +1,5 @@
 elpa
-vendor/autopair.el
 vendor/dired-single.el
-vendor/markdown-mode.el
-vendor/multi-term.el
 vendor/flymake-jslint.el
 vendor/edit-server.el
 vendor/auto-complete/*el
@@ -19,3 +16,5 @@ vendor/auto-complete/ac-dict/ruby-mode
 vendor/auto-complete/ac-dict/scheme-mode
 vendor/auto-complete/ac-dict/tcl-mode
 .DS_Store
+url
+eshell

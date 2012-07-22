@@ -9,6 +9,29 @@
 (setenv "PATH" (concat "/usr/local/bin:/usr/local/sbin:/usr/texbin:" (getenv "PATH")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; set up package management
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'package)
+(add-to-list 'package-archives 
+             '("marmalade" .
+               "http://marmalade-repo.org/packages/") t)
+(add-to-list 'package-archives
+             '("melpa" .
+               "http://melpa.milkbox.net/packages/") t)
+(package-initialize)
+
+(defvar my-packages
+  '(ace-jump-mode autopair clojure-mode coffee-mode deft expand-region flymake-coffee helm j2s-mode magit magithub markdown-mode markdown-mode+ multi-term nose paredit pretty-mode rainbow-mode slime slime-js w3m)
+  "List of packages to ensure are installed at startup.")
+
+(mapc
+ (lambda (package)
+   (or (package-installed-p package)
+       (if (y-or-n-p (format "Package %s is missing. Install it? " package))
+           (package-install package))))
+ my-packages)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Library Paths
 ;; Everything is situated underneath dotfiles-dir (~/.emacs.d)
 ;; This should make everything self-contained and easy to migrate
@@ -84,6 +107,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General Settings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'bind-key)
 (set-terminal-coding-system 'utf-8) ; set terminal output to utf-8
 (set-keyboard-coding-system 'utf-8) ; set terminal input to utf-8
 (prefer-coding-system 'utf-8)       ; set preferred coding to utf-8
@@ -242,13 +266,103 @@
 (require 'pretty-mode nil 'noerror)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Window sizing
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(eval-when-compile
+  (defvar emacs-min-top)
+  (defvar emacs-min-left)
+  (defvar emacs-min-height)
+  (defvar emacs-min-width))
+
+(unless noninteractive
+  (defvar emacs-min-top 22)
+  (defvar emacs-min-left 5)
+  (defvar emacs-min-height (if (= 1050 (x-display-pixel-height)) 55 64))
+  (defvar emacs-min-width 100))
+
+(defun emacs-min ()
+  (interactive)
+  (set-frame-parameter (selected-frame) 'fullscreen nil)
+  (set-frame-parameter (selected-frame) 'vertical-scroll-bars nil)
+  (set-frame-parameter (selected-frame) 'horizontal-scroll-bars nil)
+  (set-frame-parameter (selected-frame) 'top emacs-min-top)
+  (set-frame-parameter (selected-frame) 'left emacs-min-left)
+  (set-frame-parameter (selected-frame) 'height emacs-min-height)
+  (set-frame-parameter (selected-frame) 'width emacs-min-width))
+
+(if window-system
+    (add-hook 'after-init-hook 'emacs-min))
+
+(defun emacs-max ()
+  (interactive)
+  (if t
+      (progn
+        (set-frame-parameter (selected-frame) 'fullscreen 'fullboth)
+        (set-frame-parameter (selected-frame) 'vertical-scroll-bars nil)
+        (set-frame-parameter (selected-frame) 'horizontal-scroll-bars nil))
+    (set-frame-parameter (selected-frame) 'top 26)
+    (set-frame-parameter (selected-frame) 'left 2)
+    (set-frame-parameter (selected-frame) 'width
+                         (floor (/ (float (x-display-pixel-width)) 9.15)))
+    (if (= 1050 (x-display-pixel-height))
+        (set-frame-parameter (selected-frame) 'height
+                             (if (>= emacs-major-version 24)
+                                 66
+                               55))
+      (set-frame-parameter (selected-frame) 'height
+                           (if (>= emacs-major-version 24)
+                               75
+                             64)))))
+
+(defun emacs-toggle-size ()
+  (interactive)
+  (if (> (cdr (assq 'width (frame-parameters))) 100)
+      (emacs-min)
+    (emacs-max)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Utility functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun hide-or-expand ()
+  (interactive)
+  (if (> (length (window-list)) 1)
+      (delete-other-windows)
+    (bury-buffer)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Mark and pop
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defvar push-mark-before-goto-char nil)
+
+(defadvice goto-char (before push-mark-first activate)
+  (when push-mark-before-goto-char
+    (push mark)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Specific key-bindings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; Don't need C-z to minimize, put it to better use
-(if window-system (progn
-    (global-set-key "\C-z" 'multi-term-next)
-    (global-set-key "\C-x\C-z" 'multi-term-next)))
+;(if window-system (progn
+;    (global-set-key "\C-z" 'multi-term-next)
+;    (global-set-key "\C-x\C-z" 'multi-term-next)))
+(bind-key "C-z" 'hide-or-expand)
+
+(bind-key "M-`" 'other-frame)
+(bind-key "C-`" 'pop-to-mark-command)
+
+(when (package-installed-p 'expand-region)
+    (bind-key "C-=" 'er/expand-region))
+
+;; C-c map
+
+(bind-key "C-c m" 'emacs-toggle-size)
+
+;; C-. map
+
+(when (package-installed-p 'ace-jump-mode)
+    (bind-key "C-. C-s" 'ace-jump-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spell check
@@ -372,8 +486,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Set the node path
 (when (require 'coffee-mode nil 'noerror)
-  (add-to-list 'auto-mode-alist '("\\.coffee$" . coffee-mode))
-  (add-to-list 'auto-mode-alist '("Cakefile" . coffee-mode))
 
   (defun coffee-custom ()
     "coffee-mode-hook"
@@ -520,6 +632,34 @@
   (ac-config-default)
   (setq ac-comphist-file (concat metafiles-dir "/ac-comphist.dat"))
   (define-key ac-mode-map (kbd "M-TAB") 'auto-complete))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Helm
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (package-installed-p 'helm)
+  (require 'helm-misc)
+  (bind-key "C-c M-x" 'helm-M-x)
+  (bind-key "C-h a" 'helm-c-apropos)
+  (bind-key "M-s a" 'helm-do-grep)
+  (bind-key "M-s b" 'helm-occur)
+  (bind-key "M-s F" 'helm-for-files))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; swank-js support
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (package-installed-p 'slime-js)
+  (add-hook 'js2-mode-hook
+            (lambda ()
+              (slime-js-minor-mode 1)))
+  (add-hook 'css-mode-hook
+            (lambda ()
+              (define-key css-mode-map "\M-\C-x" 'slime-js-refresh-css)
+              (define-key css-mode-map "\C-c\C-r" 'slime-js-embed-css))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; w3m
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq w3m-use-cookies t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Support for color code color  display in files

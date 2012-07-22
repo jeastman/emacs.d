@@ -36,3 +36,19 @@
 (setq org-directory "~/Dropbox/org")
 (setq org-mobile-directory "~/Dropbox/MobileOrg")
 (setq my-notes "~/Dropbox/notes")
+
+; Set preferred sources for helm
+(if (package-installed-p 'helm)
+    (progn (require 'helm-misc)
+     (setq helm-for-files-preferred-list
+           (quote
+            (helm-c-source-ffap-line
+             helm-c-source-ffap-guesser
+             helm-c-source-buffers-list
+             helm-c-source-recentf
+             helm-c-source-bookmarks
+             helm-c-source-file-cache
+             helm-c-source-files-in-current-dir
+             helm-c-source-mac-spotlight)))))
+
+
