@@ -21,7 +21,7 @@
 (package-initialize)
 
 (defvar my-packages
-  '(ace-jump-mode autopair clojure-mode coffee-mode deft expand-region flymake-coffee helm j2s-mode magit magithub markdown-mode markdown-mode+ multi-term nose paredit pretty-mode rainbow-mode slime slime-js w3m)
+  '(ace-jump-mode autopair clojure-mode coffee-mode deft expand-region flymake-coffee helm js2-mode magit magithub markdown-mode markdown-mode+ multi-term nose paredit pretty-mode rainbow-mode slime slime-js w3m)
   "List of packages to ensure are installed at startup.")
 
 (mapc
