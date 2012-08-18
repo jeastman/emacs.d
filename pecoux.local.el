@@ -1,9 +1,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Path specific configuration for pecoux
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Choose a nice mac font
+(set-face-attribute 'default nil :font "Consolas-14")
 
 ; Prevent finder from open new frame
 (setq ns-pop-up-frames 'nil)
+
+; Move to trash when deleting stuff
+(setq delete-by-moving-to-trash t
+      trash-directory "~/.Trash/emacs")
 
 ; Use aspell instead of ispell
 (setq-default ispell-program-name "/usr/local/bin/aspell")
