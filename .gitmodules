@@ -1,24 +1,6 @@
-[submodule "vendor/markdown-mode"]
-	path = vendor/markdown-mode
-	url = git://github.com/defunkt/markdown-mode.git
 [submodule "vendor/pianobar"]
 	path = vendor/pianobar
 	url = git://github.com/agrif/pianobar.el.git
-[submodule "vendor/smex"]
-	path = vendor/smex
-	url = git://github.com/nonsequitur/smex.git
-[submodule "vendor/flim"]
-	path = vendor/flim
-	url = git://github.com/wanderlust/flim.git
-[submodule "vendor/semi"]
-	path = vendor/semi
-	url = git://github.com/wanderlust/semi.git
-[submodule "vendor/apel"]
-	path = vendor/apel
-	url = git://github.com/wanderlust/apel.git
-[submodule "vendor/wanderlust"]
-	path = vendor/wanderlust
-	url = git://github.com/wanderlust/wanderlust.git
 [submodule "vendor/pycoverage.el"]
 	path = vendor/pycoverage.el
 	url = https://github.com/mattharrison/pycoverage.el.git
