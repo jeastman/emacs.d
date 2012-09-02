@@ -21,7 +21,7 @@
 (package-initialize)
 
 (defvar my-packages
-  '(ace-jump-mode autopair coffee-mode deft expand-region flymake-coffee helm js2-mode magit magithub markdown-mode markdown-mode+ multi-term nose paredit pretty-mode rainbow-delimiters rainbow-mode slime slime-repl slime-js w3m)
+  '(ace-jump-mode autopair auto-complete coffee-mode deft expand-region flymake-coffee helm js2-mode magit magithub markdown-mode markdown-mode+ multi-term nose paredit pretty-mode rainbow-delimiters rainbow-mode slime slime-repl slime-js smex w3m)
   "List of packages to ensure are installed at startup.")
 
 (mapc
@@ -210,7 +210,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Smex
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'smex)
 (smex-initialize)
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "M-X") 'smex-major-mode-commands)
@@ -628,7 +627,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;(add-to-list 'load-path (concat ...))
 (when (require 'auto-complete-config nil 'noerror)
-  (add-to-list 'ac-dictionary-directories (concat dotfiles-dir "vendor/auto-complete/ac-dict"))
   (ac-config-default)
   (setq ac-comphist-file (concat metafiles-dir "/ac-comphist.dat"))
   (define-key ac-mode-map (kbd "M-TAB") 'auto-complete))
