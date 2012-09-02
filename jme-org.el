@@ -108,11 +108,11 @@
 ;; #+ARCHIVE: archive.txt::
 ;;
 
-(defvar org-my-archive-expiry-days 7
+(defvar jme/org-archive-expiry-days 7
   "The number of days after which a completed task should be auto-archived.
 This can be 0 for immediate, or a floating point value.")
 
-(defun org-my-archive-done-tasks ()
+(defun jme/org-archive-done-tasks ()
   (interactive)
   (save-excursion
     (goto-char (point-min))
@@ -134,13 +134,13 @@ This can be 0 for immediate, or a floating point value.")
                 (if (>= (time-to-number-of-days
                          (time-subtract (current-time)
                                         (apply #'encode-time when-closed)))
-                        org-my-archive-expiry-days)
+                        jme/org-archive-expiry-days)
                     (org-archive-subtree)))
             (goto-char end)))))
     (save-buffer)))
 
 (setq safe-local-variable-values (quote ((after-save-hook archive-done-tasks))))
-(defalias 'archive-done-tasks 'org-my-archive-done-tasks)
+(defalias 'archive-done-tasks 'jme/org-archive-done-tasks)
 
 ;; Uncomment the following to always use flyspell in org mode
 ;(add-hook 'org-mode-hook 'turn-on-flyspell)
