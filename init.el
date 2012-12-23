@@ -21,7 +21,7 @@
 (package-initialize)
 
 (defvar my-packages
-  '(ace-jump-mode autopair auto-complete coffee-mode deft expand-region flymake-coffee helm js2-mode magit magithub markdown-mode markdown-mode+ multi-term nose paredit pretty-mode rainbow-delimiters rainbow-mode slime slime-repl slime-js smex w3m)
+  '(ace-jump-mode autopair auto-complete coffee-mode deft dired+ expand-region flymake-coffee helm js2-mode magit magithub markdown-mode markdown-mode+ multi-term nose paredit pretty-mode rainbow-delimiters rainbow-mode slime slime-repl slime-js smex w3m)
   "List of packages to ensure are installed at startup.")
 
 (mapc
@@ -128,8 +128,6 @@
 (global-whitespace-mode 1)          ; Always enable whitespace minor mode
 
 (setq-default tab-width 4)          ; set the default tab width
-
-(recentf-mode 1)                    ; Save list of recent files visited
 
 ; Auto revert mode
 (global-auto-revert-mode 1)         ; Reverts buffers when they change on disk
@@ -273,11 +271,12 @@
   (defvar emacs-min-height)
   (defvar emacs-min-width))
 
-(unless noninteractive
-  (defvar emacs-min-top 22)
-  (defvar emacs-min-left 5)
-  (defvar emacs-min-height (if (= 1050 (x-display-pixel-height)) 55 64))
-  (defvar emacs-min-width 100))
+(if window-system
+    (unless noninteractive
+      (defvar emacs-min-top 22)
+      (defvar emacs-min-left 5)
+      (defvar emacs-min-height (if (= 1050 (x-display-pixel-height)) 55 64))
+      (defvar emacs-min-width 100)))
 
 (defun emacs-min ()
   (interactive)
@@ -383,17 +382,28 @@
 (define-key comint-mode-map [(control meta p)]
     'comint-previous-input)
 
-(setq comint-completion-autolist t	;list possibilities on partial completion
-       comint-completion-recexact nil	;use shortest compl. if characters cannot be added
+;;(setq comint-completion-autolist t	;list possibilities on partial completion
+;;       comint-completion-recexact nil	;use shortest compl. if characters cannot be added
        ;; how many history items are stored in comint-buffers (e.g. py- shell)
        ;; use the HISTSIZE environment variable that shells use (if avail.)
        ;; (default is 32)
-       comint-input-ring-size (string-to-number (or (getenv  
-"HISTSIZE") "100")))
+;;       comint-input-ring-size (string-to-number (or (getenv  
+;;"HISTSIZE") "100")))
+
+(add-hook 'term-mode-hook
+          #'(lambda () 
+              (setq autopair-dont-activate t) ;; for emacsen < 24
+              (autopair-mode -1))             ;; for emacsen >= 24
+          )
+
+(add-hook 'term-exec-hook
+          (function
+           (lambda ()
+             (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))))
 
 (autoload 'multi-term "multi-term" nil t)
 (autoload 'multi-term-next "multi-term" nil t)
-(setq multi-term-program "/bin/bash")   ;; use bash
+;;(setq multi-term-program "/bin/bash")   ;; use bash
 ;; only needed if you use autopair
 (add-hook 'term-mode-hook
       #'(lambda () (setq autopair-dont-activate t)))
@@ -410,6 +420,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; prefer dired over dumping directory to buffer
+(require 'dired+)
+(put 'dired-find-alternate-file 'disabled nil)  ;enable `a' command
 (global-set-key "\C-x\C-d" 'dired)
 
 (when (require 'dired-single nil 'noerror)
@@ -664,6 +676,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (when (require 'rainbow-mode nil 'noerror)
   (add-hook 'css-mode-hook 'rainbow-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Newsticker
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq newsticker-cache-filename (concat metafiles-dir "/.newsticker-cache"))
+(setq newsticker-dir (concat metafiles-dir "/newsticker/"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Pianobar
