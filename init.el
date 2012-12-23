@@ -9,29 +9,6 @@
 (setenv "PATH" (concat "/usr/local/bin:/usr/local/sbin:/usr/texbin:" (getenv "PATH")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; set up package management
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'package)
-(add-to-list 'package-archives 
-             '("marmalade" .
-               "http://marmalade-repo.org/packages/") t)
-(add-to-list 'package-archives
-             '("melpa" .
-               "http://melpa.milkbox.net/packages/") t)
-(package-initialize)
-
-(defvar my-packages
-  '(ace-jump-mode autopair auto-complete coffee-mode deft dired+ expand-region flymake-coffee helm js2-mode magit magithub markdown-mode markdown-mode+ multi-term nose paredit pretty-mode rainbow-delimiters rainbow-mode slime slime-repl slime-js smex w3m)
-  "List of packages to ensure are installed at startup.")
-
-(mapc
- (lambda (package)
-   (or (package-installed-p package)
-       (if (y-or-n-p (format "Package %s is missing. Install it? " package))
-           (package-install package))))
- my-packages)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Library Paths
 ;; Everything is situated underneath dotfiles-dir (~/.emacs.d)
 ;; This should make everything self-contained and easy to migrate
@@ -44,6 +21,64 @@
 (setq dotfiles-dir (file-name-directory
     (or (buffer-file-name) load-file-name)))
 (setq metafiles-dir "~/.emacs-meta")
+(unless (file-exists-p metafiles-dir)
+  (make-directory metafiles-dir))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; set up package management
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'package)
+(setq elpa-dir (concat dotfiles-dir "elpa"))
+(setq elpa-archives-dir (concat elpa-dir "/archives"))
+
+(add-to-list 'package-archives 
+             '("marmalade" .
+               "http://marmalade-repo.org/packages/") t)
+(add-to-list 'package-archives
+             '("melpa" .
+               "http://melpa.milkbox.net/packages/") t)
+(package-initialize)
+
+;; The first time this is loaded, the archieves will not have been
+;; cataloged.
+(unless (file-exists-p elpa-archives-dir)
+  (package-refresh-contents))
+
+(defvar my-packages
+  '(
+    ace-jump-mode
+    auto-complete
+    autopair
+    coffee-mode
+    deft
+    dired+
+    expand-region
+    flymake-coffee
+    helm
+    js2-mode
+    magit
+    magithub
+    markdown-mode
+    markdown-mode+
+    multi-term
+    nose
+    paredit
+    pretty-mode
+    rainbow-delimiters
+    rainbow-mode
+    slime
+    slime-js
+    slime-repl
+    smex
+    w3m)
+  "List of packages to ensure are installed at startup.")
+
+(mapc
+ (lambda (package)
+   (or (package-installed-p package)
+       (if (y-or-n-p (format "Package %s is missing. Install it? " package))
+           (package-install package))))
+ my-packages)
 
 ;; Update load path
 (add-to-list 'load-path dotfiles-dir)
@@ -64,8 +99,11 @@
 (setq meta-tramp (concat metafiles-dir "/tramp"))
 
 ; Keep 3rd-party libraries in vendor directory
-(add-to-list 'load-path (concat dotfiles-dir "vendor"))
-(let ((default-directory (concat dotfiles-dir "vendor")))
+(setq vendor-dir (concat dotfiles-dir "vendor"))
+(unless (file-exists-p vendor-dir)
+  (make-directory vendor-dir))
+(add-to-list 'load-path vendor-dir)
+(let ((default-directory vendor-dir))
      (normal-top-level-add-subdirs-to-load-path))
 
 (add-to-list 'exec-path "/usr/local/bin")
@@ -75,7 +113,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Support for system and user specific stuff
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setq system-specific-config (concat dotfiles-dir system-name ".el")
+(setq system-specific-config (concat dotfiles-dir (car (split-string (system-name) "\\.")) ".el")
     user-specific-config (concat dotfiles-dir user-login-name ".el")
     user-specific-dir (concat dotfiles-dir user-login-name))
 (add-to-list 'load-path user-specific-dir)
