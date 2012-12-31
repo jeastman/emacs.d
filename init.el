@@ -169,6 +169,10 @@
 
 ; Auto revert mode
 (global-auto-revert-mode 1)         ; Reverts buffers when they change on disk
+; Also auto refresh dired
+(setq global-auto-revert-non-file-buffers t)
+; Don't announce revert buffer
+(setq auto-revert-verbose nil)
 
 ; uniquify: unique buffer names
 (require 'uniquify) ;; make buffer names more unique
