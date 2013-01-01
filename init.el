@@ -685,8 +685,9 @@
 ;;(add-to-list 'load-path (concat ...))
 (when (require 'auto-complete-config nil 'noerror)
   (ac-config-default)
+  (setq ac-user-dictionary-files (concat metafiles-dir "/.dict"))
   (setq ac-comphist-file (concat metafiles-dir "/ac-comphist.dat"))
-  (define-key ac-mode-map (kbd "M-TAB") 'auto-complete))
+  (define-key ac-mode-map (kbd "S-TAB") 'auto-complete))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Helm
