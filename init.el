@@ -52,11 +52,15 @@
     auto-complete
     autopair
     coffee-mode
+    deferred
     deft
     dired+
+    epc
     expand-region
     flymake-coffee
     helm
+    ipython
+    jedi
     js2-mode
     magit
     magithub
@@ -606,6 +610,10 @@
 
 (add-hook 'post-command-hook 'show-fly-err-at-point)
 
+;; Jedi for Python
+(eval-when-compile (require 'jedi nil t))
+(setq jedi:setup-keys t)
+(add-hook 'python-mode-hook 'jedi:setup)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ido-mode
