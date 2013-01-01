@@ -1,4 +1,4 @@
-(require 'org-install)
+(require 'org)
 ;; Org-mode settings
 (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
 (add-to-list 'auto-mode-alist '("\\.org.txt$" . org-mode))
