@@ -23,6 +23,8 @@
 (setq metafiles-dir "~/.emacs-meta")
 (unless (file-exists-p metafiles-dir)
   (make-directory metafiles-dir))
+;; Custome themes
+(setq custom-theme-directory (concat dotfiles-dir "themes"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; set up package management
@@ -132,8 +134,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes (quote (wombat)))
- '(custom-safe-themes (quote ("bf8c80820d13f0cd019c797c0b053222f87245a5" default)))
+ '(custom-enabled-themes (quote (tomorrow-night)))
+ '(custom-safe-themes (quote ("f09bdd55e1e9d1f790ffb36b84b2dcdaca5c1db336e8127e0b11cfc971bdd64b" default)))
  '(safe-local-variable-values (quote ((erlang-indent-level . 4) (after-save-hook archive-done-tasks)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
