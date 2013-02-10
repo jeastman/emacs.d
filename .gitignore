@@ -1,5 +1,4 @@
 elpa
-vendor/dired-single.el
 vendor/flymake-jslint.el
 vendor/edit-server.el
 .DS_Store
