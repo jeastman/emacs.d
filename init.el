@@ -23,6 +23,9 @@
 (setq metafiles-dir "~/.emacs-meta")
 (unless (file-exists-p metafiles-dir)
   (make-directory metafiles-dir))
+(setq temporary-file-directory (concat metafiles-dir "/tmp/"))
+(unless (file-exists-p temporary-file-directory)
+  (make-directory temporary-file-directory))
 ;; Custome themes
 (setq custom-theme-directory (concat dotfiles-dir "themes"))
 
@@ -33,7 +36,7 @@
 (setq elpa-dir (concat dotfiles-dir "elpa"))
 (setq elpa-archives-dir (concat elpa-dir "/archives"))
 
-(add-to-list 'package-archives 
+(add-to-list 'package-archives
              '("marmalade" .
                "http://marmalade-repo.org/packages/") t)
 (add-to-list 'package-archives
@@ -55,9 +58,14 @@
     deferred
     deft
     dired+
+    dired-details
+    dired-details+
+    dired-single
     epc
     expand-region
     flymake-coffee
+    graphviz-dot-mode
+    handlebars-mode
     helm
     ipython
     jedi
@@ -69,6 +77,7 @@
     multi-term
     nose
     paredit
+    powerline
     pretty-mode
     rainbow-delimiters
     rainbow-mode
@@ -113,6 +122,7 @@
      (normal-top-level-add-subdirs-to-load-path))
 
 (add-to-list 'exec-path "/usr/local/bin")
+(add-to-list 'exec-path "/usr/local/share/npm/bin")
 
 (require 'cl)
 
@@ -139,7 +149,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-enabled-themes (quote (tomorrow-night)))
- '(custom-safe-themes (quote ("f09bdd55e1e9d1f790ffb36b84b2dcdaca5c1db336e8127e0b11cfc971bdd64b" default)))
+ '(custom-safe-themes (quote ("dd7dc55384f8cebb079cca2c829dded105e5b4968b5d69eae638b516021ecc7e" default)))
  '(safe-local-variable-values (quote ((erlang-indent-level . 4) (after-save-hook archive-done-tasks)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -148,6 +158,7 @@
  ;; If there is more than one, they won't work right.
  )
 
+(powerline-default-theme)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General Settings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -164,9 +175,9 @@
       truncate-partial-width-windows nil ; respect 'truncate-lines'
       uniquify-buffer-name-style 'forward ; sane paths in buffer names
       whitespace-style '(faces trailing lines-tail space-before-tab
-			       indentation space-after-tab) ; whitespace handline
+                   indentation space-after-tab) ; whitespace handline
       whitespace-line-column 80     ; lines longer than this are highlighted
-      ediff-window-setup-function 'ediff-setup-windows-plain 
+      ediff-window-setup-function 'ediff-setup-windows-plain
       save-place-file meta-places)  ; Where to store the places file
 
 (global-whitespace-mode 1)          ; Always enable whitespace minor mode
@@ -204,6 +215,8 @@
 ; make emacs use the clipboard
 (setq x-select-enable-clipboard t)
 
+(winner-mode 1) ; turn on winner mode
+
 (random t) ; Seed the random-number generator
 
 ; Allow narrowing
@@ -238,9 +251,10 @@
       meta-saves)
 
 (setq-default flymake-no-changes-timeout '3) ; timeout for flymake
+(setq flymake-run-in-place nil)
 
-(when (require 'autopair nil 'noerror)
-  (autopair-global-mode))              ; enable autopair in all buffers
+;(when (require 'autopair nil 'noerror)
+;  (autopair-global-mode))              ; enable autopair in all buffers
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; deft
@@ -279,7 +293,8 @@
 
 ; Set the font to use
 (if (eq window-system 'ns)                   ; only setting on MacOS for now
-    (set-default-font "Consolas-14"))
+    (set-default-font "Monaco-14"))
+;    (set-default-font "Consolas-14"))
 
 ; Set up smooth scrolling
 (setq scroll-step 1)
@@ -431,16 +446,16 @@
 (define-key comint-mode-map [(control meta p)]
     'comint-previous-input)
 
-;;(setq comint-completion-autolist t	;list possibilities on partial completion
-;;       comint-completion-recexact nil	;use shortest compl. if characters cannot be added
+;;(setq comint-completion-autolist t    ;list possibilities on partial completion
+;;       comint-completion-recexact nil ;use shortest compl. if characters cannot be added
        ;; how many history items are stored in comint-buffers (e.g. py- shell)
        ;; use the HISTSIZE environment variable that shells use (if avail.)
        ;; (default is 32)
-;;       comint-input-ring-size (string-to-number (or (getenv  
+;;       comint-input-ring-size (string-to-number (or (getenv
 ;;"HISTSIZE") "100")))
 
 (add-hook 'term-mode-hook
-          #'(lambda () 
+          #'(lambda ()
               (setq autopair-dont-activate t) ;; for emacsen < 24
               (autopair-mode -1))             ;; for emacsen >= 24
           )
@@ -453,9 +468,6 @@
 (autoload 'multi-term "multi-term" nil t)
 (autoload 'multi-term-next "multi-term" nil t)
 ;;(setq multi-term-program "/bin/bash")   ;; use bash
-;; only needed if you use autopair
-(add-hook 'term-mode-hook
-      #'(lambda () (setq autopair-dont-activate t)))
 (global-set-key (kbd "C-c t") 'multi-term-next)
 (global-set-key (kbd "C-c T") 'multi-term) ;; create a new one
 
@@ -472,6 +484,11 @@
 (require 'dired+)
 (put 'dired-find-alternate-file 'disabled nil)  ;enable `a' command
 (global-set-key "\C-x\C-d" 'dired)
+
+;; Make dired less verbose
+(require 'dired-details)
+;;(setq-default dired-details-hidden-string "--- ")
+(dired-details-install)
 
 (when (require 'dired-single nil 'noerror)
 
@@ -538,8 +555,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (when (require 'js-comint nil 'noerror)
   (setq inferior-js-program-command "node"))
-(when (require 'flymake-jslint nil 'noerror)
-(add-hook 'js-mode-hook (lambda () (flymake-mode t))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Coffee Script
@@ -576,7 +591,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Pyhton
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;(setq python-remove-cwd-from-path nil)
+(setq python-remove-cwd-from-path nil)
 
 ; Bring back indent after newline
 (add-hook 'python-mode-hook '(lambda ()
@@ -598,17 +613,17 @@
 
 ;; To avoid having to mouse hover for the error message, these functions
 ;; make flymake error messages appear in the minibuffer
-(defun show-fly-err-at-point ()
-  "If the cursor is sitting on a flymake error, display the message in the minibuffer"
-  (require 'cl)
-  (interactive)
-  (let ((line-no (line-number-at-pos)))
-    (dolist (elem flymake-err-info)
-      (if (eq (car elem) line-no)
-          (let ((err (car (second elem))))
-            (message "%s" (flymake-ler-text err)))))))
+;; (defun show-fly-err-at-point ()
+;;   "If the cursor is sitting on a flymake error, display the message in the minibuffer"
+;;   (require 'cl)
+;;   (interactive)
+;;   (let ((line-no (line-number-at-pos)))
+;;     (dolist (elem flymake-err-info)
+;;       (if (eq (car elem) line-no)
+;;           (let ((err (car (second elem))))
+;;             (message "%s" (flymake-ler-text err)))))))
 
-(add-hook 'post-command-hook 'show-fly-err-at-point)
+;; (add-hook 'post-command-hook 'show-fly-err-at-point)
 
 ;; Jedi for Python
 (eval-when-compile (require 'jedi nil t))

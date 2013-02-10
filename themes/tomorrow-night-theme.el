@@ -29,7 +29,13 @@
       (aqua "#8abeb7")
       (blue "#81a2be")
       (purple "#b294bb")
-      (white "#ffffff"))
+      (white "#ffffff")
+      (spray0 "#e3e3e3")
+      (spray1 "#cadbd8")      
+      (spray2 "#9db8bd")
+      (spray3 "#6f9ca6")
+      (spray4 "#58595e")
+      (spray5 "#3d3c39"))
 
   (custom-theme-set-faces
    'tomorrow-night
@@ -43,8 +49,14 @@
    `(link ((t (:foreground ,blue))))
    `(link-visited ((t (:foreground ,purple))))
    `(minibuffer-prompt ((t (:foreground ,blue))))
-   `(mode-line ((t (:background ,selection :foreground ,foreground))))
-   `(mode-line-inactive ((t (:background ,current-line :foreground ,foreground))))
+;;   `(mode-line ((t (:background ,selection :foreground ,foreground))))
+   `(mode-line ((t (:background ,spray3 :foreground ,background :family "Lucida Grande"))))
+   `(powerline-active1 ((t (:background ,spray2 :foreground ,background :family "Lucida Grande"))))
+   `(powerline-active2 ((t (:background ,spray4 :foreground ,foreground :family "Lucida Grande"))))
+;;   `(mode-line-inactive ((t (:background ,current-line :foreground ,foreground))))
+   `(mode-line-inactive ((t (:background ,comment :foreground ,selection :family "Lucida Grande"))))
+   `(powerline-inactive1 ((t (:background ,spray1 :foreground ,selection :family "Lucida Grande"))))
+   `(powerline-inactive2 ((t (:background ,spray4 :foreground ,foreground :family "Lucida Grande"))))
    `(region ((t (:background ,selection))))
    `(secondary-selection ((t (:background ,blue))))
    `(shadow ((t (:foreground ,comment))))
@@ -185,7 +197,7 @@
    `(erc-underline-face ((t (:underline t))))
    
    ;; flymake
-   `(flymake-errline ((,class (:foreground ,red-1 :weight bold :underline t))))
+   `(flymake-errline ((,class (:foreground ,white :background ,red :weight bold :underline t))))
    `(flymake-warnline ((,class (:foreground ,yellow :weight bold :underline t))))
 
    ;; flyspell

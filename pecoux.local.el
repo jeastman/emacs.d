@@ -26,7 +26,7 @@
     ("Man - Applications" "share/man/man6" t)))
 
 ; lintnode location
-(setq lintnode-location "/Users/jeastman/Projects/l/lintnode")
+;;(setq lintnode-location "/Users/jeastman/Projects/l/lintnode")
 ; Node path
 (setenv "NODE_PATH" "/usr/local/lib/node_modules")
 
