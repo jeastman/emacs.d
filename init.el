@@ -85,6 +85,7 @@
     slime-js
     slime-repl
     smex
+    undo-tree
     w3m)
   "List of packages to ensure are installed at startup.")
 
@@ -256,6 +257,8 @@
 ;(when (require 'autopair nil 'noerror)
 ;  (autopair-global-mode))              ; enable autopair in all buffers
 
+; better undo
+(global-undo-tree-mode)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; deft
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -529,7 +532,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Org
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(load-library "jme-org")
+(require 'org)
+; Begin move to literate progammeing model
+(let* ((path (expand-file-name (concat user-login-name "-org") dotfiles-dir))
+        (literate (concat path ".org")))
+     (cond
+      ((file-exists-p literate) (org-babel-load-file literate))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LaTeX

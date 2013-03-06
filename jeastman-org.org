@@ -1,0 +1,233 @@
+#+TITLE: Org Mode Configuration
+#+OPTIONS: toc:4 h:4
+#+STARTUP: showeverything
+
+* Configuration
+Inspired by the [[http://eschulte.me/emacs24-starter-kit/#installation][Emacs Starter Kit]], I set up my configuration file
+using Org-babel. My personal move to this literate style of configuration
+programming began with this file. My main configuration file loads this
+automatically by using =(org-babel-load-file "/path/to/file")=.
+
+** General settings
+
+*** Modules
+Org has a number of handy optional modules. The following list are the set
+of modules that I am currently experimenting with.
+
+#+begin_src emacs-lisp
+  (setq org-modules '(org-annotate-file
+                      org-bbdb 
+                      org-bibtex
+                      org-docview
+                      org-info
+                      org-jsinfo
+                      org-man
+                      org-panel
+                      org-w3m))
+#+end_src
+
+*** Org Files
+I use a number of files to break up tasks into resonably grouped files.
+
+=work.org= - Work-specific items.
+=tasks.org= - General tasks.
+=home.org= - Home-specific items.
+=notes.org= - General notes file.
+
+#+begin_src emacs-lisp
+  (setq diary-file (concat org-directory "/diary"))
+  (setq org-mobile-inbox-for-pull (concat org-directory "/flagged.org"))
+  (setq org-agenda-files (list (concat org-directory "/work.org")
+                               (concat org-directory "/tasks.org")
+                               (concat org-directory "/home.org")
+                               (concat org-directory "/notes.org")))
+  (setq org-default-notes-file (concat org-directory "/notes.org"))
+  (setq org-annotate-file-storage-file (concat org-directory "/annotated.org"))
+#+end_src
+
+** Look and Feel
+
+Startup with content folded.
+
+#+begin_src emacs-lisp
+(setq org-startup-folded 'content)
+#+end_src
+
+Use =ido=-style completion.
+
+#+begin_src emacs-lisp
+(setq org-completion-use-ido t)
+#+end_src
+
+*** Targets
+
+Targets include this file and any file contributing to the agenda - up to
+5 levels deep.
+
+#+begin_src emacs-lisp
+(setq org-refile-targets (quote ((org-agenda-files :maxlevel . 5) (nil :maxlevel . 5))))
+#+end_src
+
+Targets start with the file name. This allows creating level 1 tasks.
+
+#+begin_src emacs-lisp
+(setq org-refile-use-outline-path (quote file))
+#+end_src
+
+Targets complete in steps so we start with filename, TAB shows the next
+level of targets etc.
+
+#+begin_src emacs-lisp
+(setq org-outline-path-complete-in-steps t)
+#+end_src
+
+Allow refile to create parent tasks with confirmation.
+
+#+begin_src emacs-lisp
+(setq org-refile-allow-creating-parent-nodes (quote confirm))
+#+end_src
+
+** Task settings
+
+*** Timestamps
+Add a timestamp to the task when it moves to the DONE state.
+
+#+begin_src emacs-lisp
+(setq org-log-done 'time)
+#+end_src
+
+*** Effort
+
+#+begin_src emacs-lisp
+(setq org-global-properties
+      '(("Effort_ALL". "0 0:15 0:30 1:00 2:00 3:00 4:00")))
+#+end_src
+
+*** Workflows
+
+#+begin_src emacs-lisp
+(setq org-todo-keywords
+      '((sequence "PROJECT(p)" "|" "FINISHED(f)")
+        (sequence "TODO(t)" "|" "NOTE(n)" "DONE(d)")
+        (sequence "TODO(t)" "STARTED(s)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
+#+end_src
+
+*** Templates
+#+begin_src emacs-lisp
+(setq org-capture-templates
+      '(("m" "Mezeo Task" entry (file+headline
+                                  (concat org-directory "/work.org") "General")
+         "* TODO %^{Brief Description} %^g\n  %?\n  Added: %U")
+        ("t" "Todo" entry (file+headline
+                           (concat org-directory "/tasks.org") "Tasks")
+         "* TODO %^{Brief Description} %^g\n  %?\n  Added: %U")
+        ("n" "Notes" entry (file+datetree
+                              (concat org-directory "/notes.org") "Inbox")
+         "* %^{Description} %^g\n  %?\n  Added: %U")))
+#+end_src
+
+*** Archiving
+Archiving of completed tasks. see
+http://article.gmane.org/gmane.emacs.orgmode/3629. 
+
+To set an org file up for archiving you need to add the following at the
+top of the file (replace archive.text with the archive file):
+
+=-*- mode: org; after-save-hook: (archive-done-tasks) -*-=
+=#+ARCHIVE: archive.txt::=
+
+#+begin_src emacs-lisp
+(defvar jme/org-archive-expiry-days 7
+  "The number of days after which a completed task should be auto-archived.
+This can be 0 for immediate, or a floating point value.")
+
+(defun jme/org-archive-done-tasks ()
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (let ((done-regexp
+           (concat "\\* \\(" (regexp-opt org-done-keywords) "\\) "))
+          (state-regexp
+           (concat "- State \"\\(" (regexp-opt org-done-keywords)
+                   "\\)\"\\s-*\\[\\([^]\n]+\\)\\]")))
+      (while (re-search-forward done-regexp nil t)
+        (let ((end (save-excursion
+                     (outline-next-heading)
+                     (point)))
+              begin)
+          (goto-char (line-beginning-position))
+          (setq begin (point))
+          (if (re-search-forward state-regexp end t)
+              (let* ((time-string (match-string 2))
+                     (when-closed (org-parse-time-string time-string)))
+                (if (>= (time-to-number-of-days
+                         (time-subtract (current-time)
+                                        (apply #'encode-time when-closed)))
+                        jme/org-archive-expiry-days)
+                    (org-archive-subtree)))
+            (goto-char end)))))
+    (save-buffer)))
+
+(setq safe-local-variable-values (quote ((after-save-hook archive-done-tasks))))
+(defalias 'archive-done-tasks 'jme/org-archive-done-tasks)
+#+end_src
+
+** Key bindings
+
+#+begin_src emacs-lisp
+  (bind-key "C-c l" 'org-store-link)
+  (bind-key "C-c L" 'org-insert-link-global)
+  (bind-key "C-c a" 'org-agenda)
+  (bind-key "C-c c" 'org-capture)
+  (bind-key "C-c b" 'org-iswitchb)
+  (eval-after-load 'org
+    '(progn
+       (bind-key "C-c p" 'orgpan-panel org-mode-map)))
+#+end_src
+
+** Agenda Settings
+
+#+begin_src emacs-lisp
+  (setq org-agenda-custom-commands
+        '(
+          ("P" "Projects"
+           ((tags "PROJECT")))
+          ("H" "Office and Home Lists"
+           ((agenda)
+            (tags-todo "OFFICE")
+            (tags-todo "HOME")
+            (tags-todo "COMPUTER")
+            (tags-todo "PHONE")))
+          ("D" "Daily Action List"
+           (
+            (agenda "" ((org-agenda-ndays 1)
+                        (org-agenda-sorting-strategy
+                         (quote ((agenda time-up priority-down tag-up) )))
+                        (org-deadline-warning-days 0)
+                        ))
+            ))
+          ))
+#+end_src
+
+A common problem with all-day and multi-day events in org agenda view is
+that they become separated from timed events and are placed below all =TODO=
+items. Likewise, additional fields such as =Location:= are orphaned from
+their parent events. The following hook will ensure that all events are
+correctly placed in the agenda:
+
+See http://orgmode.org/worg/org-contrib/org-mac-iCal.html
+
+#+begin_src emacs-lisp
+(add-hook 'org-agenda-cleanup-fancy-diary-hook
+          (lambda ()
+            (goto-char (point-min))
+            (save-excursion
+              (while (re-search-forward "^[a-z]" nil t)
+                (goto-char (match-beginning 0))
+                (insert "0:00-24:00")))
+            (while (re-search-forward "^ [a-z]" nil t)
+              (goto-char (match-beginning 0))
+              (save-excursion
+                (re-search-backward "^[0-9]+:[0-9]+-[0-9]+:[0-9]+ " nil t))
+              (insert (match-string 0)))))
+#+end_src
