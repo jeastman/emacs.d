@@ -2,7 +2,7 @@
 ;; Path specific configuration for pecoux
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Choose a nice mac font
-;(set-face-attribute 'default nil :font "Consolas-14")
+(set-face-attribute 'default nil :font "Consolas-14")
 
 ; Prevent finder from open new frame
 (setq ns-pop-up-frames 'nil)

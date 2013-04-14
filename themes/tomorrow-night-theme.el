@@ -57,6 +57,7 @@
    `(mode-line-inactive ((t (:background ,comment :foreground ,selection :family "Lucida Grande"))))
    `(powerline-inactive1 ((t (:background ,spray1 :foreground ,selection :family "Lucida Grande"))))
    `(powerline-inactive2 ((t (:background ,spray4 :foreground ,foreground :family "Lucida Grande"))))
+   '(header-line ((t (:inherit mode-line :background "grey20" :foreground "grey90" :box nil :foundry "nil" :family "Consolas"))))
    `(region ((t (:background ,selection))))
    `(secondary-selection ((t (:background ,blue))))
    `(shadow ((t (:foreground ,comment))))

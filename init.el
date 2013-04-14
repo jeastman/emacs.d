@@ -7,7 +7,6 @@
 
 ;; Fix up path - make sure usr/local is at top
 (setenv "PATH" (concat "/usr/local/bin:/usr/local/sbin:/usr/texbin:" (getenv "PATH")))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Library Paths
 ;; Everything is situated underneath dotfiles-dir (~/.emacs.d)
@@ -150,14 +149,9 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-enabled-themes (quote (tomorrow-night)))
- '(custom-safe-themes (quote ("dd7dc55384f8cebb079cca2c829dded105e5b4968b5d69eae638b516021ecc7e" default)))
+ '(custom-safe-themes (quote ("af308b38a4e64c038e6b7069b431f0a7b9d08fbdfe032631f1b436e8b4700aac" default)))
  '(safe-local-variable-values (quote ((erlang-indent-level . 4) (after-save-hook archive-done-tasks)))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+
 
 (powerline-default-theme)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -174,12 +168,9 @@
       mouse-yank-at-point t         ; Use point instead of mouse click
       require-final-newline t       ; Add newline to end of file on save
       truncate-partial-width-windows nil ; respect 'truncate-lines'
-      uniquify-buffer-name-style 'forward ; sane paths in buffer names
-      whitespace-style '(faces trailing lines-tail space-before-tab
+      whitespace-style '(face trailing lines-tail space-before-tab
                    indentation space-after-tab) ; whitespace handline
-      whitespace-line-column 80     ; lines longer than this are highlighted
-      ediff-window-setup-function 'ediff-setup-windows-plain
-      save-place-file meta-places)  ; Where to store the places file
+      whitespace-line-column 80)    ; lines longer than this are highlighted
 
 (global-whitespace-mode 1)          ; Always enable whitespace minor mode
 
@@ -236,7 +227,7 @@
 
 ; savehist: save some history
 (setq savehist-additional-variables    ; also save...
-  '(search ring regexp-search-ring)    ; ... my search entries
+  '(search-ring regexp-search-ring)    ; ... my search entries
   savehist-autosave-interval 60        ; save every minute (default: 5 min)
   savehist-file meta-savehist)         ; keep my home clean
 (savehist-mode t)                      ; do customization before activation
@@ -422,7 +413,7 @@
 
 ;; C-c map
 
-(bind-key "C-c m" 'emacs-toggle-size)
+(bind-key "C-c w" 'emacs-toggle-size)
 
 ;; C-. map
 
@@ -655,7 +646,7 @@
   (imenu-make-index-alist)
   (let ((name-and-pos '())
         (symbol-names '()))
-    (flet ((addsymbols (symbol-list)
+    (cl-flet ((addsymbols (symbol-list)
                        (when (listp symbol-list)
                          (dolist (symbol symbol-list)
                            (let ((name nil) (position nil))
@@ -726,6 +717,7 @@
 (when (package-installed-p 'helm)
   (require 'helm-misc)
   (bind-key "C-c M-x" 'helm-M-x)
+  (bind-key "C-c h" 'helm-mini)
   (bind-key "C-h a" 'helm-c-apropos)
   (bind-key "M-s a" 'helm-do-grep)
   (bind-key "M-s b" 'helm-occur)
