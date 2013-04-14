@@ -1120,6 +1120,14 @@ loads the configuration based on my login name.
 (autoload 'pianobar "pianobar" nil t)
 #+end_src
 
+** Powerline
+
+Turn on powerline for modeline goodness.
+
+#+begin_src emacs-lisp
+(powerline-default-theme)
+#+end_src
+
 ** Python
 
 #+begin_src emacs-lisp
