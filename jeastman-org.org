@@ -3,7 +3,7 @@
 #+STARTUP: showeverything
 
 * Configuration
-Inspired by the [[http://eschulte.me/emacs24-starter-kit/#installation][Emacs Starter Kit]], I set up my configuration file
+Inspired by the [[https://github.com/eschulte/emacs24-starter-kit][Emacs Starter Kit]], I set up my configuration file
 using Org-babel. My personal move to this literate style of configuration
 programming began with this file. My main configuration file loads this
 automatically by using =(org-babel-load-file "/path/to/file")=.
@@ -16,7 +16,7 @@ of modules that I am currently experimenting with.
 
 #+begin_src emacs-lisp
   (setq org-modules '(org-annotate-file
-                      org-bbdb 
+                      org-bbdb
                       org-bibtex
                       org-docview
                       org-info
@@ -57,6 +57,12 @@ Use =ido=-style completion.
 
 #+begin_src emacs-lisp
 (setq org-completion-use-ido t)
+#+end_src
+
+Make sure we we export with syntax highlighting.
+
+#+begin_src emacs-lisp
+(setq org-src-fontify-natively t)
 #+end_src
 
 *** Targets
@@ -128,7 +134,7 @@ Add a timestamp to the task when it moves to the DONE state.
 
 *** Archiving
 Archiving of completed tasks. see
-http://article.gmane.org/gmane.emacs.orgmode/3629. 
+http://article.gmane.org/gmane.emacs.orgmode/3629.
 
 To set an org file up for archiving you need to add the following at the
 top of the file (replace archive.text with the archive file):
@@ -170,19 +176,6 @@ This can be 0 for immediate, or a floating point value.")
 
 (setq safe-local-variable-values (quote ((after-save-hook archive-done-tasks))))
 (defalias 'archive-done-tasks 'jme/org-archive-done-tasks)
-#+end_src
-
-** Key bindings
-
-#+begin_src emacs-lisp
-  (bind-key "C-c l" 'org-store-link)
-  (bind-key "C-c L" 'org-insert-link-global)
-  (bind-key "C-c a" 'org-agenda)
-  (bind-key "C-c c" 'org-capture)
-  (bind-key "C-c b" 'org-iswitchb)
-  (eval-after-load 'org
-    '(progn
-       (bind-key "C-c p" 'orgpan-panel org-mode-map)))
 #+end_src
 
 ** Agenda Settings
@@ -230,4 +223,17 @@ See http://orgmode.org/worg/org-contrib/org-mac-iCal.html
               (save-excursion
                 (re-search-backward "^[0-9]+:[0-9]+-[0-9]+:[0-9]+ " nil t))
               (insert (match-string 0)))))
+#+end_src
+
+** Key bindings
+
+#+begin_src emacs-lisp
+  (bind-key "C-c l" 'org-store-link)
+  (bind-key "C-c L" 'org-insert-link-global)
+  (bind-key "C-c a" 'org-agenda)
+  (bind-key "C-c c" 'org-capture)
+  (bind-key "C-c b" 'org-iswitchb)
+  (eval-after-load 'org
+    '(progn
+       (bind-key "C-c p" 'orgpan-panel org-mode-map)))
 #+end_src
