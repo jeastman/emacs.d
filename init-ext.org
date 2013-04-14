@@ -1,0 +1,1373 @@
+#+TITLE: Emacs Configuration
+#+OPTIONS: toc:4 h:4
+#+STARTUP: showeverything
+
+* General Configuration
+
+** Library Paths
+
+Everything is situated underneath =dotfiles-dir (~/.emacs.d)=
+
+This makes everything self-contained and easy to migrate to other
+environments.
+
+This section contains all of the path configurations that are not machine
+specific. A seperate directory =(~/.emacs-meta)= is configured for =Meta=
+information files (backups, temporary files, etc.)
+
+*** Metafiles
+
+First, we need to define the =dotfile-dir= and =metafiles-dir= values.
+
+#+begin_src emacs-lisp
+(setq dotfiles-dir (file-name-directory
+    (or (buffer-file-name) load-file-name)))
+(setq metafiles-dir "~/.emacs-meta")
+#+end_src
+
+As this may be the first time I am running in this environment, the
+=metafiles-dir= directory may not actually exist. We go ahead and create
+it if it doesn't.
+
+#+begin_src emacs-lisp
+(unless (file-exists-p metafiles-dir)
+  (make-directory metafiles-dir))
+#+end_src
+
+*** Temporary directory
+
+I can now set the Emacs temporary directory to be within the
+=metafiles-dir=, again creating it if necessary.
+
+#+begin_src emacs-lisp
+(setq temporary-file-directory (concat metafiles-dir "/tmp/"))
+(unless (file-exists-p temporary-file-directory)
+  (make-directory temporary-file-directory))
+#+end_src
+
+*** Custom Themes
+
+I tend to like playing around with different color themes. Sometimes this
+is based on mood, sometimes it is based on environment. These themes go
+into their own directory.
+
+#+begin_src emacs-lisp
+  (setq custom-theme-directory (concat dotfiles-dir "themes"))
+#+end_src
+
+** Package Management
+
+I have moved /almost/ everything to use the package management system
+instead of referencing external projects directly. This is extremely
+convenient and makes updates very simple.
+
+#+begin_src emacs-lisp
+(require 'package)
+#+end_src
+
+The package directory and archives go into their own directories under
+=dotfiles-dir=.
+
+#+begin_src emacs-lisp
+(setq elpa-dir (concat dotfiles-dir "elpa"))
+(setq elpa-archives-dir (concat elpa-dir "/archives"))
+#+end_src
+
+*** Package Repositories
+
+The =package-archives= variable is an alist of archive sites from which
+packages may be fetched.
+
+#+begin_src emacs-lisp
+  (add-to-list 'package-archives
+               '("marmalade" .
+                 "http://marmalade-repo.org/packages/") t)
+  (add-to-list 'package-archives
+               '("melpa" .
+                 "http://melpa.milkbox.net/packages/") t)
+#+end_src
+
+The package system needs to be initialized. The first time this is loaded,
+the archives will not have been cataloged.
+
+#+begin_src emacs-lisp
+(package-initialize)
+
+(unless (file-exists-p elpa-archives-dir)
+  (package-refresh-contents))
+#+end_src
+
+*** Packages to Install
+
+This list of packages are installed at startup, if they have not already
+been installed.
+
+| Package                 | Description                                                               |
+|-------------------------+---------------------------------------------------------------------------|
+| =ace-jump-mode=         | A quick cursor location minor mode                                        |
+| =auto-complete=         | Auto completion                                                           |
+| =coffee-mode=           | Major mode to edit CoffeeScript files                                     |
+| =deferred=              | Simple asynchronous functions for emacs lisp                              |
+| =deft=                  | quickly browse, filter, and edit plain text notes                         |
+| =dired+=                | Extensions to Dired                                                       |
+| =dired-details=         | make file details hide-able in dired                                      |
+| =dired-details+=        | Enhancements to library `dired-details+.el'                               |
+| =dired-single=          | Reuse the current dired buffer to visit another directory                 |
+| =epc=                   | A RPC stack for the Emacs Lisp                                            |
+| =expand-region=         | Increase selected region by semantic units                                |
+| =flymake-coffee=        | A flymake handler for coffee script                                       |
+| =flymake-haskell-multi= | Syntax-check haskell-mode using both ghc and hlint                        |
+| =git-gutter-fringe=     | Fringe version of git-gutter                                              |
+| =graphviz-dot-mode=     | Mode for the dot-language used by graphviz                                |
+| =handlebars-mode=       | A major mode for editing Handlebars files                                 |
+| =helm=                  | An Emacs incremental and narrowing framework                              |
+| =jabber=                | A Jabber client                                                           |
+| =jedi=                  | a Python auto-completion for Emacs                                        |
+| =js2-mode=              | Improved JavaScript editing mode                                          |
+| =magit=                 | Control Git from Emacs                                                    |
+| =magithub=              | Magit extensions for using GitHub                                         |
+| =markdown-mode=         | Major mode for Markdown-formatted text files                              |
+| =markdown-mode+=        | extra functions for markdown-mode                                         |
+| =multi-term=            | Managing multiple terminal buffers in Emacs                               |
+| =nose=                  | Easy Python test running in Emacs                                         |
+| =org=                   | Outline-based notes management and organizer                              |
+| =paredit=               | minor mode for editing parentheses                                        |
+| =powerline=             | Rewrite of Powerline                                                      |
+| =pretty-mode=           | redisplay parts of the buffer as pretty symbols                           |
+| =rainbow-delimiters=    | Highlight nested parens, brackets, braces a different color at each depth |
+| =rainbow-mode=          | Colorize color names in buffers                                           |
+| =sauron=                | Track (erc/org/dbus/...) events and react to them                         |
+| =slime=                 | Superior Lisp Interaction Mode for Emacs                                  |
+| =slime-js=              | Slime extension for swank-js                                              |
+| =slime-repl=            | Read-Eval-Print Loop written in Emacs Lisp                                |
+| =smex=                  | M-x interface with Ido-style fuzzy matching                               |
+| =undo-tree=             | Treat undo history as a tree                                              |
+| =w3m=                   | an Emacs interface to w3m                                                 |
+
+#+begin_src emacs-lisp
+(defvar my-packages
+  '(
+    ace-jump-mode
+    auto-complete
+    autopair
+    coffee-mode
+    deferred
+    deft
+    dired+
+    dired-details
+    dired-details+
+    dired-single
+    epc
+    expand-region
+    flymake-coffee
+    graphviz-dot-mode
+    handlebars-mode
+    helm
+    jedi
+    js2-mode
+    magit
+    magithub
+    markdown-mode
+    markdown-mode+
+    multi-term
+    nose
+    paredit
+    powerline
+    pretty-mode
+    rainbow-delimiters
+    rainbow-mode
+    slime
+    slime-js
+    slime-repl
+    smex
+    undo-tree
+    w3m)
+  "List of packages to ensure are installed at startup.")
+#+end_src
+
+I use the list to check for packages that are not already installed and
+install them, with confirmation, of course.
+
+#+begin_src emacs-lisp
+(mapc
+ (lambda (package)
+   (or (package-installed-p package)
+       (if (y-or-n-p (format "Package %s is missing. Install it? " package))
+           (package-install package))))
+ my-packages)
+#+end_src
+
+** Additional Paths
+
+I add the =dotfiles-dir= to the load path here to ensure we can pick up
+the additional configuration files.
+
+#+begin_src emacs-lisp
+(add-to-list 'load-path dotfiles-dir)
+#+end_src
+
+I also add all top-level subdirectories of =dotfiles-dir=.
+
+#+begin_src emacs-lisp
+(let ((default-directory dotfiles-dir))
+      (normal-top-level-add-subdirs-to-load-path))
+#+end_src
+
+*** Paths for meta-information
+
+I set up variables for all paths needed for storing things in the
+=meta-information= directory. By consolidating them all in one place (and
+using the variables later), I have an easier time keeping track of them
+and maintaining them.
+
+| Variable         | Purpose                                                                                                   |
+|------------------+-----------------------------------------------------------------------------------------------------------|
+| =meta-saveplace= | Name of the file that records the =save-place-alist=, which stores the location of point in visited files |
+| =meta-backup=    | Location for backup files                                                                                 |
+| =meta-bookmarks= | Bookmarks file.                                                                                           |
+| =meta-savehist=  | File used by =savehist= where minibuffer history is save to and loaded                                    |
+| =meta-recent=    | File to save the recent list into                                                                         |
+| =meta-saves=     | Prefix to use for auto-save files                                                                         |
+| =meta-ido=       | File in which the =ido= state is saved between invocations                                                |
+| =meta-tramp=     | File used for =tramp= persistence                                                                         |
+
+#+begin_src emacs-lisp
+(setq 
+   meta-saveplace (concat metafiles-dir "/saveplace")
+   ;meta-backup (concat metafiles-dir "/backups/") ;; still needs work
+   meta-bookmarks (concat metafiles-dir "/bookmarks")
+   meta-savehist (concat metafiles-dir "/savehist")
+   meta-recent (concat metafiles-dir "/recentf")
+   meta-saves (concat metafiles-dir "/auto-save-list/.saves-")
+   meta-ido (concat metafiles-dir "/ido.last")
+   meta-tramp (concat metafiles-dir "/tramp"))
+#+end_src
+
+*** Non-packaged packages
+
+There are several packages I use that do not exist in package archives. In
+order to handle loading these, I add the 3rd party libraries in the
+=vendor= directory.
+
+#+begin_src emacs-lisp
+(setq vendor-dir (concat dotfiles-dir "vendor"))
+(unless (file-exists-p vendor-dir)
+  (make-directory vendor-dir))
+(add-to-list 'load-path vendor-dir)
+(let ((default-directory vendor-dir))
+     (normal-top-level-add-subdirs-to-load-path))
+#+end_src
+
+*** System and user specific configuration
+
+I run the same configuration on several machines. Different machines have
+different capabilities as well as different file system layouts. To handle
+this situation, I load system specific files based on the name of the
+machine. I also load in a file based on user name, to handle additional
+environments. I have updated my original version of this to do something
+similar to what [[https://github.com/eschulte/emacs24-starter-kit][Emacs Starter Kit]] does by attempting to load several
+different forms of each file.
+
+#+begin_src emacs-lisp
+  (flet ((jme/load (base)
+                   (let* ((path          (expand-file-name base dotfiles-dir))
+                          (literate      (concat path ".org"))
+                          (encrypted-org (concat path ".org.gpg"))
+                          (plain         (concat path ".el"))
+                          (encrypted-el  (concat path ".el.gpg")))
+                     (cond
+                      ((file-exists-p encrypted-org) (org-babel-load-file encrypted-org))
+                      ((file-exists-p encrypted-el) (load encrypted-el))
+                      ((file-exists-p literate) (org-babel-load-file literate))
+                      ((file-exists-p plain) (load plain)))))
+         (remove-extension (name)
+             (string-match "\\(.*?\\)\.\\(org\\(\\.el\\)?\\|el\\)\\(\\.gpg\\)?$" name)
+             (match-string 1 name)))
+    (let ((user-dir (concat dotfiles-dir user-login-name)))
+      (jme/load (car (split-string (system-name) "\\.")))
+      (jme/load user-login-name)
+      (when (file-exists-p user-dir)
+          (add-to-list 'load-path user-dir)
+          (mapc #'jme/load
+                (remove-duplicates
+                 (mapcar #'remove-extension
+                         (directory-files user-dir t ".*\.\\(org\\|el\\)\\(\\.gpg\\)?$"))
+                 :test #'string=)))))
+#+end_src
+
+** General Emacs Settings
+
+There are a number of configuration items I tend to look at as basic
+configuration. There is a fine line between what is a /package/ and what
+is just part of Emacs, especially at the rate things are being included in
+the /official/ distribution.
+
+*** Window sizing
+
+When using a =window-system=, which I most often do, I like to start Emacs
+with a specific window size and position. This code accomplishes that.
+
+First, we need to set up the window sizing.
+
+#+begin_src emacs-lisp
+(eval-when-compile
+  (defvar emacs-min-top)
+  (defvar emacs-min-left)
+  (defvar emacs-min-height)
+  (defvar emacs-min-width))
+
+(if window-system
+    (unless noninteractive
+      (defvar emacs-min-top 22)
+      (defvar emacs-min-left 5)
+      (defvar emacs-min-height (if (= 1050 (x-display-pixel-height)) 55 64))
+      (defvar emacs-min-width 100)))
+#+end_src
+
+This function resets the window to its minimal position.
+
+#+begin_src emacs-lisp
+(defun emacs-min ()
+  (interactive)
+  (set-frame-parameter (selected-frame) 'fullscreen nil)
+  (set-frame-parameter (selected-frame) 'vertical-scroll-bars nil)
+  (set-frame-parameter (selected-frame) 'horizontal-scroll-bars nil)
+  (set-frame-parameter (selected-frame) 'top emacs-min-top)
+  (set-frame-parameter (selected-frame) 'left emacs-min-left)
+  (set-frame-parameter (selected-frame) 'height emacs-min-height)
+  (set-frame-parameter (selected-frame) 'width emacs-min-width))
+#+end_src
+
+This function does the opposite of the above. It sets the window to
+maximum position.
+
+#+begin_src emacs-lisp
+(defun emacs-max ()
+  (interactive)
+  (if t
+      (progn
+        (set-frame-parameter (selected-frame) 'fullscreen 'fullboth)
+        (set-frame-parameter (selected-frame) 'vertical-scroll-bars nil)
+        (set-frame-parameter (selected-frame) 'horizontal-scroll-bars nil))
+    (set-frame-parameter (selected-frame) 'top 26)
+    (set-frame-parameter (selected-frame) 'left 2)
+    (set-frame-parameter (selected-frame) 'width
+                         (floor (/ (float (x-display-pixel-width)) 9.15)))
+    (if (= 1050 (x-display-pixel-height))
+        (set-frame-parameter (selected-frame) 'height
+                             (if (>= emacs-major-version 24)
+                                 66
+                               55))
+      (set-frame-parameter (selected-frame) 'height
+                           (if (>= emacs-major-version 24)
+                               75
+                             64)))))
+#+end_src
+
+One last function to give me the ability to toggle between the two.
+
+#+begin_src emacs-lisp
+(defun emacs-toggle-size ()
+  (interactive)
+  (if (> (cdr (assq 'width (frame-parameters))) 100)
+      (emacs-min)
+    (emacs-max)))
+#+end_src
+
+I start off with Emacs in its minimal state when starting up. Since moving
+to the =mac= Emacs port on my Apple machines, as opposed to the =ns=
+version, I don't really use the toggle much anymore. Instead I use the mac
+fullscreen mode.
+
+#+begin_src emacs-lisp
+(if window-system
+    (add-hook 'after-init-hook 'emacs-min))
+#+end_src
+
+*** Coding system
+
+I am a fan of UTF-8. Make sure everything is set up to handle it.
+
+| Variable                     | Value   | Description          |
+|------------------------------+---------+----------------------|
+| =set-terminal-coding-system= | =utf-8= | terminal output      |
+| =set-terminal-coding-system= | =utf-8= | terminal input       |
+| =perfer-coding-system=       | =utf-8= | set preferred coding |
+
+#+begin_src emacs-lisp
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
+#+end_src
+
+*** Interface settings
+
+I most often have the audio on my machines muted, so use the visible bell
+instead of beeps. Who likes beeps anyway?
+
+#+begin_src emacs-lisp
+(setq visible-bell t)
+#+end_src
+
+Make sure I can see what it is that I am typing. This setting is the
+number of seconds to pause before unfinished commands are echoed. I find
+the default of 1 second a bit slow.
+
+#+begin_src emacs-lisp
+(echo-keystrokes 0.1)
+#+end_src
+
+I am not a big fan of overloading the arrow keys. Plus they are just too
+far away from my fingers to be useful. Don't use the shift+arrows for mark.
+
+#+begin_src emacs-lisp
+(setq shift-select-mode nil)
+#+end_src
+
+Use point instead of click with mouse yank.
+
+#+begin_src emacs-lisp
+(setq mouse-yank-at-point t)
+#+end_src
+
+While I no longer have a machine with a mouse connected (only trackpads
+now), I still use swipe-type scrolling which I would like to be smooth.
+
+These settings handle one line at a time, disable scrolling acceleration
+and scroll the window under the mouse.
+
+#+begin_src emacs-lisp
+(setq scroll-step 1)
+(setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ; one line at a time
+(setq mouse-wheel-progressive-speed nil) ; don't accelerate scrolling
+(setq mouse-wheel-follow-mouse 't) ; scroll window under mouse
+#+end_src
+
+Truncate lines in windows narrower than the frame.
+
+#+begin_src emacs-lisp
+(setq truncate-partial-width-windows t)
+#+end_src
+
+Set the default tab stop.
+
+#+begin_src emacs-lisp
+(setq-default tab-width 4)
+#+end_src
+
+Never put tabs in files, use spaces instead. If, for some reason, a real
+tab is needed, use =C-q C-i= to insert one.
+
+#+begin_src emacs-lisp
+(setq-default indent-tabs-mode nil)
+#+end_src
+
+I want to always go to the next indent level when hitting return.
+
+#+begin_src emacs-lisp
+(bind-key "RET" 'newline-and-indent)
+#+end_src
+
+Set the column that triggers fill
+
+#+begin_src emacs-lisp
+(setq-default fill-column 75)
+#+end_src
+
+Turn on auto fill for text files.
+
+#+begin_src emacs-lisp
+(add-hook 'text-mode-hook 'turn-on-auto-fill)
+#+end_src
+
+Allow narrowing.
+
+#+begin_src emacs-lisp
+(put 'narrow-to-defun 'disabled nil)
+(put 'narrow-to-page 'disabled nil)
+(put 'narrow-to-region 'disabled nil)
+#+end_src
+
+*** Visual tweaks
+
+Unlike a number of people, I do not mind the menu bar if I am actually
+using a window system of some kind. It is not that I use it often, but it
+does not get in my way much either. So, I check to see if I am using a
+window system and disable it if not.
+
+#+begin_src emacs-lisp
+(if (eq window-system 'nil)
+    (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+  (if (fboundp 'menu-bar-mode) (menu-bar-mode 1)))
+#+end_src
+
+The toolbar, however, is completely useless to me, so I always disable it.
+
+#+begin_src emacs-lisp
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+#+end_src
+
+Likewise, scrollbars offer no value.
+
+#+begin_src emacs-lisp
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+#+end_src
+
+Don't show the startup message.
+
+#+begin_src emacs-lisp
+(setq inhibit-startup-message t
+      inhibit-startup-echo-area-message t)
+#+end_src
+
+Visually indicate empty lines after the buffer end. This is shown as a
+fringe bitmap in the left edge.
+
+#+begin_src emacs-lisp
+(set-default 'indicate-empty-lines t)
+#+end_src
+
+Cause Emacs to fully redraw the display before it processes queued input
+events. Apparently this provides a slight performance tweak for newer
+machines. My machines seem to be able to handle it.
+
+#+begin_src emacs-lisp
+(setq redisplay-dont-pause t)
+#+end_src
+
+**** Modeline
+
+I refer to my modeline quite often. It is very easy for it to get too
+cluttered, it is expensive real estate.
+
+Show the line:column number.
+
+#+begin_src emacs-lisp
+(line-number-mode 1)
+(column-number-mode 1)
+#+end_src
+
+Also, show the size of the file.
+
+#+begin_src emacs-lisp
+(size-indication-mode 1)
+#+end_src
+
+*** Miscellaneous
+
+Add newline to end of file on save.
+
+#+begin_src emacs-lisp
+(setq require-final-newline t)
+#+end_src
+
+Make Emacs use the clipboard
+
+#+begin_src emacs-lisp
+(setq x-select-enable-clipboard t)
+#+end_src
+
+Seed the random-number generator
+
+#+begin_src emacs-lisp
+(random t)
+#+end_src
+
+Prefix used for generating the auto save file names.
+
+#+begin_src emacs-lisp
+(setq auto-save-list-file-prefix meta-saves)
+#+end_src
+
+**** Bookmarks
+
+Save bookmarks into their own file in the meta information directory.
+
+#+begin_src emacs-lisp
+(setq bookmark-default-file meta-bookmarks)
+#+end_src
+
+**** Backup
+
+I like all of my backup copies of files to be in a common location.
+
+Configure where the backups should go.
+
+#+begin_src emacs-lisp
+(setq backup-directory-alist (quote ((".*" . "~/.emacs-meta/backups/"))))
+#+end_src
+
+I like to use version numbers for the backup files. Set the number of
+newest versions and oldest versions to keep when a new numbered backup is
+made. I also don't care about the deletion of excess backup versions, so do
+that silently. Also, I like to use copying to create backups for files
+that are linked, instead of renaming.
+
+| Variable                        | Value | Description                                                          |
+|---------------------------------+-------+----------------------------------------------------------------------|
+| =version-control=               | =t=   | Control use of version numbers for backup files                      |
+| =kept-new-versions=             | =2=   | Number of newest versions to keep when a new numbered backup is made |
+| =kept-old-versions=             | =2=   | Number of oldest versions to keep when a new numbered backup is made |
+| =delete-old-versions=           | =t=   | When set to =t=, delete excess backup versions silently              |
+| =backup-by-copying-when-linked= | =t=   | Use copying to create backups for files with multiple names          |
+
+#+begin_src emacs-lisp
+(setq
+  version-control t
+  kept-new-versions 2
+  kept-old-versions 2
+  delete-old-versions t
+  backup-by-copying-when-linked t)
+#+end_src
+
+*** Global mode settings
+
+**** Auto-revert
+
+Revert buffers when they change on disk.
+
+#+begin_src emacs-lisp
+(global-auto-revert-mode 1)
+#+end_src
+
+Auto-refresh dired buffers.
+
+#+begin_src emacs-lisp
+(setq global-auto-revert-non-file-buffers t)
+#+end_src
+
+But.. don't announce reversion of buffer
+
+#+begin_src emacs-lisp
+(setq auto-revert-verbose nil)
+#+end_src
+
+**** Git gutter
+
+Git gutter is a nice little utility that adds markers in the fringe to
+denote changes in a file.
+
+#+begin_src emacs-lisp
+(require 'git-gutter-fringe)
+(setq git-gutter:lighter " GG")
+#+end_src
+
+Turn it on globally.
+
+#+begin_src emacs-lisp
+(global-git-gutter-mode t)
+#+end_src
+
+**** Recentf
+b
+Save recently used files. This turns on the "Open Recent" submenu which is
+displayed in the "File" menu, containing a list of files that were
+operated on recently.
+
+Require the actual package.
+
+#+begin_src emacs-lisp
+(require 'recentf)
+#+end_src
+
+I use the following settings for this mode:
+
+| variable                 | value         | description                       |
+|--------------------------+---------------+-----------------------------------|
+| =recentf-save-file=      | =meta-recent= | File to save the recent list into |
+| =recent-max-saved-items= | 100           | Max number of items saved         |
+| =recent-max-menu-items=  | 15            | Max number of items in menu       |
+
+#+begin_src emacs-lisp
+(setq
+  recentf-save-file meta-recent
+  recentf-max-saved-items 100
+  recentf-max-menu-items 15)
+#+end_src
+
+Turn on Recentf mode.
+
+#+begin_src emacs-lisp
+(recentf-mode t)
+#+end_src
+
+**** Savehist
+
+Save minibuffer history. The minibuffer history is saved periodically
+(every 300 seconds, in this case) and when exiting Emacs. I use
+=savehist-file= to specify the filename (in the meta information directory)
+where the history should be stored. Additionally, I have it set to save:
+
+| History type         | Description                                        |
+|----------------------+----------------------------------------------------|
+| =search-ring=        | List of search string sequences                    |
+| =regexp-search-ring= | List of regular expression search string sequences |
+
+#+begin_src emacs-lisp
+(setq savehist-additional-variables
+  '(search-ring regexp-search-ring)
+  savehist-autosave-interval 300
+  savehist-file meta-savehist)
+#+end_src
+
+Turn on savehist minor mode.
+
+#+begin_src emacs-lisp
+(savehist-mode t)
+#+end_src
+
+**** Saveplace
+
+Preserve the location of point in file when saving files.
+
+Specify the name of the file that records saveplace information.
+
+#+begin_src emacs-lisp
+(setq save-place-file meta-saveplace)
+#+end_src
+
+Activate saveplace for all buffers.
+
+#+begin_src emacs-lisp
+(setq-default save-place t)
+#+end_src
+
+Require the actual package.
+
+#+begin_src emacs-lisp
+(require 'saveplace)
+#+end_src
+
+**** Show Paren mode
+
+I like to visually see the matching parens. =Show Paren= mode is a global
+minor mode that highlights matching parens.
+
+#+begin_src emacs-lisp
+(show-paren-mode 1)
+#+end_src
+
+**** Undo-tree-mode
+
+=Undo-tree-mode= replaces Emacs' standard undo feature with a more
+powerful, yet easier to user version, that treats the undo history as what
+it is: a tree.
+
+Enable =Undo-tree-mode= globally.
+
+#+begin_src emacs-lisp
+(global-undo-tree-mode)
+#+end_src
+
+**** Whitespace
+
+I like to see whitespace in files. I find this helps with both
+organization and formatting. I use the following style for whitespace
+visualization:
+
+| Style            | Description                           |
+|------------------+---------------------------------------|
+| face             | enable all visualization via faces    |
+| trailing         | trailing blanks                       |
+| lines-tail       | lines with long columns               |
+| space-before-tab | SPACEs before TAB                     |
+| space-after-tab  | 8 or more SPACEs after a TAB          |
+| indentation      | 8 or more SPACEs at beginning of line |
+
+#+begin_src emacs-lisp
+(setq whitespace-style '(face trailing lines-tail space-before-tab
+                   indentation space-after-tab))
+#+end_src
+
+Specify the column beyond which the line is highlighted.
+
+#+begin_src emacs-lisp
+(setq whitespace-line-column 80)
+#+end_src
+
+Turn on whitespace visualization minor mode globally.
+
+#+begin_src emacs-lisp
+(global-whitespace-mode 1)
+#+end_src
+
+**** Winner
+
+#+begin_src emacs-lisp
+(winner-mode 1)
+#+end_src
+
+* Utility functions
+
+There are a number of /utility/ functions that I keep around for handling
+different things. Some of them are experimental, but they /do/ work.
+
+** Hide or Expand
+
+I have kept this around for a long time and go through different phases
+of using it. I have recently gone back to using it quite a bit now that I
+have been using =winner= mode.
+
+#+begin_src emacs-lisp
+(defun hide-or-expand ()
+  (interactive)
+  (if (> (length (window-list)) 1)
+      (delete-other-windows)
+    (bury-buffer)))
+#+end_src
+
+** Mark and Pop
+
+This bit of elisp allows optionally storing the mark before moving. I
+adopted this from a [[https://gist.github.com/magnars/2350388][gist]] by Magnar Sveen.
+
+#+begin_src emacs-lisp
+(defvar push-mark-before-goto-char nil)
+#+end_src
+
+#+begin_src emacs-lisp
+(defadvice goto-char (before push-mark-first activate)
+  (when push-mark-before-goto-char
+    (push mark)))
+#+end_src
+
+* Package Specific Settings
+
+** Auto complete
+
+I have fiddled around with different auto-completion packages and
+extensions over time. This one works.
+
+#+begin_src emacs-lisp
+(when (require 'auto-complete-config nil 'noerror)
+  (ac-config-default)
+  (setq ac-user-dictionary-files (concat metafiles-dir "/.dict"))
+  (setq ac-comphist-file (concat metafiles-dir "/ac-comphist.dat"))
+  (bind-key "S-TAB" 'auto-complete ac-mode-map)
+#+end_src
+
+** CoffeeScript
+
+Support for CoffeeScript.
+
+#+begin_src emacs-lisp
+(when (require 'coffee-mode nil 'noerror)
+
+  (defun coffee-custom ()
+    "coffee-mode-hook"
+
+    ;; CoffeeScript uses two spaces.
+    (set (make-local-variable 'tab-width) 2)
+
+    ;; If you don't have js2-mode
+    (setq coffee-js-mode 'javascript-mode)
+
+    ;; If you don't want your compiled files to be wrapped
+    (setq coffee-args-compile '("-c" "--bare"))
+
+    ;; *Messages* spam
+    (setq coffee-debug-mode t)
+
+    ;; Emacs key binding
+    (define-key coffee-mode-map [(meta r)] 'coffee-compile-buffer)
+
+    ;; Compile '.coffee' files on every save
+    (and (file-exists-p (buffer-file-name))
+         (file-exists-p (coffee-compiled-file-name))
+         (coffee-cos-mode t)))
+
+  (add-hook 'coffee-mode-hook 'coffee-custom)
+  (add-hook 'coffee-mode-hook '(lambda () (flymake-coffee-load))))
+#+end_src
+
+** Deft
+
+I find Deft to be a great note-taking utility.
+
+#+begin_src emacs-lisp
+(when (require 'deft nil 'noerror)
+  (when (boundp 'my-notes)
+    (when (file-exists-p my-notes)
+      (setq
+       deft-extension "org"
+       deft-directory my-notes
+       deft-text-mode 'org-mode)
+      (bind-key "<f9>" 'deft))))
+#+end_src
+
+** Dired
+
+I have been trying to train myself to use =dired= as much as possible. My
+go-to alternative is the command line, which often interrupts whatever I
+was doing in the particular shell I choose. My settings here are still
+very much experimental.
+
+I moved to using =dired+= to pick up some extra features.
+
+#+begin_src emacs-lisp
+(require 'dired+)
+(put 'dired-find-alternate-file 'disabled nil)  ;enable `a' command
+
+
+;; Make dired less verbose
+(require 'dired-details)
+;;(setq-default dired-details-hidden-string "--- ")
+(dired-details-install)
+
+(when (require 'dired-single nil 'noerror)
+
+  ;Make sure each dired buffer doesn't spawn new dired buffers
+  (defun my-dired-init ()
+    "Bunch of stuff to run for dired, either immediately or when it's
+  loaded."
+    ;; <add other stuff here>
+    (define-key dired-mode-map [return] 'dired-single-buffer)
+    (define-key dired-mode-map [mouse-1] 'dired-single-buffer-mouse)
+    (define-key dired-mode-map "^"
+      (function
+       (lambda nil (interactive) (dired-single-buffer "..")))))
+  ;; if dired's already loaded, then the keymap will be bound
+  (if (boundp 'dired-mode-map)
+      ;; we're good to go; just add our bindings
+      (my-dired-init)
+    ;; it's not loaded yet, so add our bindings to the load-hook
+    (add-hook 'dired-load-hook 'my-dired-init)))
+#+end_src
+
+** Erlang
+
+#+begin_src emacs-lisp
+(require 'erlang-start nil 'noerror)
+(require 'erlang-flymake nil 'noerror)
+#+end_src
+
+** Flymake
+
+#+begin_src emacs-lisp
+(setq-default flymake-no-changes-timeout '3) ; timeout for flymake
+(setq flymake-run-in-place nil)
+#+end_src
+
+** Flyspell
+
+I often use =flyspell= mode when writing text documents. I typically turn
+this on a some point after I have already begun writing. This bit of
+advice ensures that the buffer is checked when I turn =flyspell= on.
+
+#+begin_src emacs-lisp
+(defadvice flyspell-mode (after advice-flyspell-check-buffer-on-start activate)
+  (flyspell-buffer))
+#+end_src
+
+** Haskell
+
+I like automatic indentation, needs to be turned on for Haskell.
+
+#+begin_src emacs-lisp
+(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+#+end_src
+
+** Helm
+
+#+begin_src emacs-lisp
+(when (package-installed-p 'helm)
+  (require 'helm-misc)
+  (bind-key "C-c M-x" 'helm-M-x)
+  (bind-key "C-h a" 'helm-c-apropos)
+  (bind-key "M-s a" 'helm-do-grep)
+  (bind-key "M-s b" 'helm-occur)
+  (bind-key "M-s F" 'helm-for-files))
+#+end_src
+
+** Ido
+
+#+begin_src emacs-lisp
+(defun recentf-ido-find-file ()
+  "Find a recent file using ido."
+  (interactive)
+  (let ((file (ido-completing-read "Choose recent file: " recentf-list nil t)))
+    (when file
+      (find-file file))))
+
+(defun ido-goto-symbol ()
+  "Will update the imenu index and then use ido to select a
+   symbol to navigate to"
+  (interactive)
+  (imenu-make-index-alist)
+  (let ((name-and-pos '())
+        (symbol-names '()))
+    (cl-flet ((addsymbols (symbol-list)
+                       (when (listp symbol-list)
+                         (dolist (symbol symbol-list)
+                           (let ((name nil) (position nil))
+                             (cond
+                              ((and (listp symbol) (imenu--subalist-p symbol))
+                               (addsymbols symbol))
+
+                              ((listp symbol)
+                               (setq name (car symbol))
+                               (setq position (cdr symbol)))
+
+                              ((stringp symbol)
+                               (setq name symbol)
+                               (setq position (get-text-property 1 'org-imenu-marker symbol))))
+
+                             (unless (or (null position) (null name))
+                               (add-to-list 'symbol-names name)
+                               (add-to-list 'name-and-pos (cons name position))))))))
+      (addsymbols imenu--index-alist))
+    (let* ((selected-symbol (ido-completing-read "Symbol? " symbol-names))
+           (position (cdr (assoc selected-symbol name-and-pos))))
+      (goto-char position))))
+
+;; ido-mode is like magic pixie dust!
+(when (> emacs-major-version 21)
+    (ido-mode t)
+    (setq
+        ido-save-directory-list-file meta-ido
+;        ido-ignore-buffers ;; ignore these guys
+;          '("\\` " "^\*Mess" "^\*Back" ".*Completion" "^\*Ido" "^\*trace"
+;             "^\*compilation" "^\*GTAGS" "^session\.*" "^\*")
+        ido-case-fold  t                 ; be case-insensitive
+        ido-enable-last-directory-history t ; remember last used dirs
+        ido-max-work-directory-list 30   ; should be enough
+        ido-max-work-file-list      50   ; remember many
+        ido-use-filename-at-point nil    ; don't use filename at point (annoying)
+        ido-use-url-at-point nil         ; don't use url at point (annoying)
+        ido-enable-flex-matching nil     ; don't try to be too smart
+        ido-max-prospects 10
+        ido-enable-flex-matching t
+        ido-create-new-buffer 'always
+        ido-confirm-unique-completion t  ; wait for RET, even with unique completion
+))
+
+;; when using ido, the confirmation is rather annoying...
+(setq confirm-nonexistent-file-or-buffer nil)
+
+;; increase minibuffer size when ido completion is active
+(add-hook 'ido-minibuffer-setup-hook
+  (function
+    (lambda ()
+      (make-local-variable 'resize-minibuffer-window-max-height)
+      (setq resize-minibuffer-window-max-height 1))))
+#+end_src
+
+** Javascript
+
+#+begin_src emacs-lisp
+(when (require 'js-comint nil 'noerror)
+  (setq inferior-js-program-command "node"))
+#+end_src
+
+** LaTeX
+
+#+begin_src emacs-lisp
+(defun flymake-get-tex-args (file-name)
+    (list "/usr/texbin/chktex" (list "-q" "-I" "-H" "-v0" file-name)))
+#+end_src
+
+** Lisp
+
+#+begin_src emacs-lisp
+(add-hook 'lisp-mode-hook (lambda () (local-set-key (kbd "RET") 'newline-and-indent)))
+(add-hook 'emacs-lisp-mode-hook (lambda () (local-set-key (kbd "RET") 'newline-and-indent)))
+#+end_src
+
+** Magit
+
+#+begin_src emacs-lisp
+(require 'magit nil 'noerror)
+#+end_src
+
+** Markdown
+
+#+begin_src emacs-lisp
+(when (require 'markdown-mode nil 'noerror)
+  (add-to-list 'auto-mode-alist '("\\.markdown$" . markdown-mode))
+  (add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode)))
+#+end_src
+
+** Newsticker
+
+#+begin_src emacs-lisp
+(setq newsticker-cache-filename (concat metafiles-dir "/.newsticker-cache"))
+(setq newsticker-dir (concat metafiles-dir "/newsticker/"))
+#+end_src
+
+** Org
+
+My =org= mode settings are contained in their own file. This function
+loads the configuration based on my login name.
+
+#+begin_src emacs-lisp
+(let* ((path (expand-file-name (concat user-login-name "-org") dotfiles-dir))
+        (literate (concat path ".org")))
+     (cond
+      ((file-exists-p literate) (org-babel-load-file literate))))
+#+end_src
+
+** Pianobar
+
+#+begin_src emacs-lisp
+(autoload 'pianobar "pianobar" nil t)
+#+end_src
+
+** Python
+
+#+begin_src emacs-lisp
+(setq python-remove-cwd-from-path nil)
+
+; Bring back indent after newline
+(add-hook 'python-mode-hook '(lambda ()
+           (define-key python-mode-map "\C-m" 'newline-and-indent)))
+
+(when (load "flymake" t)
+         (defun flymake-pyflakes-init ()
+           (let* ((temp-file (flymake-init-create-temp-buffer-copy
+                              'flymake-create-temp-inplace))
+              (local-file (file-relative-name
+                           temp-file
+                           (file-name-directory buffer-file-name))))
+             (list jme-python-flymake-script  (list temp-file))))
+
+         (add-to-list 'flymake-allowed-file-name-masks
+                  '("\\.py\\'" flymake-pyflakes-init)))
+
+(add-hook 'find-file-hook 'flymake-find-file-hook)
+#+end_src
+
+#+begin_src emacs-lisp
+;; Jedi for Python
+(eval-when-compile (require 'jedi nil t))
+(setq jedi:setup-keys t)
+(add-hook 'python-mode-hook 'jedi:setup)
+#+end_src
+
+** Rainbow mode
+
+#+begin_src emacs-lisp
+(when (require 'rainbow-mode nil 'noerror)
+  (add-hook 'css-mode-hook 'rainbow-mode))
+#+end_src
+
+** Shell
+
+I try to use my shell within Emacs as much as possible. I will admit that
+I have not yet been able to do this completely, though the desire is
+there.
+
+#+begin_src emacs-lisp
+(require 'comint)
+#+end_src
+
+Ensure that the shell prompt is read only, not doing this is just weird.
+
+#+begin_src emacs-lisp
+(setq comint-prompt-read-only t)
+#+end_src
+
+Update the mode's keybindings to work to my liking.
+
+#+begin_src emacs-lisp
+(define-key comint-mode-map [(meta p)]
+   'comint-previous-matching-input-from-input)
+(define-key comint-mode-map [(meta n)]
+   'comint-next-matching-input-from-input)
+(define-key comint-mode-map [(control meta n)]
+    'comint-next-input)
+(define-key comint-mode-map [(control meta p)]
+    'comint-previous-input)
+#+end_src
+
+I have found that when I use =autopair= mode, it does not work well in the
+shell. I make sure to turn it off in that case.
+
+#+begin_src emacs-lisp
+(add-hook 'term-mode-hook
+          #'(lambda ()
+              (setq autopair-dont-activate t) ;; for emacsen < 24
+              (autopair-mode -1))             ;; for emacsen >= 24
+          )
+#+end_src
+
+Ensure the shell is set to UTF-8.
+
+#+begin_src emacs-lisp
+(add-hook 'term-exec-hook
+          (function
+           (lambda ()
+             (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))))
+#+end_src
+
+Autoload =multi-term= and =multi-term-next= so they can be used in key
+bindings.
+
+#+begin_src emacs-lisp
+(autoload 'multi-term "multi-term" nil t)
+(autoload 'multi-term-next "multi-term" nil t)
+#+end_src
+
+Tramp is a fantastic package that allows for remote file editing.
+
+#+begin_src emacs-lisp
+(require 'tramp)
+#+end_src
+
+I provide a regexp to match my prompts.
+
+#+begin_src emacs-lisp
+(setq shell-prompt-pattern "^[^a-zA-Z].*[#$%>☞] *")
+#+end_src
+
+Set Tramp to use ssh by default.
+
+#+begin_src emacs-lisp
+(setq tramp-default-method "ssh")
+#+end_src
+
+Have Tramp store its files in the meta information directory.
+
+#+begin_src emacs-lisp
+(setq tramp-persistency-file-name meta-tramp)
+#+end_src
+
+** Smex
+
+#+begin_src emacs-lisp
+(smex-initialize)
+(global-set-key (kbd "M-x") 'smex)
+(global-set-key (kbd "M-X") 'smex-major-mode-commands)
+(global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
+#+end_src
+
+** Swank-js
+
+#+begin_src emacs-lisp
+(when (package-installed-p 'slime-js)
+  (add-hook 'js2-mode-hook
+            (lambda ()
+              (slime-js-minor-mode 1)))
+  (add-hook 'css-mode-hook
+            (lambda ()
+              (define-key css-mode-map "\M-\C-x" 'slime-js-refresh-css)
+              (define-key css-mode-map "\C-c\C-r" 'slime-js-embed-css))))
+#+end_src
+
+** Uniquify
+
+By default, Emacs makes buffer names unique by adding =<2>=, =<3>=,
+etc. to the end of the buffer name. I don't find this particularly
+useful. Using the =Uniquify= package, I can easily change this behavior.
+
+#+begin_src emacs-lisp
+(require 'uniquify)
+#+end_src
+
+Use the =post-forward= type of naming for buffers. This names the buffer
+with the file name followed by a shortened form of the path.
+
+For example:
+
+=/foo/bar/mumble/name= becomes =name|bar/mumble=
+
+#+begin_src emacs-lisp
+(setq uniquify-buffer-name-style 'post-forward)
+#+end_src
+
+Change the string used as a separator for the buffer name components.
+
+#+begin_src emacs-lisp
+(setq uniquify-separator ":")
+#+end_src
+
+Rerationalize buffer names after a buffer has been killed.
+
+#+begin_src emacs-lisp
+(setq uniquify-after-kill-buffer-p t)
+#+end_src
+
+Some buffers should not be uniquified. I provide a regular expression here
+for these exceptions.
+
+#+begin_src emacs-lisp
+(setq uniquify-ignore-buffers-re "^\\*")
+#+end_src
+
+** w3m
+
+#+begin_src emacs-src
+(setq w3m-use-cookies t)
+#+end_src
+
+* Key Bindings
+
+I have debated several times about where to locate key bindings. While
+there is a good argument to keeping them near the functions/configuration
+they relate to, I find it better to have all global keys in one place.
+
+| Key       | Action              | Comments                            |
+|-----------+---------------------+-------------------------------------|
+| =C-z=     | hide-or-expand      | Thought of as analog to shell sleep |
+| =M-`=     | other-frame         |                                     |
+| =C-`=     | pop-to-mark-command |                                     |
+| =C-==     | expand-region       |                                     |
+| =C-c h=   | helm-mini           |                                     |
+| =C-c t=   | multi-term-next     | Reuse terminal                      |
+| =C-c T=   | multi-term          | Create a new terminal               |
+| =C-c w=   | emacs-toggle-size   | Custom function for min/max size    |
+| =C-x C-d= | dired               | Use dired instead of dumping dir    |
+| =C-. C-s= | ace-jump-mode       |                                     |
+
+
+** Top-level mappings
+
+#+begin_src emacs-lisp
+(bind-key "C-z" 'hide-or-expand)
+
+(bind-key "M-`" 'other-frame)
+(bind-key "C-`" 'pop-to-mark-command)
+
+(when (package-installed-p 'expand-region)
+    (bind-key "C-=" 'er/expand-region))
+#+end_src
+
+** =C-c= mappings
+
+#+begin_src emacs-lisp
+(bind-key "C-c h" 'helm-mini)
+(bind-key "C-c t" 'multi-term-next)
+(bind-key "C-c T" 'multi-term)
+(bind-key "C-c w" 'emacs-toggle-size)
+#+end_src
+
+** =C-x= mappings
+
+#+begin_src emacs-lisp
+(bind-key "C-c C-d" 'dired)
+#+end_src
+
+** =C-.= mappings
+
+#+begin_src emacs-lisp
+(when (package-installed-p 'ace-jump-mode)
+    (bind-key "C-. C-s" 'ace-jump-mode))
+#+end_src
+
+* Needs to be moved
+
+#+begin_src emacs-lisp
+(load "functions")
+#+end_src
+
+* Emacs Server
+
+#+begin_src emacs-lisp
+;; Don't start the server unless we can verify that it isn't running.
+(require 'server)
+(when (and (functionp 'server-running-p) (not (server-running-p)))
+(server-start))
+
+;; Support for Chrome 'edit with emacs' extension
+(when (require 'edit-server nil 'noerror)
+  (edit-server-start))
+#+end_src
