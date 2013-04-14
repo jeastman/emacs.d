@@ -258,6 +258,14 @@ order to handle loading these, I add the 3rd party libraries in the
      (normal-top-level-add-subdirs-to-load-path))
 #+end_src
 
+I leverage the =bind-key= package to do all of my key-binding. I need
+to =require= it in early to handle all of my mode-specific key
+bindings.
+
+#+begin_src emacs-lisp
+(require 'bind-key)
+#+end_src
+
 *** System and user specific configuration
 
 I run the same configuration on several machines. Different machines have
@@ -414,7 +422,7 @@ number of seconds to pause before unfinished commands are echoed. I find
 the default of 1 second a bit slow.
 
 #+begin_src emacs-lisp
-(echo-keystrokes 0.1)
+(setq echo-keystrokes 0.1)
 #+end_src
 
 I am not a big fan of overloading the arrow keys. Plus they are just too
@@ -843,7 +851,7 @@ extensions over time. This one works.
   (ac-config-default)
   (setq ac-user-dictionary-files (concat metafiles-dir "/.dict"))
   (setq ac-comphist-file (concat metafiles-dir "/ac-comphist.dat"))
-  (bind-key "S-TAB" 'auto-complete ac-mode-map)
+  (bind-key "S-TAB" 'auto-complete ac-mode-map))
 #+end_src
 
 ** CoffeeScript
