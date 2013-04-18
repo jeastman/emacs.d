@@ -5,14 +5,8 @@
 ;; Date: 2013-04-13
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;(add-hook 'after-init-hook
-; `(lambda ()
-;    ;; remember this directory
-;    (require 'org)
-;    (org-babel-load-file (expand-file-name "init-ext.org" ".emacs.d"))))
-
 (require 'org)
-(org-babel-load-file (expand-file-name "init-ext.org" ".emacs.d"))
+(org-babel-load-file (expand-file-name "init-ext.org" "~/.emacs.d"))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
