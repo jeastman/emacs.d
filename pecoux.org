@@ -73,7 +73,7 @@ Org specific directories.
 
 #+begin_src emacs-lisp
 (setq org-directory "~/Dropbox/org")
-(setq org-mobile-directory "~/Dropbox/MobileOrg")
+(setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
 (setq my-notes "~/Dropbox/notes")
 #+end_src
 
@@ -130,6 +130,7 @@ button. Fix that.
 I like using the =Consolas= font on the Mac.
 
 #+begin_src emacs-lisp
-(set-face-attribute 'default nil :font "Consolas-14")
+(if window-system
+    (set-face-attribute 'default nil :font "Consolas-14"))
 #+end_src
 
