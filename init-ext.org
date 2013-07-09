@@ -4,6 +4,13 @@
 
 * General Configuration
 
+** Common Lisp
+
+#+begin_src emacs-lisp
+(eval-when-compile
+   (require 'cl))
+#+end_src
+
 ** Library Paths
 
 Everything is situated underneath =dotfiles-dir (~/.emacs.d)=
@@ -19,10 +26,19 @@ information files (backups, temporary files, etc.)
 
 First, we need to define the =dotfile-dir= and =metafiles-dir= values.
 
+#+BEGIN_QUOTE
+*UPDATE*: I had to move the package initialization into the =init.el=
+file in order to ensure proper loading of =org-mode=. While this is not
+ideal, it currently works for everything but the initial launch.
+
+For the time being, I am leaving the moved portions here until I formulate
+a proper fix for the situation.
+#+END_QUOTE
+
 #+begin_src emacs-lisp
-(setq dotfiles-dir (file-name-directory
-    (or (buffer-file-name) load-file-name)))
-(setq metafiles-dir "~/.emacs-meta")
+;(setq dotfiles-dir (file-name-directory
+;    (or (buffer-file-name) load-file-name)))
+;(setq metafiles-dir "~/.emacs-meta")
 #+end_src
 
 As this may be the first time I am running in this environment, the
@@ -30,8 +46,8 @@ As this may be the first time I am running in this environment, the
 it if it doesn't.
 
 #+begin_src emacs-lisp
-(unless (file-exists-p metafiles-dir)
-  (make-directory metafiles-dir))
+;(unless (file-exists-p metafiles-dir)
+;  (make-directory metafiles-dir))
 #+end_src
 
 *** Temporary directory
@@ -62,15 +78,15 @@ instead of referencing external projects directly. This is extremely
 convenient and makes updates very simple.
 
 #+begin_src emacs-lisp
-(require 'package)
+;(require 'package)
 #+end_src
 
 The package directory and archives go into their own directories under
 =dotfiles-dir=.
 
 #+begin_src emacs-lisp
-(setq elpa-dir (concat dotfiles-dir "elpa"))
-(setq elpa-archives-dir (concat elpa-dir "/archives"))
+;(setq elpa-dir (concat dotfiles-dir "elpa"))
+;(setq elpa-archives-dir (concat elpa-dir "/archives"))
 #+end_src
 
 *** Package Repositories
@@ -79,19 +95,19 @@ The =package-archives= variable is an alist of archive sites from which
 packages may be fetched.
 
 #+begin_src emacs-lisp
-  (add-to-list 'package-archives
-               '("marmalade" .
-                 "http://marmalade-repo.org/packages/") t)
-  (add-to-list 'package-archives
-               '("melpa" .
-                 "http://melpa.milkbox.net/packages/") t)
+;  (add-to-list 'package-archives
+;               '("marmalade" .
+;                 "http://marmalade-repo.org/packages/") t)
+;  (add-to-list 'package-archives
+;               '("melpa" .
+;                 "http://melpa.milkbox.net/packages/") t)
 #+end_src
 
 The package system needs to be initialized. The first time this is loaded,
 the archives will not have been cataloged.
 
 #+begin_src emacs-lisp
-(package-initialize)
+;(package-initialize)
 
 (unless (file-exists-p elpa-archives-dir)
   (package-refresh-contents))
@@ -1125,6 +1141,7 @@ loads the configuration based on my login name.
 Turn on powerline for modeline goodness.
 
 #+begin_src emacs-lisp
+(message "init powerline")
 (powerline-default-theme)
 #+end_src
 
