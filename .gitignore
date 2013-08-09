@@ -4,6 +4,9 @@ vendor/edit-server.el
 .DS_Store
 url
 eshell
+init-ext.el
 jeastman.el
 jeastman-org.el
 jeastman.org
+pecoux.el
+swank.scm

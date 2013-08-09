@@ -10,23 +10,23 @@
 
 Use =aspell= instead of =ispell=.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq-default ispell-program-name "/usr/local/bin/aspell")
-#+end_src
+#+END_SRC
 
 *** CoffeeScript
 
 Set the coffeescript path.
 
-#+begin_src emacs-lisp
-(setq coffee-command "/usr/local/bin/coffee")
-#+end_src
+#+BEGIN_SRC emacs-lisp
+(setq coffee-command "/usr/local/share/npm/bin/coffee")
+#+END_SRC
 
 *** Erlang
 
 Set up Erlang paths.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "/usr/local/Cellar/erlang/R16B/lib/erlang/lib/tools-2.6.10/emacs")
 (setq erlang-root-dir "/usr/local/Cellar/erlang/R16B")
 (setq erlang-man-dirs
@@ -34,48 +34,48 @@ Set up Erlang paths.
     ("Man - Modules" "share/man/man3" t)
     ("Man - Files" "share/man/man4" t)
     ("Man - Applications" "share/man/man6" t)))
-#+end_src
+#+END_SRC
 
 *** Flymake
 
 Path for python flymake script.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq jme-python-flymake-script "/Users/jeastman/.emacs.d/vendor/pycheckers.sh")
-#+end_src
+#+END_SRC
 
 *** LaTeX
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (defun flymake-get-tex-args (file-name)
       (list "chktex" (list "-H" "-I" "-q" "-v0" file-name)))
-#+end_src
+#+END_SRC
 
 *** markown
 
 Use =mmd= (MultiMarkdown) instead of =md= (Markdown).
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq markdown-command "/usr/local/bin/mmd")
-#+end_src
+#+END_SRC
 
 *** Node
 
 Make sure node path is set up.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setenv "NODE_PATH" "/usr/local/lib/node_modules")
-#+end_src
+#+END_SRC
 
 *** Org
 
 Org specific directories.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq org-directory "~/Dropbox/org")
 (setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
 (setq my-notes "~/Dropbox/notes")
-#+end_src
+#+END_SRC
 
 * Machine Specific
 
@@ -83,20 +83,20 @@ Org specific directories.
 
 Prevent finder from opening new frames.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq ns-pop-up-frames 'nil)
-#+end_src
+#+END_SRC
 
 Take advantage of the trash can on the Mac.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq delete-by-moving-to-trash t
       trash-directory "~/.Trash/emacs")
-#+end_src
+#+END_SRC
 
 Include spotlight data into helm.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (if (package-installed-p 'helm)
     (progn (require 'helm-misc)
      (setq helm-for-files-preferred-list
@@ -109,19 +109,19 @@ Include spotlight data into helm.
              helm-c-source-file-cache
              helm-c-source-files-in-current-dir
              helm-c-source-mac-spotlight)))))
-#+end_src
+#+END_SRC
 
 ** Tweaks
 
 Flyspell depends on =mouse-3= which does not work well without a 3rd
 button. Fix that.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (eval-after-load "flyspell"
   '(progn
      (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
      (define-key flyspell-mouse-map [moude-3] #'undefined)))
-#+end_src
+#+END_SRC
 
 ** Visuals
 
@@ -129,8 +129,8 @@ button. Fix that.
 
 I like using the =Consolas= font on the Mac.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (if window-system
     (set-face-attribute 'default nil :font "Consolas-14"))
-#+end_src
+#+END_SRC
 

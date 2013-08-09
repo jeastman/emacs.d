@@ -15,25 +15,26 @@ automatically by using =(org-babel-load-file "/path/to/file")=.
 In order to overcome some issues with the latest version of =org=, I
 am loading =org-compat= explicitly.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (load "org-compat")
-#+end_src
+#+END_SRC
 
 *** Modules
 Org has a number of handy optional modules. The following list are the set
 of modules that I am currently experimenting with.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (setq org-modules '(org-annotate-file
                       org-bbdb
                       org-bibtex
                       org-docview
+                      org-list
                       org-info
                       org-jsinfo
                       org-man
                       org-panel
                       org-w3m))
-#+end_src
+#+END_SRC
 
 *** Org Files
 I use a number of files to break up tasks into resonably grouped files.
@@ -43,7 +44,7 @@ I use a number of files to break up tasks into resonably grouped files.
 =home.org= - Home-specific items.
 =notes.org= - General notes file.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (setq diary-file (concat org-directory "/diary"))
   (setq org-mobile-inbox-for-pull (concat org-directory "/flagged.org"))
   (setq org-agenda-files (list (concat org-directory "/work.org")
@@ -52,83 +53,83 @@ I use a number of files to break up tasks into resonably grouped files.
                                (concat org-directory "/notes.org")))
   (setq org-default-notes-file (concat org-directory "/notes.org"))
   (setq org-annotate-file-storage-file (concat org-directory "/annotated.org"))
-#+end_src
+#+END_SRC
 
 ** Look and Feel
 
 Startup with content folded.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq org-startup-folded 'content)
-#+end_src
+#+END_SRC
 
 Use =ido=-style completion.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq org-completion-use-ido t)
-#+end_src
+#+END_SRC
 
 Make sure we we export with syntax highlighting.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq org-src-fontify-natively t)
-#+end_src
+#+END_SRC
 
 *** Targets
 
 Targets include this file and any file contributing to the agenda - up to
 5 levels deep.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq org-refile-targets (quote ((org-agenda-files :maxlevel . 5) (nil :maxlevel . 5))))
-#+end_src
+#+END_SRC
 
 Targets start with the file name. This allows creating level 1 tasks.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq org-refile-use-outline-path (quote file))
-#+end_src
+#+END_SRC
 
 Targets complete in steps so we start with filename, TAB shows the next
 level of targets etc.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq org-outline-path-complete-in-steps t)
-#+end_src
+#+END_SRC
 
 Allow refile to create parent tasks with confirmation.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq org-refile-allow-creating-parent-nodes (quote confirm))
-#+end_src
+#+END_SRC
 
 ** Task settings
 
 *** Timestamps
 Add a timestamp to the task when it moves to the DONE state.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq org-log-done 'time)
-#+end_src
+#+END_SRC
 
 *** Effort
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq org-global-properties
       '(("Effort_ALL". "0 0:15 0:30 1:00 2:00 3:00 4:00")))
-#+end_src
+#+END_SRC
 
 *** Workflows
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq org-todo-keywords
       '((sequence "PROJECT(p)" "|" "FINISHED(f)")
         (sequence "TODO(t)" "|" "NOTE(n)" "DONE(d)")
         (sequence "TODO(t)" "STARTED(s)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
-#+end_src
+#+END_SRC
 
 *** Templates
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq org-capture-templates
       '(("m" "Mezeo Task" entry (file+headline
                                   (concat org-directory "/work.org") "General")
@@ -139,7 +140,7 @@ Add a timestamp to the task when it moves to the DONE state.
         ("n" "Notes" entry (file+datetree
                               (concat org-directory "/notes.org") "Inbox")
          "* %^{Description} %^g\n  %?\n  Added: %U")))
-#+end_src
+#+END_SRC
 
 *** Archiving
 Archiving of completed tasks. see
@@ -151,7 +152,7 @@ top of the file (replace archive.text with the archive file):
 =-*- mode: org; after-save-hook: (archive-done-tasks) -*-=
 =#+ARCHIVE: archive.txt::=
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (defvar jme/org-archive-expiry-days 7
   "The number of days after which a completed task should be auto-archived.
 This can be 0 for immediate, or a floating point value.")
@@ -185,11 +186,11 @@ This can be 0 for immediate, or a floating point value.")
 
 (setq safe-local-variable-values (quote ((after-save-hook archive-done-tasks))))
 (defalias 'archive-done-tasks 'jme/org-archive-done-tasks)
-#+end_src
+#+END_SRC
 
 ** Agenda Settings
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (setq org-agenda-custom-commands
         '(
           ("P" "Projects"
@@ -209,7 +210,7 @@ This can be 0 for immediate, or a floating point value.")
                         ))
             ))
           ))
-#+end_src
+#+END_SRC
 
 A common problem with all-day and multi-day events in org agenda view is
 that they become separated from timed events and are placed below all =TODO=
@@ -219,7 +220,7 @@ correctly placed in the agenda:
 
 See http://orgmode.org/worg/org-contrib/org-mac-iCal.html
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (add-hook 'org-agenda-cleanup-fancy-diary-hook
           (lambda ()
             (goto-char (point-min))
@@ -232,11 +233,11 @@ See http://orgmode.org/worg/org-contrib/org-mac-iCal.html
               (save-excursion
                 (re-search-backward "^[0-9]+:[0-9]+-[0-9]+:[0-9]+ " nil t))
               (insert (match-string 0)))))
-#+end_src
+#+END_SRC
 
 ** Key bindings
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (bind-key "C-c l" 'org-store-link)
   (bind-key "C-c L" 'org-insert-link-global)
   (bind-key "C-c a" 'org-agenda)
@@ -245,4 +246,4 @@ See http://orgmode.org/worg/org-contrib/org-mac-iCal.html
   (eval-after-load 'org
     '(progn
        (bind-key "C-c p" 'orgpan-panel org-mode-map)))
-#+end_src
+#+END_SRC
