@@ -2,37 +2,38 @@
 ;; Emacs configuration file
 ;; Converted to literate format
 ;; Author: John Eastman
-;; Date: 2013-04-13
+;; Date: 2013-10-24
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; This section has been moved from init-ext as I am loading org from
-;; from the package system and need it to be used from the elpa directory.
-;;
-;; This is currently broken for first time use, since 
-;; Define dotfile-dir and metafiles-dir values
-(setq dotfiles-dir (file-name-directory
-    (or (buffer-file-name) load-file-name)))
-(setq metafiles-dir "~/.emacs-meta")
+;; Use cask for package management
+(require 'cask "~/.cask/cask.el")
+(cask-initialize)
 
-;; As this may be the first time this is run, we may need to create
-;; the metafiles directory if it does not exist.
-(unless (file-exists-p metafiles-dir)
-  (make-directory metafiles-dir))
+(when (not (cl-remove-if-not
+            (lambda (p) (equal 'org (car p)))
+            package-alist))
+  (message "No org-mode package found; installing now...")
+  (package-install 'org))
 
 ;; Invoke and configure package management.
-(require 'package)
-(setq elpa-dir (concat dotfiles-dir "elpa"))
-(setq elpa-archives-dir (concat elpa-dir "/archives"))
-(add-to-list 'package-archives
-             '("marmalade" .
-               "http://marmalade-repo.org/packages/") t)
-(add-to-list 'package-archives
-             '("melpa" .
-               "http://melpa.milkbox.net/packages/") t)
-
-(package-initialize)
+;(require 'package)
+;(setq elpa-dir (concat dotfiles-dir "elpa"))
+;(setq elpa-archives-dir (concat elpa-dir "/archives"))
+;(add-to-list 'package-archives
+;             '("marmalade" .
+;               "http://marmalade-repo.org/packages/") t)
+;(add-to-list 'package-archives
+;             '("melpa" .
+;               "http://melpa.milkbox.net/packages/") t)
+;
+;(package-initialize)
 
 (require 'org)
+(when (string-match "^[1234567]" (org-version))
+  (warn "Org-Mode is out of date. We expect org 8 or higher, but instead we have %s" (org-version)))
+
+(require 'pallet)
+
 (org-babel-load-file (expand-file-name "init-ext.org" "~/.emacs.d"))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

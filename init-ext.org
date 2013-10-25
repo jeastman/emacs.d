@@ -26,19 +26,10 @@ information files (backups, temporary files, etc.)
 
 First, we need to define the =dotfile-dir= and =metafiles-dir= values.
 
-#+BEGIN_QUOTE
-*UPDATE*: I had to move the package initialization into the =init.el=
-file in order to ensure proper loading of =org-mode=. While this is not
-ideal, it currently works for everything but the initial launch.
-
-For the time being, I am leaving the moved portions here until I formulate
-a proper fix for the situation.
-#+END_QUOTE
-
 #+BEGIN_SRC emacs-lisp
-;(setq dotfiles-dir (file-name-directory
-;    (or (buffer-file-name) load-file-name)))
-;(setq metafiles-dir "~/.emacs-meta")
+(setq dotfiles-dir (file-name-directory
+    (or (buffer-file-name) load-file-name)))
+(setq metafiles-dir "~/.emacs-meta")
 #+END_SRC
 
 As this may be the first time I am running in this environment, the
@@ -46,8 +37,8 @@ As this may be the first time I am running in this environment, the
 it if it doesn't.
 
 #+BEGIN_SRC emacs-lisp
-;(unless (file-exists-p metafiles-dir)
-;  (make-directory metafiles-dir))
+(unless (file-exists-p metafiles-dir)
+  (make-directory metafiles-dir))
 #+END_SRC
 
 *** Temporary directory
@@ -77,46 +68,16 @@ I have moved /almost/ everything to use the package management system
 instead of referencing external projects directly. This is extremely
 convenient and makes updates very simple.
 
-#+BEGIN_SRC emacs-lisp
-;(require 'package)
-#+END_SRC
+My Emacs packages are now managed by [[https://github.com/cask/cask][Cask]] and [[https://github.com/rdallasgray/pallet][Pallet]].
 
-The package directory and archives go into their own directories under
-=dotfiles-dir=.
+I maintain a list of the packages I am using here, but the actual list of
+pacakges is managed in the =Cask= file. Pallet helps to ensure that the
+packages installed are kept in sync with the dependency spec.
 
-#+BEGIN_SRC emacs-lisp
-;(setq elpa-dir (concat dotfiles-dir "elpa"))
-;(setq elpa-archives-dir (concat elpa-dir "/archives"))
-#+END_SRC
+*** Packages
 
-*** Package Repositories
-
-The =package-archives= variable is an alist of archive sites from which
-packages may be fetched.
-
-#+BEGIN_SRC emacs-lisp
-;  (add-to-list 'package-archives
-;               '("marmalade" .
-;                 "http://marmalade-repo.org/packages/") t)
-;  (add-to-list 'package-archives
-;               '("melpa" .
-;                 "http://melpa.milkbox.net/packages/") t)
-#+END_SRC
-
-The package system needs to be initialized. The first time this is loaded,
-the archives will not have been cataloged.
-
-#+BEGIN_SRC emacs-lisp
-;(package-initialize)
-
-(unless (file-exists-p elpa-archives-dir)
-  (package-refresh-contents))
-#+END_SRC
-
-*** Packages to Install
-
-This list of packages are installed at startup, if they have not already
-been installed.
+This list is a /mostly/ up-to-date list of the packages I use. Refer to the
+=Cask= file for the list of packages actually installed.
 
 | Package                 | Description                                                               |
 |-------------------------+---------------------------------------------------------------------------|
@@ -159,58 +120,6 @@ been installed.
 | =undo-tree=             | Treat undo history as a tree                                              |
 | =w3m=                   | an Emacs interface to w3m                                                 |
 
-#+BEGIN_SRC emacs-lisp
-(defvar my-packages
-  '(
-    ace-jump-mode
-    auto-complete
-    autopair
-    coffee-mode
-    deferred
-    deft
-    dired+
-    dired-details
-    dired-details+
-    dired-single
-    epc
-    expand-region
-    flymake-coffee
-    graphviz-dot-mode
-    handlebars-mode
-    helm
-    jedi
-    js2-mode
-    magit
-    markdown-mode
-    markdown-mode+
-    multi-term
-    nose
-    paredit
-    powerline
-    pretty-mode
-    rainbow-delimiters
-    rainbow-mode
-    slime
-    slime-js
-    slime-repl
-    smex
-    undo-tree
-    w3m)
-  "List of packages to ensure are installed at startup.")
-#+END_SRC
-
-I use the list to check for packages that are not already installed and
-install them, with confirmation, of course.
-
-#+BEGIN_SRC emacs-lisp
-(mapc
- (lambda (package)
-   (or (package-installed-p package)
-       (if (y-or-n-p (format "Package %s is missing. Install it? " package))
-           (package-install package))))
- my-packages)
-#+END_SRC
-
 ** Additional Paths
 
 I add the =dotfiles-dir= to the load path here to ensure we can pick up
@@ -246,7 +155,7 @@ and maintaining them.
 | =meta-tramp=     | File used for =tramp= persistence                                                                         |
 
 #+BEGIN_SRC emacs-lisp
-(setq 
+(setq
    meta-saveplace (concat metafiles-dir "/saveplace")
    ;meta-backup (concat metafiles-dir "/backups/") ;; still needs work
    meta-bookmarks (concat metafiles-dir "/bookmarks")
