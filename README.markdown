@@ -3,7 +3,11 @@ Emacs Configuration
 
 The majority of configuration is done directly in `init.el`. I typically run
 on MacOS X and tend to do most of my tweaking on that platform. I use the
-same configuration on Linux, though not as frequently. 
+same configuration on Linux, though not as frequently.
+
+I have recently converted my configuration to literate style using
+`org-mode` and `org-babel`. Please have a look at the individual org files
+for more information.
 
 Additional Directories
 ---------------------
@@ -57,7 +61,7 @@ variables to machine specific files. Paths for each item listed below are expect
 ### aspell ###
 
         ispell-program-name
-        
+
 Spell check section needs absolute path to aspell.
 
 ### multi-term ###
@@ -72,7 +76,7 @@ is common on all platforms, it is defined in `init.el`.
 I use multi-markdown instead of markdown, `markdown-command` is set to the
 absolute path of `mmd`.
 
-### Erlang ### 
+### Erlang ###
 
         erlang-root-dir
 
@@ -104,7 +108,7 @@ Full path to `pycheckers.sh` file for flymake is specified.
 
         org-directory
         org-mobile-directory
-        
+
 Paths to where org files are located as well as files published for mobile
 org.
 

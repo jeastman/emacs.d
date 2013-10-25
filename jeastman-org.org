@@ -55,6 +55,16 @@ I use a number of files to break up tasks into resonably grouped files.
   (setq org-annotate-file-storage-file (concat org-directory "/annotated.org"))
 #+END_SRC
 
+** Babel
+
+Ensure we have support for programming languages used in code blocks.
+
+#+BEGIN_SRC emacs-lisp
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t) (python . t)))
+#+END_SRC
+
 ** Look and Feel
 
 Startup with content folded.

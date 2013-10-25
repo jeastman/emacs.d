@@ -141,7 +141,6 @@ been installed.
 | =jedi=                  | a Python auto-completion for Emacs                                        |
 | =js2-mode=              | Improved JavaScript editing mode                                          |
 | =magit=                 | Control Git from Emacs                                                    |
-| =magithub=              | Magit extensions for using GitHub                                         |
 | =markdown-mode=         | Major mode for Markdown-formatted text files                              |
 | =markdown-mode+=        | extra functions for markdown-mode                                         |
 | =multi-term=            | Managing multiple terminal buffers in Emacs                               |
@@ -182,7 +181,6 @@ been installed.
     jedi
     js2-mode
     magit
-    magithub
     markdown-mode
     markdown-mode+
     multi-term
@@ -997,7 +995,7 @@ I like automatic indentation, needs to be turned on for Haskell.
 (when (package-installed-p 'helm)
   (require 'helm-misc)
   (bind-key "C-c M-x" 'helm-M-x)
-  (bind-key "C-h a" 'helm-c-apropos)
+  (bind-key "C-h a" 'helm-apropos)
   (bind-key "M-s a" 'helm-do-grep)
   (bind-key "M-s b" 'helm-occur)
   (bind-key "M-s F" 'helm-for-files))
