@@ -994,8 +994,8 @@ These settings control the behavior of ido.
 | =ido-max-work-directory-list=        | =30=       | Maximum number of working directories to record    |
 | =ido-max-work-file-list=             | =50=       | Maximum number of names of recently opened files   |
 | =ido-save-directory-list-file=       | =meta-ido= | File used to store ido state                       |
-| =ido-use-filename-at-point=          | =t=        | Attempt to use filename at point as starting point |
-| =ido-use-url-at-point=               | =t=        | Attempt to use URL at point                        |
+| =ido-use-filename-at-point=          | =nil=      | Don't attempt to use filename at point as starting point |
+| =ido-use-url-at-point=               | =nil=      | Don't attempt to use URL at point                  |
 | =confirm-nonexistent-file-or-buffer= | =nil=      | Don't confirm before visiting a non-existent file  |
 
 #+BEGIN_SRC emacs-lisp
@@ -1010,8 +1010,8 @@ These settings control the behavior of ido.
    ido-max-work-directory-list 30   ; should be enough
    ido-max-work-file-list      50   ; remember many
    ido-save-directory-list-file meta-ido
-   ido-use-filename-at-point t
-   ido-use-url-at-point t
+   ido-use-filename-at-point nil
+   ido-use-url-at-point nil
   )
 
   (setq confirm-nonexistent-file-or-buffer nil)
