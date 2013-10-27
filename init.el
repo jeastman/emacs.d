@@ -15,19 +15,6 @@
   (message "No org-mode package found; installing now...")
   (package-install 'org))
 
-;; Invoke and configure package management.
-;(require 'package)
-;(setq elpa-dir (concat dotfiles-dir "elpa"))
-;(setq elpa-archives-dir (concat elpa-dir "/archives"))
-;(add-to-list 'package-archives
-;             '("marmalade" .
-;               "http://marmalade-repo.org/packages/") t)
-;(add-to-list 'package-archives
-;             '("melpa" .
-;               "http://melpa.milkbox.net/packages/") t)
-;
-;(package-initialize)
-
 (require 'org)
 (when (string-match "^[1234567]" (org-version))
   (warn "Org-Mode is out of date. We expect org 8 or higher, but instead we have %s" (org-version)))
