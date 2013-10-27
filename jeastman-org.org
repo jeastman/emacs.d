@@ -60,9 +60,14 @@ I use a number of files to break up tasks into resonably grouped files.
 Ensure we have support for programming languages used in code blocks.
 
 #+BEGIN_SRC emacs-lisp
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((emacs-lisp . t) (python . t)))
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (ditaa . t)
+     (dot . t)
+     (gnuplot . t)
+     (plantuml . t)
+     (python . t)))
 #+END_SRC
 
 ** Look and Feel
