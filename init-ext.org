@@ -484,6 +484,32 @@ Also, show the size of the file.
 (size-indication-mode 1)
 #+END_SRC
 
+***** Battery information
+
+Battery information display in the modeline is controlled by
+=battery-mode-line-format= and =battery-status-function=.
+
+=battery-mode-line-format= is a customizable variable, I am setting it here
+to reflect the following format:
+
+  - status
+    - =empty= - high
+    - =-= - low
+    - =!= - critical
+    - =+= - charging
+  - load percentage
+  - =%=
+  - " " - a space
+  - time remaining
+
+The result should look something like:
+
+=42% 2:30=
+
+#+BEGIN_SRC emacs-lisp
+(setq battery-mode-line-format " %b%p%%%% %t")
+#+END_SRC
+
 *** Miscellaneous
 
 Add newline to end of file on save.
@@ -1047,9 +1073,104 @@ loads the configuration based on my login name.
 
 Turn on powerline for modeline goodness.
 
+I like the look of powerline, but I wanted battery status displayed, which
+it did not do so well. This updated theme adds that by moving the
+positioning stuff over more to the right and adding the
+=global-mode-string= into its own section. When nothing is set in that
+portion, it remains empty. As of now, I manually turn on battery status if
+needed.
+
+The modeline is broken into two sides, left and right.
+
+*** The left hand side
+
+The left hand side is composed of:
+
+  - Left side
+    - Buffer status
+      - =%= - read only
+      - =*= - modified
+      - =-= - not modified
+    - Buffer size
+    - mode-line-mule-info
+    - Buffer identification
+    - 'Which function' name
+    - " " - a space
+  - Powerline Separator
+    - ERC Modified Channels
+    - Major mode
+    - Process
+    - Minor modes
+    - Narrow
+    - " " - a space
+  - Powerline Separator
+    - VC mode
+
+*** The right hand side
+
+  - Powerline Separator
+    - global-mode-string
+      - Battery information
+  - Powerline Separator
+    - " " - a space
+    - line number
+    - ':'
+    - column number
+    - "-"
+    - Buffer Percentage
+    - 'Heads Up' display
+
+*** The theme itself
+
 #+BEGIN_SRC emacs-lisp
-(message "init powerline")
-(powerline-default-theme)
+(defun jme/powerline-theme ()
+  "Setup personal powerline theme."
+  (interactive)
+  (setq-default mode-line-format
+                '("%e"
+                  (:eval
+                   (let* ((active (powerline-selected-window-active))
+                          (mode-line (if active 'mode-line 'mode-line-inactive))
+                          (face1 (if active 'powerline-active1 'powerline-inactive1))
+                          (face2 (if active 'powerline-active2 'powerline-inactive2))
+                          (separator-left (intern (format "powerline-%s-%s"
+                                                          powerline-default-separator
+                                                          (car powerline-default-separator-dir))))
+                          (separator-right (intern (format "powerline-%s-%s"
+                                                           powerline-default-separator
+                                                           (cdr powerline-default-separator-dir))))
+                          (lhs (list (powerline-raw "%*" nil 'l)
+                                     (powerline-buffer-size nil 'l)
+                                     (powerline-raw mode-line-mule-info nil 'l)
+                                     (powerline-buffer-id nil 'l)
+                                     (when (and (boundp 'which-func-mode) which-func-mode)
+                                       (powerline-raw which-func-format nil 'l))
+                                     (powerline-raw " ")
+                                     (funcall separator-left mode-line face1)
+                                     (when (boundp 'erc-modified-channels-object)
+                                       (powerline-raw erc-modified-channels-object face1 'l))
+                                     (powerline-major-mode face1 'l)
+                                     (powerline-process face1)
+                                     (powerline-minor-modes face1 'l)
+                                     (powerline-narrow face1 'l)
+                                     (powerline-raw " " face1)
+                                     (funcall separator-left face1 face2)
+                                     (powerline-vc face2 'r)))
+                          (rhs (list (funcall separator-right face2 face1)
+                                     (powerline-raw global-mode-string face1 'r)
+                                     (funcall separator-right face1 mode-line)
+                                     (powerline-raw " ")
+                                     (powerline-raw "%4l" nil 'l)
+                                     (powerline-raw ":" nil 'l)
+                                     (powerline-raw "%3c" nil 'r)
+                                     (powerline-raw "-" nil 'r)
+                                     (powerline-raw "%6p" nil 'r)
+                                     (powerline-hud face2 face1))))
+                     (concat (powerline-render lhs)
+                             (powerline-fill face2 (powerline-width rhs))
+                             (powerline-render rhs)))))))
+
+(jme/powerline-theme)
 #+END_SRC
 
 ** Python
@@ -1235,8 +1356,20 @@ for these exceptions.
 
 ** w3m
 
-#+BEGIN_SRC emacs-src
+#+BEGIN_SRC emacs-lisp
 (setq w3m-use-cookies t)
+#+END_SRC
+
+** Diminish
+
+I use diminish to hide most of minor modes from the modeline.
+
+#+BEGIN_SRC emacs-lisp
+(diminish 'auto-complete-mode)
+(diminish 'global-whitespace-mode)
+(diminish 'flymake-mode)
+(diminish 'git-gutter-mode)
+(diminish 'undo-tree-mode)
 #+END_SRC
 
 * Key Bindings

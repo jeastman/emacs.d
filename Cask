@@ -14,6 +14,7 @@
 (depends-on "dash")
 (depends-on "deferred")
 (depends-on "deft")
+(depends-on "diminish")
 (depends-on "dired+")
 (depends-on "dired-details")
 (depends-on "dired-details+")
