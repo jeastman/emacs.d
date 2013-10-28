@@ -487,11 +487,13 @@ Also, show the size of the file.
 ***** Battery information
 
 Battery information display in the modeline is controlled by
-=battery-mode-line-format= and =battery-status-function=.
+=battery-mode-line-format= and =battery-status-function=. I enable this
+whenever I am on a mac, as I only have mac laptops.
 
 =battery-mode-line-format= is a customizable variable, I am setting it here
 to reflect the following format:
 
+  - "⚡︎ "
   - status
     - =empty= - high
     - =-= - low
@@ -504,10 +506,30 @@ to reflect the following format:
 
 The result should look something like:
 
-=42% 2:30=
+=⚡︎ 42% 2:30=
 
 #+BEGIN_SRC emacs-lisp
-(setq battery-mode-line-format " %b%p%%%% %t")
+  (if (string-equal system-type "darwin")
+      (setq battery-mode-line-format "⚡️%b%p%%%% %t ")
+    (setq battery-mode-line-format "⚡︎ %b%p%%%% %t "))
+  (display-battery-mode)
+#+END_SRC
+
+***** Time
+
+I often run emacs in a fullscreen fashion that does not display the system
+clock on my desktop. However, I often refer to the clock, thus I add it to
+the modeline. The =display-time= functionality in Emacs is quite robust and
+can potentially display much more information than just the time. I
+configure it here to my liking.
+
+#+BEGIN_SRC emacs-lisp
+  (setq display-time-default-load-average nil)  ; Don't display load
+  (setq display-time-day-and-date nil)  ; Don't display date
+  (if (string-equal system-type "darwin")
+      (setq display-time-format "🕗%l:%M%p")
+    (setq display-time-format "%l:%M%p"))
+  (display-time-mode)
 #+END_SRC
 
 *** Miscellaneous
@@ -1084,110 +1106,6 @@ loads the configuration based on my login name.
 (autoload 'pianobar "pianobar" nil t)
 #+END_SRC
 
-** Powerline
-
-Turn on powerline for modeline goodness.
-
-I like the look of powerline, but I wanted battery status displayed, which
-it did not do so well. This updated theme adds that by moving the
-positioning stuff over more to the right and adding the
-=global-mode-string= into its own section. When nothing is set in that
-portion, it remains empty. As of now, I manually turn on battery status if
-needed.
-
-The modeline is broken into two sides, left and right.
-
-*** The left hand side
-
-The left hand side is composed of:
-
-  - Left side
-    - Buffer status
-      - =%= - read only
-      - =*= - modified
-      - =-= - not modified
-    - Buffer size
-    - mode-line-mule-info
-    - Buffer identification
-    - 'Which function' name
-    - " " - a space
-  - Powerline Separator
-    - ERC Modified Channels
-    - Major mode
-    - Process
-    - Minor modes
-    - Narrow
-    - " " - a space
-  - Powerline Separator
-    - VC mode
-
-*** The right hand side
-
-  - Powerline Separator
-    - global-mode-string
-      - Battery information
-  - Powerline Separator
-    - " " - a space
-    - line number
-    - ':'
-    - column number
-    - "-"
-    - Buffer Percentage
-    - 'Heads Up' display
-
-*** The theme itself
-
-#+BEGIN_SRC emacs-lisp
-(defun jme/powerline-theme ()
-  "Setup personal powerline theme."
-  (interactive)
-  (setq-default mode-line-format
-                '("%e"
-                  (:eval
-                   (let* ((active (powerline-selected-window-active))
-                          (mode-line (if active 'mode-line 'mode-line-inactive))
-                          (face1 (if active 'powerline-active1 'powerline-inactive1))
-                          (face2 (if active 'powerline-active2 'powerline-inactive2))
-                          (separator-left (intern (format "powerline-%s-%s"
-                                                          powerline-default-separator
-                                                          (car powerline-default-separator-dir))))
-                          (separator-right (intern (format "powerline-%s-%s"
-                                                           powerline-default-separator
-                                                           (cdr powerline-default-separator-dir))))
-                          (lhs (list (powerline-raw "%*" nil 'l)
-                                     (powerline-buffer-size nil 'l)
-                                     (powerline-raw mode-line-mule-info nil 'l)
-                                     (powerline-buffer-id nil 'l)
-                                     (when (and (boundp 'which-func-mode) which-func-mode)
-                                       (powerline-raw which-func-format nil 'l))
-                                     (powerline-raw " ")
-                                     (funcall separator-left mode-line face1)
-                                     (when (boundp 'erc-modified-channels-object)
-                                       (powerline-raw erc-modified-channels-object face1 'l))
-                                     (powerline-major-mode face1 'l)
-                                     (powerline-process face1)
-                                     (powerline-minor-modes face1 'l)
-                                     (powerline-narrow face1 'l)
-                                     (powerline-raw " " face1)
-                                     (funcall separator-left face1 face2)
-                                     (powerline-vc face2 'r)))
-                          (rhs (list (funcall separator-right face2 face1)
-                                     (powerline-raw global-mode-string face1 'r)
-                                     (funcall separator-right face1 mode-line)
-                                     (powerline-raw " ")
-                                     (powerline-raw "%4l" nil 'l)
-                                     (powerline-raw ":" nil 'l)
-                                     (powerline-raw "%3c" nil 'r)
-                                     (powerline-raw "-" nil 'r)
-                                     (powerline-raw "%6p" nil 'r)
-                                     (powerline-hud face2 face1))))
-                     (concat (powerline-render lhs)
-                             (powerline-fill face2 (powerline-width rhs))
-                             (powerline-render rhs)))))))
-
-(jme/powerline-theme)
-#+END_SRC
-
 ** Python
 
 #+BEGIN_SRC emacs-lisp
@@ -1385,6 +1303,132 @@ I use diminish to hide most of minor modes from the modeline.
 (diminish 'flymake-mode)
 (diminish 'git-gutter-mode)
 (diminish 'undo-tree-mode)
+#+END_SRC
+
+* Theme Configuration
+
+** Load custom theme
+
+I have moved to using the =monoOne= font. More information may be found on
+monoOne [[https://github.com/madmalik/monoOne][here]].
+
+#+BEGIN_SRC emacs-lisp
+(if (string-equal system-type "darwin")
+    (load-theme 'tomorrow-night-mac t)
+  (load-theme 'tomorrow-night t))
+#+END_SRC
+
+For certain major modes, I find it desirable to use a non-monospaced
+font. Typically this is for certain documentation modes where the end
+result will not end up in a monospaced font. (I picked up this particular
+code from a [[ehttp://stackoverflow.com/questions/534307/set-emacs-defaut-font-face-per-buffer-mode/3756010#3756010][stackoverflow question]].
+
+#+BEGIN_SRC emacs-lisp
+(dolist (hook '(erc-mode-hook
+        LaTeX-mode-hook
+        org-mode-hook
+        markdown-mode-hook))
+  (add-hook hook (lambda () (variable-pitch-mode t))))
+#+END_SRC
+
+** Powerline
+
+Turn on powerline for modeline goodness.
+
+I like the look of powerline, but I wanted battery status displayed, which
+it did not do so well. This updated theme adds that by moving the
+positioning stuff over more to the left and adding the
+=global-mode-string= into its own section. When nothing is set in that
+portion, it remains empty.
+
+The modeline is broken into two sides, left and right.
+
+*** The left hand side
+
+The left hand side is composed of:
+
+  - Left side
+    - Buffer status
+      - =%= - read only
+      - =*= - modified
+      - =-= - not modified
+    - Buffer size
+    - mode-line-mule-info
+    - Buffer identification
+    - 'Which function' name
+    - " " - a space
+  - Powerline Separator
+    - ERC Modified Channels
+    - Major mode
+    - Process
+    - Minor modes
+    - Narrow
+    - " " - a space
+  - Powerline Separator
+    - VC mode
+
+*** The right hand side
+
+  - Powerline Separator
+    - " " - a space
+    - line number
+    - ':'
+    - column number
+    - Buffer Percentage
+  - Powerline Separator
+    - global-mode-string
+      - Battery and Time information
+
+*** The theme itself
+
+#+BEGIN_SRC emacs-lisp
+  (defun jme/powerline-theme ()
+    "Setup personal powerline theme."
+    (interactive)
+    (setq-default mode-line-format
+                  '("%e"
+                    (:eval
+                     (let* ((active (powerline-selected-window-active))
+                            (mode-line (if active 'mode-line 'mode-line-inactive))
+                            (face1 (if active 'powerline-active1 'powerline-inactive1))
+                            (face2 (if active 'powerline-active2 'powerline-inactive2))
+                            (separator-left (intern (format "powerline-%s-%s"
+                                                            powerline-default-separator
+                                                            (car powerline-default-separator-dir))))
+                            (separator-right (intern (format "powerline-%s-%s"
+                                                             powerline-default-separator
+                                                             (cdr powerline-default-separator-dir))))
+                            (lhs (list (powerline-raw "%*" nil 'l)
+                                       (powerline-buffer-size nil 'l)
+                                       (powerline-raw mode-line-mule-info nil 'l)
+                                       (powerline-buffer-id nil 'l)
+                                       (when (and (boundp 'which-func-mode) which-func-mode)
+                                         (powerline-raw which-func-format nil 'l))
+                                       (powerline-raw " ")
+                                       (funcall separator-left mode-line face1)
+                                       (when (boundp 'erc-modified-channels-object)
+                                         (powerline-raw erc-modified-channels-object face1 'l))
+                                       (powerline-major-mode face1 'l)
+                                       (powerline-process face1)
+                                       (powerline-minor-modes face1 'l)
+                                       (powerline-narrow face1 'l)
+                                       (powerline-raw " " face1)
+                                       (funcall separator-left face1 face2)
+                                       (powerline-vc face2 'r)))
+                            (rhs (list (funcall separator-right face2 face1)
+                                       (powerline-raw " " face1)
+                                       (powerline-raw "%4l" face1 'l)
+                                       (powerline-raw ":" face1 'l)
+                                       (powerline-raw "%3c" face1 'r)
+                                       (powerline-raw "%6p" face1 'r)
+                                       (funcall separator-right face1 mode-line)
+                                       (powerline-raw " ")
+                                       (powerline-raw global-mode-string nil 'l))))
+                       (concat (powerline-render lhs)
+                               (powerline-fill face2 (powerline-width rhs))
+                               (powerline-render rhs)))))))
+
+  (jme/powerline-theme)
 #+END_SRC
 
 * Key Bindings

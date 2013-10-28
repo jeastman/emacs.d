@@ -27,8 +27,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes (quote (tomorrow-night)))
- '(custom-safe-themes (quote ("d7caa3eedf8032f9193be8917d685ba6cc8181c924b941a31e07449b0aafbc9a" "af308b38a4e64c038e6b7069b431f0a7b9d08fbdfe032631f1b436e8b4700aac" default)))
  '(safe-local-variable-values (quote ((erlang-indent-level . 4) (after-save-hook archive-done-tasks)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
