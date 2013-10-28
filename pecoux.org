@@ -123,28 +123,3 @@ button. Fix that.
      (define-key flyspell-mouse-map [moude-3] #'undefined)))
 #+END_SRC
 
-** Visuals
-
-*** Font
-
-I have moved to using the =monoOne= font. More information may be found on
-monoOne [[https://github.com/madmalik/monoOne][here]].
-
-#+BEGIN_SRC emacs-lisp
-;(if window-system
-;     (set-face-attribute 'default nil :font "monoOne-14"))
-#+END_SRC
-
-For certain major modes, I find it desirable to use a non-monospaced
-font. Typically this is for certain documentation modes where the end
-result will not end up in a monospaced font. (I picked up this particular
-code from a [[ehttp://stackoverflow.com/questions/534307/set-emacs-defaut-font-face-per-buffer-mode/3756010#3756010][stackoverflow question]].
-
-#+BEGIN_SRC emacs-lisp
-(dolist (hook '(erc-mode-hook
-        LaTeX-mode-hook
-        org-mode-hook
-        markdown-mode-hook))
-  (add-hook hook (lambda () (variable-pitch-mode t))))
-#+END_SRC
-
