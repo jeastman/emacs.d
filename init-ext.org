@@ -748,13 +748,12 @@ visualization:
 |------------------+---------------------------------------|
 | face             | enable all visualization via faces    |
 | trailing         | trailing blanks                       |
-| lines-tail       | lines with long columns               |
 | space-before-tab | SPACEs before TAB                     |
 | space-after-tab  | 8 or more SPACEs after a TAB          |
 | indentation      | 8 or more SPACEs at beginning of line |
 
 #+BEGIN_SRC emacs-lisp
-(setq whitespace-style '(face trailing lines-tail space-before-tab
+(setq whitespace-style '(face trailing space-before-tab
                    indentation space-after-tab))
 #+END_SRC
 

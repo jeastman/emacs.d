@@ -9,6 +9,21 @@
 ;; Ported to GNU Emacs 24's built-in theme system by Jim Myhrberg (@jimeh)
 ;; Additional sections by John Eastman
 
+;; SPEC definition
+;; - an alist of the form
+;;
+;; ((DISPLAY . ATTS)...)
+;;
+;; Where DISPLAY is a form specifying the conditions to match certain
+;; terminals and ATTS is a property list (ATTR VALUE ATTR VALUE...)
+;; specifying face attributes and values for frames on those terminals.
+;; On each terminal, the first element with a matching DISPLAY specification
+;; takes effect, and the remaining elements in SPEC are disregarded.
+;; In the ATTS property list, possible attributes are `:family',
+;; `:width', `:height', `:weight', `:slant', `:underline',
+;; `:overline', `:strike-through', `:box', `:foreground',
+;; `:background', `:stipple', `:inverse-video', and `:inherit'.
+
 ;;; Code:
 
 (deftheme tomorrow-night-mac
@@ -30,19 +45,27 @@
       (blue "#81a2be")
       (purple "#b294bb")
       (white "#ffffff")
+      (ltsalmon "#ffa07a")
+      (ltskyblue "#87cefa")
+      (ltgoldenrod "LightGoldenrod")
       (spray0 "#e3e3e3")
       (spray1 "#cadbd8")
       (spray2 "#9db8bd")
       (spray3 "#6f9ca6")
       (spray4 "#58595e")
-      (spray5 "#3d3c39"))
+      (spray5 "#3d3c39")
+      (sansfont "Helvetica Neue-16")
+      (sansfamily "Helvetica Neue")
+      (monofont "monoOne-14")
+      (monofamily "monoOne")
+      (modelinefont "Helvetica Neue-12"))
 
   (custom-theme-set-faces
    'tomorrow-night-mac
 
    ;; Built-in stuff (Emacs 23)
-   `(default ((t (:background ,background :foreground ,foreground :font "monoOne-14"))))
-   `(variable-pitch ((t (:font "Lucida Grande"))))
+   `(default ((t (:background ,background :foreground ,foreground :font ,monofont))))
+   `(variable-pitch ((t (:font ,sansfont))))
    `(error ((t (:foreground ,red))))
    `(escape-glyph ((t (:foreground ,aqua))))
    `(fringe ((t (:background ,current-line))))
@@ -51,15 +74,15 @@
    `(link-visited ((t (:foreground ,purple))))
    `(minibuffer-prompt ((t (:foreground ,blue))))
 ;;   `(mode-line ((t (:background ,selection :foreground ,foreground))))
-   `(mode-line ((t (:background ,comment :foreground ,background :font "Helvetica Neue-14"))))
-   `(powerline-active ((t (:background ,spray2 :foreground ,background :font "Helvetica Neue-14"))))
-   `(powerline-active1 ((t (:background ,spray2 :foreground ,background :font "Helvetica Neue-14"))))
-   `(powerline-active2 ((t (:background ,spray4 :foreground ,foreground :font "Helvetica Neue-14"))))
+   `(mode-line ((t (:background ,comment :foreground ,background :font ,modelinefont))))
+   `(powerline-active ((t (:background ,spray2 :foreground ,background :font ,modelinefont))))
+   `(powerline-active1 ((t (:background ,spray2 :foreground ,background :font ,modelinefont))))
+   `(powerline-active2 ((t (:background ,spray4 :foreground ,foreground :font ,modelinefont))))
 ;;   `(mode-line-inactive ((t (:background ,current-line :foreground ,foreground))))
-   `(mode-line-inactive ((t (:background ,comment :foreground ,selection :font "Helvetica Neue-14"))))
-   `(powerline-inactive1 ((t (:background ,spray1 :foreground ,selection :font "Helvetica Neue-14"))))
-   `(powerline-inactive2 ((t (:background ,spray4 :foreground ,foreground :font "Helvetica Neue-14"))))
-   '(header-line ((t (:inherit mode-line :background "grey20" :foreground "grey90" :box nil :foundry "nil" :font "monoOne-14"))))
+   `(mode-line-inactive ((t (:background ,comment :foreground ,selection :font ,modelinefont))))
+   `(powerline-inactive1 ((t (:background ,spray1 :foreground ,selection :font ,modelinefont))))
+   `(powerline-inactive2 ((t (:background ,spray4 :foreground ,foreground :font ,modelinefont))))
+   '(header-line ((t (:inherit mode-line :background "grey20" :foreground "grey90" :box nil :foundry "nil"))))
    `(region ((t (:background ,selection))))
    `(secondary-selection ((t (:background ,blue))))
    `(shadow ((t (:foreground ,comment))))
@@ -90,40 +113,63 @@
    `(linum ((t (:background ,current-line :foreground ,foreground))))
 
    ;; org-mode
-   `(org-hide ((t (:foreground ,current-line))))
-   `(org-document-title ((,class (:foreground ,aqua :background ,background :weight bold :height 1.5))))
-   `(org-document-info ((,class (:foreground ,aqua :background ,background :weight bold))))
-   `(org-document-info-keyword ((,class (:foreground ,comment :background ,background))))
-   `(org-agenda-date-today
-     ((,class (:foreground ,orange :slant italic :weight bold))) t)
-   `(org-agenda-structure
-     ((,class (:inherit font-lock-comment-face))))
-   `(org-archived ((,class (:slant italic))))
-   `(org-checkbox ((,class (:background ,comment :foreground ,background
+   `(org-default ((t (:font ,sansfont))))
+   `(org-hide ((t (:foreground ,current-line :font ,sansfont))))
+   `(org-level-1 ((,class (:foreground ,purple :height 1.3 :family ,sansfamily))))
+   `(org-level-2 ((,class (:foreground ,blue :height 1.2 :family ,sansfamily))))
+   `(org-level-3 ((,class (:foreground ,aqua :height 1.1 :family ,sansfamily))))
+   `(org-level-4 ((,class (:foreground ,green :font ,sansfont))))
+   `(org-level-5 ((,class (:foreground ,yellow :font ,sansfont))))
+   `(org-level-6 ((,class (:foreground ,orange :font ,sansfont))))
+   `(org-level-7 ((,class (:foreground ,aqua :font ,sansfont))))
+   `(org-level-8 ((,class (:foreground ,blue :font ,sansfont))))
+   `(org-special-keyword ((,class (:foreground ,ltsalmon :font ,sansfont))))
+   `(org-drawer ((,class (:background ,background :foreground ,ltskyblue :font ,sansfont))))
+   `(org-column ((,class (:background ,yellow :foreground ,background :font ,sansfont))))
+   `(org-column-title ((,class (:background ,background :underline t :weight bold :font ,sansfont))))
+   `(org-warning ((,class (:foreground ,red-1 :weight bold :font ,sansfont))))
+   `(org-archived ((,class (:slant italic :font ,sansfont))))
+   `(org-link ((,class (:foreground ,blue :underline t :font ,sansfont))))
+   `(org-footnote ((,class (:foreground ,purple :underline t :font ,sansfont))))
+   `(org-ellipsis ((,class (:foreground ,ltgoldenrod :underline t :font ,sansfont))))
+   `(org-target ((,class (:underline t :font ,sansfont))))
+   `(org-date ((,class (:foreground ,purple :underline t :font ,sansfont))))
+   `(org-date-selected ((,class (:foreground ,red-1 :inverse-video t :font ,sansfont))))
+   `(org-sexp-date ((,class (:foreground ,purple :underline t :font ,sansfont))))
+   `(org-tag ((,class (:bold t :weight bold :font ,sansfont))))
+   `(org-list-dt ((,class (:bold t :weight bold :font ,sansfont))))
+   `(org-todo ((,class (:bold t :foreground ,red :weight bold :font ,monofont
+                              :box (:line-width 1 :style none)))))
+   `(org-done ((,class (:bold t :weight bold :foreground ,green :font ,monofont
+                              :box (:line-width 1 :style none)))))
+   `(org-agenda-done ((,class (:foreground ,green :font ,sansfont
+                              :box (:line-width 1 :style none)))))
+   `(org-headline-done ((,class (:foreground ,ltsalmon :font ,sansfont))))
+   `(org-priority ((,class (:foreground ,ltsalmon :slant italic :font ,sansfont))))
+   `(org-checkbox ((,class (:background ,comment :foreground ,background :font ,monofont
                                    :box (:line-width 1 :style released-button)))))
-   `(org-date ((,class (:foreground ,purple :underline t))))
-   `(org-done ((,class (:bold t :weight bold :foreground ,green
-                              :box (:line-width 1 :style none)))))
-   `(org-todo ((,class (:bold t :foreground ,red :weight bold
-                              :box (:line-width 1 :style none)))))
-   `(org-level-1 ((,class (:foreground ,purple :height 1.3))))
-   `(org-level-2 ((,class (:foreground ,blue :height 1.2))))
-   `(org-level-3 ((,class (:foreground ,aqua :height 1.1))))
-   `(org-level-4 ((,class (:foreground ,green))))
-   `(org-level-5 ((,class (:foreground ,yellow))))
-   `(org-level-6 ((,class (:foreground ,orange))))
-   `(org-level-7 ((,class (:foreground ,aqua))))
-   `(org-level-8 ((,class (:foreground ,blue))))
-   `(org-link ((,class (:foreground ,blue :underline t))))
-   `(org-tag ((,class (:bold t :weight bold))))
-   `(org-column ((,class (:background ,yellow :foreground ,background))))
-   `(org-column-title ((,class (:background ,background :underline t :weight bold))))
-   `(org-drawer ((,class (:background ,background))))
-   `(org-table ((,class (:font "monoOne-14"))))
-   `(org-formula ((,class (:font "monoOne-14"))))
-   `(org-code ((,class (:font "monoOne-14"))))
-   `(org-block ((,class (:font "monoOne-14"))))
-   `(org-block-background ((,class (:font "monoOne-14"))))
+   `(org-table ((,class (:foreground ,ltskyblue :font ,monofont))))
+   `(org-formula ((,class (:foreground ,red :bold t :weight bold :slant italic :font ,monofont))))
+   `(org-code ((,class (:font ,monofont))))
+   `(org-meta-line ((,class (:font ,monofont))))
+   `(org-document-title ((,class (:foreground ,aqua :background ,background :weight bold :height 1.5 :family ,sansfamily))))
+   `(org-document-info ((,class (:foreground ,aqua :background ,background :weight bold :font ,sansfont))))
+   `(org-document-info-keyword ((,class (:foreground ,comment :background ,background :font ,monofont))))
+   `(org-block ((,class (:font ,monofont))))
+   `(org-block-background ((,class (:font ,monofont))))
+   `(org-verbatim ((,class (:font ,monofont))))
+   `(org-clock-overlay ((,class (:font ,monofont))))
+   `(org-agenda-structure
+     ((,class (:inherit font-lock-comment-face :font ,monofont))))
+   `(org-agenda-date-today
+     ((,class (:foreground ,orange :slant italic :weight bold :font ,monofont))) t)
+   `(org-scheduled ((,class (:font ,monofont))))
+   `(org-scheduled-today ((,class (:font ,monofont))))
+   `(org-agenda-dimmed-todo-face ((,class (:font ,monofont))))
+   `(org-scheduled-previously ((,class (:font ,monofont))))
+   `(org-upcoming-deadline ((,class (:font ,monofont))))
+   `(org-agenda-restriction-lock ((,class (:font ,monofont))))
+   `(org-time-grid ((,class (:font ,monofont))))
 
    ;; show-paren-mode
    `(show-paren-match ((t (:background ,blue :foreground ,current-line))))
@@ -133,7 +179,7 @@
    `(whitespace-empty ((t (:background ,yellow :foreground ,red))))
    `(whitespace-hspace ((t (:background ,selection :foreground ,comment))))
    `(whitespace-indentation ((t (:background ,yellow :foreground ,red))))
-   `(whitespace-line ((t (:background ,current-line :foreground ,purple))))
+;   `(whitespace-line ((t (:background ,current-line :foreground ,purple))))
    `(whitespace-newline ((t (:foreground ,comment))))
    `(whitespace-space ((t (:background ,current-line :foreground ,comment))))
    `(whitespace-space-after-tab ((t (:background ,yellow :foreground ,red))))
@@ -197,7 +243,7 @@
    `(erc-input-face ((,class (:foreground ,yellow))))
    `(erc-keyword-face ((,class (:foreground ,blue :weight bold))))
    `(erc-nick-default-face ((,class (:foreground ,yellow :weight bold))))
-   `(erc-my-nick-face ((,class (:foreground ,red :weigth bold))))
+   `(erc-my-nick-face ((,class (:foreground ,red :weight bold))))
    `(erc-nick-msg-face ((,class (:inherit erc-default))))
    `(erc-notice-face ((,class (:foreground ,green))))
    `(erc-pal-face ((,class (:foreground ,orange :weight bold))))
