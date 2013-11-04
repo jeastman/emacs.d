@@ -107,7 +107,6 @@ This list is a /mostly/ up-to-date list of the packages I use. Refer to the
 | =multi-term=            | Managing multiple terminal buffers in Emacs                               |
 | =nose=                  | Easy Python test running in Emacs                                         |
 | =org=                   | Outline-based notes management and organizer                              |
-| =paredit=               | minor mode for editing parentheses                                        |
 | =powerline=             | Rewrite of Powerline                                                      |
 | =pretty-mode=           | redisplay parts of the buffer as pretty symbols                           |
 | =rainbow-delimiters=    | Highlight nested parens, brackets, braces a different color at each depth |
@@ -258,7 +257,7 @@ First, we need to set up the window sizing.
 This function resets the window to its minimal position.
 
 #+BEGIN_SRC emacs-lisp
-(defun emacs-min ()
+(defun jme/emacs-min ()
   (interactive)
   (set-frame-parameter (selected-frame) 'fullscreen nil)
   (set-frame-parameter (selected-frame) 'vertical-scroll-bars nil)
@@ -273,7 +272,7 @@ This function does the opposite of the above. It sets the window to
 maximum position.
 
 #+BEGIN_SRC emacs-lisp
-(defun emacs-max ()
+(defun jme/emacs-max ()
   (interactive)
   (if t
       (progn
@@ -298,11 +297,11 @@ maximum position.
 One last function to give me the ability to toggle between the two.
 
 #+BEGIN_SRC emacs-lisp
-(defun emacs-toggle-size ()
+(defun jme/emacs-toggle-size ()
   (interactive)
   (if (> (cdr (assq 'width (frame-parameters))) 100)
-      (emacs-min)
-    (emacs-max)))
+      (jme/emacs-min)
+    (jme/emacs-max)))
 #+END_SRC
 
 I start off with Emacs in its minimal state when starting up. Since moving
@@ -312,7 +311,7 @@ fullscreen mode.
 
 #+BEGIN_SRC emacs-lisp
 (if window-system
-    (add-hook 'after-init-hook 'emacs-min))
+    (add-hook 'after-init-hook 'jme/emacs-min))
 #+END_SRC
 
 *** Coding system
@@ -399,6 +398,12 @@ I want to always go to the next indent level when hitting return.
 (bind-key "RET" 'newline-and-indent)
 #+END_SRC
 
+Add newlines to the end of the file if I naviagate past it.
+
+#+BEGIN_SRC emacs-lisp
+(setq next-line-add-newlines t)
+#+END_SRC
+
 Set the column that triggers fill
 
 #+BEGIN_SRC emacs-lisp
@@ -460,7 +465,8 @@ fringe bitmap in the left edge.
 
 Cause Emacs to fully redraw the display before it processes queued input
 events. Apparently this provides a slight performance tweak for newer
-machines. My machines seem to be able to handle it.
+machines. My machines seem to be able to handle it. Picked up from
+[[http://www.masteringemacs.org/articles/2011/10/02/improving-performance-emacs-display-engine/][here]]
 
 #+BEGIN_SRC emacs-lisp
 (setq redisplay-dont-pause t)
@@ -720,10 +726,12 @@ Require the actual package.
 **** Show Paren mode
 
 I like to visually see the matching parens. =Show Paren= mode is a global
-minor mode that highlights matching parens.
+minor mode that highlights matching parens. I have now replaced the
+original =show paren= with =smartparens=.
 
 #+BEGIN_SRC emacs-lisp
-(show-paren-mode 1)
+(smartparens-global-mode t)
+(show-smartparens-global-mode t)
 #+END_SRC
 
 **** Undo-tree-mode
@@ -959,45 +967,15 @@ I like automatic indentation, needs to be turned on for Haskell.
 
 ** Ido
 
+Provide an easy way to load a recent file utilizing ido.
+
 #+BEGIN_SRC emacs-lisp
-(defun recentf-ido-find-file ()
-  "Find a recent file using ido."
-  (interactive)
-  (let ((file (ido-completing-read "Choose recent file: " recentf-list nil t)))
-    (when file
-      (find-file file))))
-
-(defun ido-goto-symbol ()
-  "Will update the imenu index and then use ido to select a
-   symbol to navigate to"
-  (interactive)
-  (imenu-make-index-alist)
-  (let ((name-and-pos '())
-        (symbol-names '()))
-    (cl-flet ((addsymbols (symbol-list)
-                       (when (listp symbol-list)
-                         (dolist (symbol symbol-list)
-                           (let ((name nil) (position nil))
-                             (cond
-                              ((and (listp symbol) (imenu--subalist-p symbol))
-                               (addsymbols symbol))
-
-                              ((listp symbol)
-                               (setq name (car symbol))
-                               (setq position (cdr symbol)))
-
-                              ((stringp symbol)
-                               (setq name symbol)
-                               (setq position (get-text-property 1 'org-imenu-marker symbol))))
-
-                             (unless (or (null position) (null name))
-                               (add-to-list 'symbol-names name)
-                               (add-to-list 'name-and-pos (cons name position))))))))
-      (addsymbols imenu--index-alist))
-    (let* ((selected-symbol (ido-completing-read "Symbol? " symbol-names))
-           (position (cdr (assoc selected-symbol name-and-pos))))
-      (goto-char position))))
-
+  (defun recentf-ido-find-file ()
+    "Find a recent file using ido."
+    (interactive)
+    (let ((file (ido-completing-read "Choose recent file: " recentf-list nil t)))
+      (when file
+        (find-file file))))
 #+END_SRC
 
 *** Configuration
@@ -1172,17 +1150,6 @@ Update the mode's keybindings to work to my liking.
     'comint-previous-input)
 #+END_SRC
 
-I have found that when I use =autopair= mode, it does not work well in the
-shell. I make sure to turn it off in that case.
-
-#+BEGIN_SRC emacs-lisp
-(add-hook 'term-mode-hook
-          #'(lambda ()
-              (setq autopair-dont-activate t) ;; for emacsen < 24
-              (autopair-mode -1))             ;; for emacsen >= 24
-          )
-#+END_SRC
-
 Ensure the shell is set to UTF-8.
 
 #+BEGIN_SRC emacs-lisp
@@ -1302,6 +1269,174 @@ I use diminish to hide most of minor modes from the modeline.
 (diminish 'flymake-mode)
 (diminish 'git-gutter-mode)
 (diminish 'undo-tree-mode)
+(diminish 'smartparens-mode)
+#+END_SRC
+
+* Custom Configuration
+
+** Window handling
+
+*** Rotating Windows
+
+I often have my frame split into multiple windows. I find it very handy to
+swap buffers between windows if I am working in multiple buffers at the
+same time. I came across this function to rotate buffers through windows
+(you can find it [[http://whattheemacsd.com/buffer-defuns.el-02.html][here]].)
+
+#+BEGIN_SRC emacs-lisp
+  (defun jme/rotate-windows ()
+    "Rotate your windows"
+    (interactive)
+    (cond ((not (> (count-windows)1))
+           (message "You can't rotate a single window!"))
+          (t
+           (setq i 1)
+           (setq numWindows (count-windows))
+           (while  (< i numWindows)
+             (let* (
+                    (w1 (elt (window-list) i))
+                    (w2 (elt (window-list) (+ (% i numWindows) 1)))
+                    (b1 (window-buffer w1))
+                    (b2 (window-buffer w2))
+                    (s1 (window-start w1))
+                    (s2 (window-start w2))
+                    )
+               (set-window-buffer w1  b2)
+               (set-window-buffer w2 b1)
+               (set-window-start w1 s2)
+               (set-window-start w2 s1)
+               (setq i (1+ i)))))))
+#+END_SRC
+
+*** Window Split
+
+This function toggles between horizontal and vertical layout of two
+windows. (Picked up from [[http://whattheemacsd.com/buffer-defuns.el-03.html][here]].)
+
+#+BEGIN_SRC emacs-lisp
+(defun jme/toggle-window-split ()
+  (interactive)
+  (if (= (count-windows) 2)
+      (let* ((this-win-buffer (window-buffer))
+             (next-win-buffer (window-buffer (next-window)))
+             (this-win-edges (window-edges (selected-window)))
+             (next-win-edges (window-edges (next-window)))
+             (this-win-2nd (not (and (<= (car this-win-edges)
+                                         (car next-win-edges))
+                                     (<= (cadr this-win-edges)
+                                         (cadr next-win-edges)))))
+             (splitter
+              (if (= (car this-win-edges)
+                     (car (window-edges (next-window))))
+                  'split-window-horizontally
+                'split-window-vertically)))
+        (delete-other-windows)
+        (let ((first-win (selected-window)))
+          (funcall splitter)
+          (if this-win-2nd (other-window 1))
+          (set-window-buffer (selected-window) this-win-buffer)
+          (set-window-buffer (next-window) next-win-buffer)
+          (select-window first-win)
+          (if this-win-2nd (other-window 1))))))
+#+END_SRC
+
+** Cleanup
+
+Whitespace cleanup can be dangerous if it changes the content of the
+file. Some changes are guaranteed to be safe, which this function sticks
+to, allowing it to be safe for a =before-save-hook=. (see
+[[http://whattheemacsd.com/buffer-defuns.el-01.html][this article]].)
+
+#+BEGIN_SRC emacs-lisp
+(defun jme/cleanup-buffer-safe ()
+  "Perform a bunch of safe operations on the whitespace content of a buffer.
+Does not indent buffer, because it is used for a before-save-hook, and that
+might be bad."
+  (interactive)
+  (untabify (point-min) (point-max))
+  (delete-trailing-whitespace)
+  (set-buffer-file-coding-system 'utf-8))
+#+END_SRC
+
+If we want to be less careful when cleaning up, we can do that too.
+
+#+BEGIN_SRC emacs-lisp
+(defun jme/cleanup-buffer ()
+  "Perform a bunch of operations on the whitespace content of a buffer.
+Including indent-buffer, which should not be called automatically on save."
+  (interactive)
+  (jme/cleanup-buffer-safe)
+  (indent-region (point-min) (point-max)))
+#+END_SRC
+
+** Movement
+
+*** Better handling of move to beginning of line
+
+I find it useful to move to the beginning of the indentation as opposed to
+strickly the beginning of the line. This accomplishes that in a smart
+way. (See
+[[http://emacsredux.com/blog/2013/05/22/smarter-navigation-to-the-beginning-of-a-line/][this article]].)
+
+#+BEGIN_SRC emacs-lisp
+(defun jme/smarter-move-beginning-of-line (arg)
+  "Move point back to indentation of beginning of line.
+
+Move point to the first non-whitespace character on this line.
+If point is already there, move to the beginning of the line.
+Effectively toggle between the first non-whitespace character and
+the beginning of the line.
+
+If ARG is not nil or 1, move forward ARG - 1 lines first.  If
+point reaches the beginning or end of the buffer, stop there."
+  (interactive "^p")
+  (setq arg (or arg 1))
+
+  ;; Move lines first
+  (when (/= arg 1)
+    (let ((line-move-visual nil))
+      (forward-line (1- arg))))
+
+  (let ((orig-point (point)))
+    (back-to-indentation)
+    (when (= orig-point (point))
+      (move-beginning-of-line 1))))
+
+;; remap C-a to `smarter-move-beginning-of-line'
+(global-set-key [remap move-beginning-of-line]
+                'jme/smarter-move-beginning-of-line)
+#+END_SRC
+
+** Mark
+
+Mark handling when ~transient-mark-mode~ can be a little confusing when you
+want to set the mark but not engage /tmm/. ~Mastering Emacs~ has a good
+[[http://www.masteringemacs.org/articles/2010/12/22/fixing-mark-commands-transient-mark-mode/][article]] on the subject.
+
+#+BEGIN_SRC emacs-lisp
+(defun jme/push-mark-no-activate ()
+  "Pushes `point' to `mark-ring' and does not activate the region
+Equivalent to \\[set-mark-command] when \\[transient-mark-mode] is disabled"
+  (interactive)
+  (push-mark (point) t nil)
+  (message "Pushed mark to ring"))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(defun jme/jump-to-mark ()
+  "Jumps to the local mark, respecting the `mark-ring' order.
+This is the same as using \\[set-mark-command] with the prefix argument."
+  (interactive)
+  (set-mark-command 1))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(defun jme/exchange-point-and-mark-no-activate ()
+  "Identical to \\[exchange-point-and-mark] but will not activate the region."
+  (interactive)
+  (exchange-point-and-mark)
+  (deactivate-mark nil))
+(define-key global-map [remap exchange-point-and-mark] 'jme/exchange-point-and-mark-no-activate)
 #+END_SRC
 
 * Theme Configuration
@@ -1436,26 +1571,26 @@ I have debated several times about where to locate key bindings. While
 there is a good argument to keeping them near the functions/configuration
 they relate to, I find it better to have all global keys in one place.
 
-| Key       | Action              | Comments                            |
-|-----------+---------------------+-------------------------------------|
-| =C-z=     | hide-or-expand      | Thought of as analog to shell sleep |
-| =M-`=     | other-frame         |                                     |
-| =C-`=     | pop-to-mark-command |                                     |
-| =C-==     | expand-region       |                                     |
-| =C-c h=   | helm-mini           |                                     |
-| =C-c t=   | multi-term-next     | Reuse terminal                      |
-| =C-c T=   | multi-term          | Create a new terminal               |
-| =C-c w=   | emacs-toggle-size   | Custom function for min/max size    |
-| =C-x C-d= | dired               | Use dired instead of dumping dir    |
-| =C-. C-s= | ace-jump-mode       |                                     |
-
+| Key        | Action                    | Comments                            |
+|------------+---------------------------+-------------------------------------|
+| =C-z=      | hide-or-expand            | Thought of as analog to shell sleep |
+| =M-`=      | jme/push-mark-no-activate |                                     |
+| =C-`=      | pop-to-mark-command       |                                     |
+| =C-==      | expand-region             |                                     |
+| =C-c h=    | helm-mini                 |                                     |
+| =C-c n=    | jme/cleanup-buffer        | Destructive cleanup of buffer       |
+| =C-c t=    | multi-term-next           | Reuse terminal                      |
+| =C-c T=    | multi-term                | Create a new terminal               |
+| =C-c w=    | jme/emacs-toggle-size     | Custom function for min/max size    |
+| =C-x <up>= | jme/rotate-windows        | Rotates windows                     |
+| =C-. C-s=  | ace-jump-mode             |                                     |
 
 ** Top-level mappings
 
 #+BEGIN_SRC emacs-lisp
 (bind-key "C-z" 'hide-or-expand)
 
-(bind-key "M-`" 'other-frame)
+(bind-key "M-`" 'jme/push-mark-no-activate)
 (bind-key "C-`" 'pop-to-mark-command)
 
 (when (package-installed-p 'expand-region)
@@ -1466,15 +1601,16 @@ they relate to, I find it better to have all global keys in one place.
 
 #+BEGIN_SRC emacs-lisp
 (bind-key "C-c h" 'helm-mini)
+(bind-key "C-c n" 'jme/cleanup-buffer)
 (bind-key "C-c t" 'multi-term-next)
 (bind-key "C-c T" 'multi-term)
-(bind-key "C-c w" 'emacs-toggle-size)
+(bind-key "C-c w" 'jme/emacs-toggle-size)
 #+END_SRC
 
 ** =C-x= mappings
 
 #+BEGIN_SRC emacs-lisp
-(bind-key "C-c C-d" 'dired)
+(bind-key "C-x <up>" 'jme/rotate-windows)
 #+END_SRC
 
 ** =C-.= mappings
@@ -1482,12 +1618,6 @@ they relate to, I find it better to have all global keys in one place.
 #+BEGIN_SRC emacs-lisp
 (when (package-installed-p 'ace-jump-mode)
     (bind-key "C-. C-s" 'ace-jump-mode))
-#+END_SRC
-
-* Needs to be moved
-
-#+BEGIN_SRC emacs-lisp
-(load "functions")
 #+END_SRC
 
 * Emacs Server
@@ -1502,3 +1632,5 @@ they relate to, I find it better to have all global keys in one place.
 (when (require 'edit-server nil 'noerror)
   (edit-server-start))
 #+END_SRC
+
+
