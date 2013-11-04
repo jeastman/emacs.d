@@ -920,6 +920,12 @@ I moved to using =dired+= to pick up some extra features.
     (add-hook 'dired-load-hook 'my-dired-init)))
 #+END_SRC
 
+Make sure =image-dired= keeps its files in the meta directory.
+
+#+BEGIN_SRC emacs-lisp
+(setq image-dired-dir (concat metafiles-dir "/image-dired"))
+#+END_SRC
+
 ** Erlang
 
 #+BEGIN_SRC emacs-lisp
