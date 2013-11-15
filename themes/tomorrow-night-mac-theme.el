@@ -82,7 +82,7 @@
    `(mode-line-inactive ((t (:background ,comment :foreground ,selection :font ,modelinefont))))
    `(powerline-inactive1 ((t (:background ,spray1 :foreground ,selection :font ,modelinefont))))
    `(powerline-inactive2 ((t (:background ,spray4 :foreground ,foreground :font ,modelinefont))))
-   '(header-line ((t (:inherit mode-line :background "grey20" :foreground "grey90" :box nil :foundry "nil"))))
+   `(header-line ((t (:background "grey20" :foreground "grey90" :box nil :font ,monofont))))
    `(region ((t (:background ,selection))))
    `(secondary-selection ((t (:background ,blue))))
    `(shadow ((t (:foreground ,comment))))
