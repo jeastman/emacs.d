@@ -1,0 +1,7 @@
+# contributor: John Eastman <john.eastman@gmail.com>
+# name : note right
+# key : note
+# --
+note right
+    $0
+end note

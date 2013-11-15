@@ -1,0 +1,7 @@
+# contributor: John Eastman <john.eastman@gmail.com>
+# name : group
+# key : group
+# --
+group $1
+    $0
+end

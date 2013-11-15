@@ -4,6 +4,7 @@
 (source "org" "http://orgmode.org/elpa/")
 
 (depends-on "ace-jump-mode")
+(depends-on "annoying-arrows-mode")
 (depends-on "auctex")
 (depends-on "auto-complete")
 (depends-on "bbdb")
@@ -19,6 +20,7 @@
 (depends-on "dired-details")
 (depends-on "dired-details+")
 (depends-on "dired-single")
+(depends-on "edit-server")
 (depends-on "epc")
 (depends-on "epl")
 (depends-on "expand-region")
@@ -66,3 +68,4 @@
 (depends-on "sws-mode")
 (depends-on "undo-tree")
 (depends-on "w3m")
+(depends-on "yasnippet")

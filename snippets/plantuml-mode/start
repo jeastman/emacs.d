@@ -1,0 +1,8 @@
+# contributor: John Eastman <john.eastman@gmail.com>
+# name : @startuml
+# key : start
+# --
+' file:$1.png
+@startuml
+    $0
+@enduml
