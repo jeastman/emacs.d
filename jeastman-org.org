@@ -10,15 +10,6 @@ automatically by using =(org-babel-load-file "/path/to/file")=.
 
 ** General settings
 
-*** Compatibility
-
-In order to overcome some issues with the latest version of =org=, I
-am loading =org-compat= explicitly.
-
-#+BEGIN_SRC emacs-lisp
-(load "org-compat")
-#+END_SRC
-
 *** Modules
 Org has a number of handy optional modules. The following list are the set
 of modules that I am currently experimenting with.

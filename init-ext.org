@@ -4,16 +4,9 @@
 
 * General Configuration
 
-** Common Lisp
-
-#+BEGIN_SRC emacs-lisp
-(eval-when-compile
-   (require 'cl))
-#+END_SRC
-
 ** Library Paths
 
-Everything is situated underneath =dotfiles-dir (~/.emacs.d)=
+Everything is situated underneath =user-emacs-directory (~/.emacs.d)=
 
 This makes everything self-contained and easy to migrate to other
 environments.
@@ -24,11 +17,9 @@ information files (backups, temporary files, etc.)
 
 *** Metafiles
 
-First, we need to define the =dotfile-dir= and =metafiles-dir= values.
+First, we need to define the  =metafiles-dir= values.
 
 #+BEGIN_SRC emacs-lisp
-(setq dotfiles-dir (file-name-directory
-    (or (buffer-file-name) load-file-name)))
 (setq metafiles-dir "~/.emacs-meta")
 #+END_SRC
 
@@ -52,14 +43,14 @@ I can now set the Emacs temporary directory to be within the
   (make-directory temporary-file-directory))
 #+END_SRC
 
-*** Custom Themes
+** Custom Themes
 
 I tend to like playing around with different color themes. Sometimes this
 is based on mood, sometimes it is based on environment. These themes go
 into their own directory.
 
 #+BEGIN_SRC emacs-lisp
-  (setq custom-theme-directory (concat dotfiles-dir "themes"))
+  (setq custom-theme-directory (concat user-emacs-directory "themes"))
 #+END_SRC
 
 ** Package Management
@@ -121,17 +112,17 @@ This list is a /mostly/ up-to-date list of the packages I use. Refer to the
 
 ** Additional Paths
 
-I add the =dotfiles-dir= to the load path here to ensure we can pick up
+I add the =user-emacs-directory= to the load path here to ensure we can pick up
 the additional configuration files.
 
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path dotfiles-dir)
+(add-to-list 'load-path user-emacs-directory)
 #+END_SRC
 
-I also add all top-level subdirectories of =dotfiles-dir=.
+I also add all top-level subdirectories of =user-emacs-directory=.
 
 #+BEGIN_SRC emacs-lisp
-(let ((default-directory dotfiles-dir))
+(let ((default-directory user-emacs-directory))
       (normal-top-level-add-subdirs-to-load-path))
 #+END_SRC
 
@@ -172,7 +163,7 @@ order to handle loading these, I add the 3rd party libraries in the
 =vendor= directory.
 
 #+BEGIN_SRC emacs-lisp
-(setq vendor-dir (concat dotfiles-dir "vendor"))
+(setq vendor-dir (concat user-emacs-directory "vendor"))
 (unless (file-exists-p vendor-dir)
   (make-directory vendor-dir))
 (add-to-list 'load-path vendor-dir)
@@ -200,7 +191,7 @@ different forms of each file.
 
 #+BEGIN_SRC emacs-lisp
   (flet ((jme/load (base)
-                   (let* ((path          (expand-file-name base dotfiles-dir))
+                   (let* ((path          (expand-file-name base user-emacs-directory))
                           (literate      (concat path ".org"))
                           (encrypted-org (concat path ".org.gpg"))
                           (plain         (concat path ".el"))
@@ -213,7 +204,7 @@ different forms of each file.
          (remove-extension (name)
              (string-match "\\(.*?\\)\.\\(org\\(\\.el\\)?\\|el\\)\\(\\.gpg\\)?$" name)
              (match-string 1 name)))
-    (let ((user-dir (concat dotfiles-dir user-login-name)))
+    (let ((user-dir (concat user-emacs-directory user-login-name)))
       (jme/load (car (split-string (system-name) "\\.")))
       (jme/load user-login-name)
       (when (file-exists-p user-dir)
@@ -832,6 +823,15 @@ extensions over time. This one works.
   (bind-key "S-TAB" 'auto-complete ac-mode-map))
 #+END_SRC
 
+** YASnippet
+
+YASnippet is an excellent template system for Emacs and it works very well
+with Auto Complete. I use it everywhere I can.
+
+#+BEGIN_SRC emacs-lisp
+(yas-global-mode 1)
+#+END_SRC
+
 ** CoffeeScript
 
 Support for CoffeeScript.
@@ -1085,7 +1085,7 @@ My =org= mode settings are contained in their own file. This function
 loads the configuration based on my login name.
 
 #+BEGIN_SRC emacs-lisp
-(let* ((path (expand-file-name (concat user-login-name "-org") dotfiles-dir))
+(let* ((path (expand-file-name (concat user-login-name "-org") user-emacs-directory))
         (literate (concat path ".org")))
      (cond
       ((file-exists-p literate) (org-babel-load-file literate))))
