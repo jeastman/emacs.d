@@ -10,4 +10,5 @@ jeastman.el
 jeastman-org.el
 jeastman.org
 pecoux.el
+scribble.el
 swank.scm
