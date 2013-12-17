@@ -1,6 +1,7 @@
 #+TITLE: Org Mode Configuration
 #+OPTIONS: toc:4 h:4
 #+STARTUP: showeverything
+#+LATEX_CLASS: jmeorgdoc
 
 * Configuration
 Inspired by the [[https://github.com/eschulte/emacs24-starter-kit][Emacs Starter Kit]], I set up my configuration file
@@ -75,10 +76,25 @@ Use =ido=-style completion.
 (setq org-completion-use-ido t)
 #+END_SRC
 
-Make sure we we export with syntax highlighting.
+The following ensures that I do not accidentally make edits to invisible
+areas. A value of ~show~ causes the point to become visible and actually do
+the requested edit.
 
 #+BEGIN_SRC emacs-lisp
-(setq org-src-fontify-natively t)
+(setq org-catch-invisible-edits 'show)
+#+END_SRC
+
+*** Code block fontification
+
+The following displays the contents of code blocks using the major-mode of
+the code.  It also changes the behavior of ~TAB~ to work as appropriate for
+the major-mode.  This allows for reading and writing code inside of Org to
+be closer to the experience in the major-mode itself.
+
+#+BEGIN_SRC emacs-lisp
+(setq
+ org-src-fontify-natively t
+ org-src-tab-acts-natively t)
 #+END_SRC
 
 *** Targets
@@ -241,7 +257,76 @@ See http://orgmode.org/worg/org-contrib/org-mac-iCal.html
               (insert (match-string 0)))))
 #+END_SRC
 
+** LaTeX
+
+Use smart quotes when exporting.
+
+#+BEGIN_SRC emacs-lisp
+(setq org-export-with-smart-quotes t)
+#+END_SRC
+
+*** Source code listings
+
+Use the ~minted~ package for source code fontification and coloring.
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'org-latex-packages-alist '("" "minted"))
+(setq org-latex-listings 'minted)
+(setq org-latex-minted-options
+   '(("frame" "lines")
+     ("fontsize" "\\scriptsize")))
+#+END_SRC
+
+We need to also ensure that the PDF conversion process adds the
+=-shell-escape= option to pdflatex.
+
+#+BEGIN_SRC emacs-lisp
+(setq org-latex-pdf-process
+   '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+     "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+     "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+#+END_SRC
+
+Add custom document classes.
+
+#+BEGIN_SRC emacs-lisp
+(require 'ox-latex)
+(add-to-list 'org-latex-classes
+      '("mezeoorgdoc" "\\documentclass[10pt,oneside]{mezeoorgdoc}"
+        ("\\chapter{%s}" . "\\chapter*{%s}")
+        ("\\section{%s}" . "\\section*{%s}")
+        ("\\subsection{%s}" . "\\subsection*{%s}")
+        ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+        ("\\paragraph{%s}" . "\\paragraph*{%s}")
+        ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
+(add-to-list 'org-latex-classes
+      '("jmeorgdoc" "\\documentclass[10pt,oneside]{jmeorgdoc}"
+        ("\\chapter{%s}" . "\\chapter*{%s}")
+        ("\\section{%s}" . "\\section*{%s}")
+        ("\\subsection{%s}" . "\\subsection*{%s}")
+        ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+        ("\\paragraph{%s}" . "\\paragraph*{%s}")
+        ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
+(add-to-list 'org-latex-classes
+      '("jmeorgarticle" "\\documentclass[10pt,oneside,article]{jmeorgdoc}"
+        ("\\section{%s}" . "\\section*{%s}")
+        ("\\subsection{%s}" . "\\subsection*{%s}")
+        ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+        ("\\paragraph{%s}" . "\\paragraph*{%s}")
+        ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
+#+END_SRC
+
 ** Key bindings
+
+Guide setup
+
+#+BEGIN_SRC emacs-lisp
+  (defun guide-key/jme-hook-function-for-org-mode ()
+    (guide-key/add-local-guide-key-sequence "C-c")
+    (guide-key/add-local-guide-key-sequence "C-c C-x")
+    (guide-key/add-local-highlight-command-regexp "org-"))
+  (add-hook 'org-mode-hook 'guide-key/jme-hook-function-for-org-mode)
+#+END_SRC
 
 #+BEGIN_SRC emacs-lisp
   (bind-key "C-c l" 'org-store-link)

@@ -1,6 +1,7 @@
 #+TITLE: Emacs Configuration
 #+OPTIONS: toc:4 h:4
 #+STARTUP: showeverything
+#+LATEX_CLASS: jmeorgdoc
 
 * General Configuration
 
@@ -938,6 +939,7 @@ Make sure =image-dired= keeps its files in the meta directory.
 #+BEGIN_SRC emacs-lisp
 (setq-default flymake-no-changes-timeout '3) ; timeout for flymake
 (setq flymake-run-in-place nil)
+(load "flymake" t)
 #+END_SRC
 
 ** Flyspell
@@ -949,6 +951,18 @@ advice ensures that the buffer is checked when I turn =flyspell= on.
 #+BEGIN_SRC emacs-lisp
 (defadvice flyspell-mode (after advice-flyspell-check-buffer-on-start activate)
   (flyspell-buffer))
+#+END_SRC
+
+** Guide Key
+
+Nice utility for providing a guide for key bindings.
+
+#+BEGIN_SRC emacs-lisp
+(setq guide-key/guide-key-sequence '("C-x"))
+(guide-key-mode 1)
+(setq guide-key/recursive-key-sequence-flag t)
+(setq guide-key/popup-window-position 'bottom)
+
 #+END_SRC
 
 ** Haskell
@@ -982,6 +996,18 @@ Provide an easy way to load a recent file utilizing ido.
     (let ((file (ido-completing-read "Choose recent file: " recentf-list nil t)))
       (when file
         (find-file file))))
+#+END_SRC
+
+Configure ido to use vertical mode. Much easier to see matches.
+
+#+BEGIN_SRC emacs-lisp
+(ido-vertical-mode)
+#+END_SRC
+
+Use ido everywhere.
+
+#+BEGIN_SRC emacs-lisp
+(ido-ubiquitous-mode 1)
 #+END_SRC
 
 *** Configuration
@@ -1037,6 +1063,19 @@ These settings control the behavior of ido.
 #+END_SRC
 
 ** LaTeX
+
+Configure AUCTeX to automatically save style information when saving the
+buffer and to parse the file after loading to get style information.
+
+Also, query for the name of the master file.
+
+#+BEGIN_SRC emacs-lisp
+(setq TeX-auto-save t)
+(setq TeX-parse-self t)
+(setq-default TeX-master nil)
+#+END_SRC
+
+Configure flymake to use ~chktex.
 
 #+BEGIN_SRC emacs-lisp
 (defun flymake-get-tex-args (file-name)
@@ -1104,19 +1143,20 @@ loads the configuration based on my login name.
 
 ; Bring back indent after newline
 (add-hook 'python-mode-hook '(lambda ()
-           (define-key python-mode-map "\C-m" 'newline-and-indent)))
+             (define-key python-mode-map "\C-m" 'newline-and-indent)))
 
-(when (load "flymake" t)
-         (defun flymake-pyflakes-init ()
-           (let* ((temp-file (flymake-init-create-temp-buffer-copy
-                              'flymake-create-temp-inplace))
-              (local-file (file-relative-name
-                           temp-file
-                           (file-name-directory buffer-file-name))))
-             (list jme-python-flymake-script  (list temp-file))))
+;(when (load "flymake" t)
+  (defun flymake-pyflakes-init ()
+    (let* ((temp-file (flymake-init-create-temp-buffer-copy
+                       'flymake-create-temp-inplace))
+           (local-file (file-relative-name
+                        temp-file
+                        (file-name-directory buffer-file-name))))
+      (list jme-python-flymake-script  (list temp-file))))
 
-         (add-to-list 'flymake-allowed-file-name-masks
-                  '("\\.py\\'" flymake-pyflakes-init)))
+  (add-to-list 'flymake-allowed-file-name-masks
+               '("\\.py\\'" flymake-pyflakes-init))
+;)
 
 (add-hook 'find-file-hook 'flymake-find-file-hook)
 #+END_SRC
@@ -1208,6 +1248,7 @@ Have Tramp store its files in the meta information directory.
 ** Smex
 
 #+BEGIN_SRC emacs-lisp
+(setq smex-save-file (concat metafiles-dir "/.smex-items"))
 (smex-initialize)
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "M-X") 'smex-major-mode-commands)
@@ -1473,7 +1514,6 @@ code from a [[ehttp://stackoverflow.com/questions/534307/set-emacs-defaut-font-f
 
 #+BEGIN_SRC emacs-lisp
 (dolist (hook '(erc-mode-hook
-        LaTeX-mode-hook
         org-mode-hook
         markdown-mode-hook))
   (add-hook hook (lambda () (variable-pitch-mode t))))
