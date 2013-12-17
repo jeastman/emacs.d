@@ -1666,20 +1666,21 @@ I have debated several times about where to locate key bindings. While
 there is a good argument to keeping them near the functions/configuration
 they relate to, I find it better to have all global keys in one place.
 
-| Key        | Action                    | Comments                            |
-|------------+---------------------------+-------------------------------------|
-| =C-z=      | hide-or-expand            | Thought of as analog to shell sleep |
-| =M-`=      | jme/push-mark-no-activate |                                     |
-| =C-`=      | pop-to-mark-command       |                                     |
-| =C-==      | expand-region             |                                     |
-| =C-c h=    | helm-mini                 |                                     |
-| =C-c n=    | jme/cleanup-buffer        | Destructive cleanup of buffer       |
-| =C-c t=    | multi-term-next           | Reuse terminal                      |
-| =C-c T=    | multi-term                | Create a new terminal               |
-| =C-c w=    | jme/emacs-toggle-size     | Custom function for min/max size    |
-| =C-x <up>= | jme/rotate-windows        | Rotates windows                     |
-| =C-. C-s=  | ace-jump-mode             |                                     |
-| =C-<f9>=   | toggle-presentation-mode  | switch in/out presentation theme    |
+| Key        | Action                      | Comments                            |
+|------------+-----------------------------+-------------------------------------|
+| =C-z=      | hide-or-expand              | Thought of as analog to shell sleep |
+| =M-`=      | jme/push-mark-no-activate   |                                     |
+| =C-`=      | pop-to-mark-command         |                                     |
+| =C-==      | expand-region               |                                     |
+| =C-c h=    | helm-mini                   |                                     |
+| =C-c n=    | jme/cleanup-buffer          | Destructive cleanup of buffer       |
+| =C-c t=    | multi-term-next             | Reuse terminal                      |
+| =C-c T=    | multi-term                  | Create a new terminal               |
+| =C-c w=    | jme/emacs-toggle-size       | Custom function for min/max size    |
+| =C-c v p=  | git-messenger:popup-message | Popup the last git commit message   |
+| =C-x <up>= | jme/rotate-windows          | Rotates windows                     |
+| =C-. C-s=  | ace-jump-mode               |                                     |
+| =C-<f9>=   | toggle-presentation-mode    | switch in/out presentation theme    |
 
 ** Top-level mappings
 
@@ -1701,6 +1702,7 @@ they relate to, I find it better to have all global keys in one place.
 (bind-key "C-c t" 'multi-term-next)
 (bind-key "C-c T" 'multi-term)
 (bind-key "C-c w" 'jme/emacs-toggle-size)
+(bind-key "C-x v p" 'git-messenger:popup-message)
 #+END_SRC
 
 ** =C-x= mappings
