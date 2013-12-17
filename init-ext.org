@@ -44,16 +44,6 @@ I can now set the Emacs temporary directory to be within the
   (make-directory temporary-file-directory))
 #+END_SRC
 
-** Custom Themes
-
-I tend to like playing around with different color themes. Sometimes this
-is based on mood, sometimes it is based on environment. These themes go
-into their own directory.
-
-#+BEGIN_SRC emacs-lisp
-  (setq custom-theme-directory (concat user-emacs-directory "themes"))
-#+END_SRC
-
 ** Package Management
 
 I have moved /almost/ everything to use the package management system
@@ -1497,16 +1487,20 @@ This is the same as using \\[set-mark-command] with the prefix argument."
 
 * Theme Configuration
 
+** Custom Themes
+
+I tend to like playing around with different color themes. Sometimes this
+is based on mood, sometimes it is based on environment. These themes go
+into their own directory.
+
+#+BEGIN_SRC emacs-lisp
+  (setq custom-theme-directory (concat user-emacs-directory "themes"))
+#+END_SRC
+
 ** Load custom theme
 
 I have moved to using the =monoOne= font. More information may be found on
 monoOne [[https://github.com/madmalik/monoOne][here]].
-
-#+BEGIN_SRC emacs-lisp
-(if (string-equal system-type "darwin")
-    (load-theme 'tomorrow-night-mac t)
-  (load-theme 'tomorrow-night t))
-#+END_SRC
 
 For certain major modes, I find it desirable to use a non-monospaced
 font. Typically this is for certain documentation modes where the end
@@ -1518,6 +1512,38 @@ code from a [[ehttp://stackoverflow.com/questions/534307/set-emacs-defaut-font-f
         org-mode-hook
         markdown-mode-hook))
   (add-hook hook (lambda () (variable-pitch-mode t))))
+#+END_SRC
+
+Under certain situations, changing the theme is desirable, specifically
+when projecting on a larger screen. The following provides functions for
+switching themes.
+
+#+BEGIN_SRC emacs-lisp
+(defun use-presentation-theme ()
+  (interactive)
+  (if (string-equal system-type "darwin")
+      (disable-theme 'tomorrow-night-mac)
+    (disable-theme 'tomorrow-night))
+  (load-theme 'prez)
+  (when (boundp 'jme/presentation-font)
+    (set-face-attribute 'default nil :font jme/presentation-font)))
+
+(defun use-default-theme ()
+  (interactive)
+  (disable-theme 'prez)
+  (if (string-equal system-type "darwin")
+      (load-theme 'tomorrow-night-mac t)
+    (load-theme 'tomorrow-night t))
+  (when (boundp 'jme/default-font)
+    (set-face-attribute 'default nil :font jme/default-font)))
+
+(defun toggle-presentation-mode ()
+  (interactive)
+  (if (string= (frame-parameter nil 'font) jme/default-font)
+      (use-presentation-theme)
+    (use-default-theme)))
+
+(use-default-theme)
 #+END_SRC
 
 ** Powerline
@@ -1639,6 +1665,7 @@ they relate to, I find it better to have all global keys in one place.
 | =C-c w=    | jme/emacs-toggle-size     | Custom function for min/max size    |
 | =C-x <up>= | jme/rotate-windows        | Rotates windows                     |
 | =C-. C-s=  | ace-jump-mode             |                                     |
+| =C-<f9>=   | toggle-presentation-mode  | switch in/out presentation theme    |
 
 ** Top-level mappings
 
@@ -1673,6 +1700,12 @@ they relate to, I find it better to have all global keys in one place.
 #+BEGIN_SRC emacs-lisp
 (when (package-installed-p 'ace-jump-mode)
     (bind-key "C-. C-s" 'ace-jump-mode))
+#+END_SRC
+
+** Function Key mappings
+
+#+BEGIN_SRC emacs-lisp
+(bind-key "C-<f9>" 'toggle-presentation-mode)
 #+END_SRC
 
 * Custom Settings
