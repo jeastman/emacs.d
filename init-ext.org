@@ -1309,13 +1309,15 @@ for these exceptions.
 I use diminish to hide most of minor modes from the modeline.
 
 #+BEGIN_SRC emacs-lisp
-(diminish 'auto-complete-mode)
-(diminish 'global-whitespace-mode)
-(diminish 'flymake-mode)
-(diminish 'git-gutter-mode)
-(diminish 'guide-key-mode)
-(diminish 'undo-tree-mode)
-(diminish 'smartparens-mode)
+(eval-after-load "auto-complete" '(diminish 'auto-complete-mode))
+(eval-after-load "eldoc" '(diminish 'eldoc-mode))
+(eval-after-load "flymake" '(diminish 'flymake-mode))
+(eval-after-load "git-gutter" '(diminish 'git-gutter-mode))
+(eval-after-load "guide-key" '(diminish 'guide-key-mode))
+(eval-after-load "smartparens" '(diminish 'smartparens-mode))
+(eval-after-load "undo-tree" '(diminish 'undo-tree-mode))
+(eval-after-load "whitespace" '(diminish 'global-whitespace-mode))
+(eval-after-load "yasnippet" '(diminish 'yas-minor-mode))
 #+END_SRC
 
 * Custom Configuration
