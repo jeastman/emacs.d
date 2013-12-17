@@ -1323,6 +1323,7 @@ I use diminish to hide most of minor modes from the modeline.
 (diminish 'global-whitespace-mode)
 (diminish 'flymake-mode)
 (diminish 'git-gutter-mode)
+(diminish 'guide-key-mode)
 (diminish 'undo-tree-mode)
 (diminish 'smartparens-mode)
 #+END_SRC
