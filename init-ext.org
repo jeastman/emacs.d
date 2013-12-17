@@ -1499,10 +1499,22 @@ into their own directory.
   (setq custom-theme-directory (concat user-emacs-directory "themes"))
 #+END_SRC
 
-** Load custom theme
-
+** Fonts
 I have moved to using the =monoOne= font. More information may be found on
 monoOne [[https://github.com/madmalik/monoOne][here]].
+
+Set appropriate fonts for the platform.
+
+#+BEGIN_SRC emacs-lisp
+  (when window-system
+    (setq jme/default-font "-*-monoOne-normal-normal-normal-*-14-*-*-*-m-0-iso10646-1")
+    (if (string-equal system-type "darwin")
+        (setq jme/presentation-font "-apple-Monaco-medium-normal-normal-*-28-*-*-*-m-0-iso10646-1")
+      (setq jme/presentation-font "-bitstream-bitstream vera sans mono-medium-r-*-*-*-120-*-*-*-*-*-*"))
+    (set-face-attribute 'default nil :font jme/default-font))
+#+END_SRC
+
+** Load custom theme
 
 For certain major modes, I find it desirable to use a non-monospaced
 font. Typically this is for certain documentation modes where the end
@@ -1526,7 +1538,7 @@ switching themes.
   (if (string-equal system-type "darwin")
       (disable-theme 'tomorrow-night-mac)
     (disable-theme 'tomorrow-night))
-  (load-theme 'prez)
+  (load-theme 'prez t)
   (when (boundp 'jme/presentation-font)
     (set-face-attribute 'default nil :font jme/presentation-font)))
 
