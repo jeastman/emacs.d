@@ -134,3 +134,11 @@ button. Fix that.
      (define-key flyspell-mouse-map [moude-3] #'undefined)))
 #+END_SRC
 
+
+** Slime
+
+#+BEGIN_SRC emacs-lisp
+(load (expand-file-name "~/quicklisp/slime-helper.el"))
+(setq inferior-lisp-program "/usr/local/bin/sbcl")
+(slime-setup '(slime-fancy))
+#+END_SRC
