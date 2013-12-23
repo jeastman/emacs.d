@@ -498,7 +498,7 @@ The result should look something like:
 
 #+BEGIN_SRC emacs-lisp
   (if (string-equal system-type "darwin")
-      (setq battery-mode-line-format "⚡️%b%p%%%% %t ")
+      (setq battery-mode-line-format "⚡️%b%p%% %t ")
     (setq battery-mode-line-format "⚡︎ %b%p%%%% %t "))
   (display-battery-mode)
 #+END_SRC
@@ -1560,9 +1560,19 @@ switching themes.
 (use-default-theme)
 #+END_SRC
 
+** Monkey Mode Line
+
+My own invention of a mode line layout.
+
+#+BEGIN_SRC emacs-lisp
+(require 'monkey-mode-line)
+(monkeyml/monkey-mode-line)
+#+END_SRC
+
 ** Powerline
 
-Turn on powerline for modeline goodness.
+Turn on powerline for modeline goodness. Soon to be disabled in favor of
+Monkey Mode Line.
 
 I like the look of powerline, but I wanted battery status displayed, which
 it did not do so well. This updated theme adds that by moving the
@@ -1657,7 +1667,7 @@ The left hand side is composed of:
                                (powerline-fill face2 (powerline-width rhs))
                                (powerline-render rhs)))))))
 
-  (jme/powerline-theme)
+  ;(jme/powerline-theme)
 #+END_SRC
 
 * Key Bindings

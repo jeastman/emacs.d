@@ -59,7 +59,6 @@
 (depends-on "pallet")
 (depends-on "plantuml-mode")
 (depends-on "popup")
-(depends-on "powerline")
 (depends-on "pretty-mode")
 (depends-on "rainbow-delimiters")
 (depends-on "rainbow-mode")
