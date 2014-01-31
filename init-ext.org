@@ -963,6 +963,24 @@ I like automatic indentation, needs to be turned on for Haskell.
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
 #+END_SRC
 
+Show documentation.
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
+#+END_SRC
+
+Set up flymake.
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'haskell-mode-hook 'flymake-haskell-multi-load)
+#+END_SRC
+
+Ignore compiled Haskell files in filename completions.
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'completion-ignored-extensions ".hi")
+#+END_SRC
+
 ** Helm
 
 #+BEGIN_SRC emacs-lisp
