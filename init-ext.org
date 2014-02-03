@@ -74,8 +74,6 @@ This list is a /mostly/ up-to-date list of the packages I use. Refer to the
 | =dired-single=          | Reuse the current dired buffer to visit another directory                 |
 | =epc=                   | A RPC stack for the Emacs Lisp                                            |
 | =expand-region=         | Increase selected region by semantic units                                |
-| =flymake-coffee=        | A flymake handler for coffee script                                       |
-| =flymake-haskell-multi= | Syntax-check haskell-mode using both ghc and hlint                        |
 | =git-gutter-fringe=     | Fringe version of git-gutter                                              |
 | =graphviz-dot-mode=     | Mode for the dot-language used by graphviz                                |
 | =handlebars-mode=       | A major mode for editing Handlebars files                                 |
@@ -853,8 +851,7 @@ Support for CoffeeScript.
          (file-exists-p (coffee-compiled-file-name))
          (coffee-cos-mode t)))
 
-  (add-hook 'coffee-mode-hook 'coffee-custom)
-  (add-hook 'coffee-mode-hook '(lambda () (flymake-coffee-load))))
+  (add-hook 'coffee-mode-hook 'coffee-custom))
 #+END_SRC
 
 ** Deft
@@ -921,15 +918,12 @@ Make sure =image-dired= keeps its files in the meta directory.
 
 #+BEGIN_SRC emacs-lisp
 (require 'erlang-start nil 'noerror)
-(require 'erlang-flymake nil 'noerror)
 #+END_SRC
 
-** Flymake
+** Flycheck
 
 #+BEGIN_SRC emacs-lisp
-(setq-default flymake-no-changes-timeout '3) ; timeout for flymake
-(setq flymake-run-in-place nil)
-(load "flymake" t)
+(add-hook 'after-init-hook #'global-flycheck-mode)
 #+END_SRC
 
 ** Flyspell
@@ -967,12 +961,6 @@ Show documentation.
 
 #+BEGIN_SRC emacs-lisp
 (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-#+END_SRC
-
-Set up flymake.
-
-#+BEGIN_SRC emacs-lisp
-(add-hook 'haskell-mode-hook 'flymake-haskell-multi-load)
 #+END_SRC
 
 Ignore compiled Haskell files in filename completions.
@@ -1083,13 +1071,6 @@ Also, query for the name of the master file.
 (setq-default TeX-master nil)
 #+END_SRC
 
-Configure flymake to use ~chktex.
-
-#+BEGIN_SRC emacs-lisp
-(defun flymake-get-tex-args (file-name)
-    (list "/usr/texbin/chktex" (list "-q" "-I" "-H" "-v0" file-name)))
-#+END_SRC
-
 ** Lisp
 
 #+BEGIN_SRC emacs-lisp
@@ -1153,20 +1134,6 @@ loads the configuration based on my login name.
 (add-hook 'python-mode-hook '(lambda ()
              (define-key python-mode-map "\C-m" 'newline-and-indent)))
 
-;(when (load "flymake" t)
-  (defun flymake-pyflakes-init ()
-    (let* ((temp-file (flymake-init-create-temp-buffer-copy
-                       'flymake-create-temp-inplace))
-           (local-file (file-relative-name
-                        temp-file
-                        (file-name-directory buffer-file-name))))
-      (list jme-python-flymake-script  (list temp-file))))
-
-  (add-to-list 'flymake-allowed-file-name-masks
-               '("\\.py\\'" flymake-pyflakes-init))
-;)
-
-(add-hook 'find-file-hook 'flymake-find-file-hook)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp

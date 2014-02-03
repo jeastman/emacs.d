@@ -255,6 +255,8 @@
    ;; flymake
    `(flymake-errline ((,class (:foreground ,white :background ,red :weight bold :underline t))))
    `(flymake-warnline ((,class (:foreground ,yellow :weight bold :underline t))))
+   `(flycheck-error ((,class (:foreground ,white :background ,red :weight bold :underline t))))
+   `(flycheck-warning ((,class (:foreground ,yellow :weight bold :underline t))))
 
    ;; flyspell
    `(flyspell-duplicate ((,class (:foreground ,yellow :weight bold :underline t))))

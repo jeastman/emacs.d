@@ -36,21 +36,6 @@ Set up Erlang paths.
     ("Man - Applications" "share/man/man6" t)))
 #+END_SRC
 
-*** Flymake
-
-Path for python flymake script.
-
-#+BEGIN_SRC emacs-lisp
-(setq jme-python-flymake-script "/Users/jeastman/.emacs.d/vendor/pycheckers.sh")
-#+END_SRC
-
-*** LaTeX
-
-#+BEGIN_SRC emacs-lisp
-(defun flymake-get-tex-args (file-name)
-      (list "chktex" (list "-H" "-I" "-q" "-v0" file-name)))
-#+END_SRC
-
 *** markown
 
 Use =mmd= (MultiMarkdown) instead of =md= (Markdown).
