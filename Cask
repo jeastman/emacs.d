@@ -26,6 +26,7 @@
 (depends-on "epl")
 (depends-on "expand-region")
 (depends-on "f")
+(depends-on "flx-ido")
 (depends-on "flycheck")
 (depends-on "flycheck-haskell")
 (depends-on "fringe-helper")

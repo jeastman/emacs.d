@@ -1026,12 +1026,13 @@ These settings control the behavior of ido.
 | =confirm-nonexistent-file-or-buffer= | =nil=      | Don't confirm before visiting a non-existent file  |
 
 #+BEGIN_SRC emacs-lisp
+  (require 'flx-ido)
   (ido-mode t)
   (setq
    ido-case-fold  t                 ; be case-insensitive
    ido-confirm-unique-completion t  ; wait for RET, even with unique completion
    ido-create-new-buffer 'always
-   ido-enable-flex-matching t
+;   ido-enable-flex-matching t
    ido-enable-last-directory-history t ; remember last used dirs
    ido-max-prospects 10
    ido-max-work-directory-list 30   ; should be enough
@@ -1039,6 +1040,8 @@ These settings control the behavior of ido.
    ido-save-directory-list-file meta-ido
    ido-use-filename-at-point nil
    ido-use-url-at-point nil
+   ido-everywhere 1
+   flx-ido-mode 1
   )
 
   (setq confirm-nonexistent-file-or-buffer nil)
