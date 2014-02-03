@@ -3,6 +3,23 @@
 #+STARTUP: showeverything
 #+LATEX_CLASS: jmeorgdoc
 
+* File Header
+
+Add some comments to the beginning of the generated elisp file.
+
+#+BEGIN_SRC emacs-lisp
+;;; init-ext.el -- Automatically generated initialization file
+;;;
+;;; This file is generated based on the init-ext.org file.
+;;; Please see that file for complete documentation.
+;;;
+;;; Commentary:
+;;; See init-ext.org
+;;;
+;;; Code:
+;;;
+#+END_SRC
+
 * General Configuration
 
 ** Library Paths
@@ -21,7 +38,8 @@ information files (backups, temporary files, etc.)
 First, we need to define the  =metafiles-dir= values.
 
 #+BEGIN_SRC emacs-lisp
-(setq metafiles-dir "~/.emacs-meta")
+(defvar metafiles-dir
+  "~/.emacs-meta" "Custom location for metadata.")
 #+END_SRC
 
 As this may be the first time I am running in this environment, the
@@ -127,22 +145,27 @@ and maintaining them.
 | =meta-saveplace= | Name of the file that records the =save-place-alist=, which stores the location of point in visited files |
 | =meta-backup=    | Location for backup files                                                                                 |
 | =meta-bookmarks= | Bookmarks file.                                                                                           |
-| =meta-savehist=  | File used by =savehist= where minibuffer history is save to and loaded                                    |
+| =meta-savehist=  | File used by =savehist= where minibuffer history is saved to and loaded                                   |
 | =meta-recent=    | File to save the recent list into                                                                         |
 | =meta-saves=     | Prefix to use for auto-save files                                                                         |
 | =meta-ido=       | File in which the =ido= state is saved between invocations                                                |
 | =meta-tramp=     | File used for =tramp= persistence                                                                         |
 
 #+BEGIN_SRC emacs-lisp
-(setq
-   meta-saveplace (concat metafiles-dir "/saveplace")
-   ;meta-backup (concat metafiles-dir "/backups/") ;; still needs work
-   meta-bookmarks (concat metafiles-dir "/bookmarks")
-   meta-savehist (concat metafiles-dir "/savehist")
-   meta-recent (concat metafiles-dir "/recentf")
-   meta-saves (concat metafiles-dir "/auto-save-list/.saves-")
-   meta-ido (concat metafiles-dir "/ido.last")
-   meta-tramp (concat metafiles-dir "/tramp"))
+(defvar meta-saveplace (concat metafiles-dir "/saveplace")
+  "Name of the file that records save-place-alist.")
+(defvar meta-bookmarks (concat metafiles-dir "/bookmarks")
+  "Location for bookmarks file.")
+(defvar meta-savehist (concat metafiles-dir "/savehist")
+  "File used by savehist where minibuffer history is saved to and loaded.")
+(defvar meta-recent (concat metafiles-dir "/recentf")
+  "File to save the recent list into.")
+(defvar meta-saves (concat metafiles-dir "/auto-save-list/.saves-")
+  "Prefix to use for auto-save files")
+(defvar meta-ido (concat metafiles-dir "/ido.last")
+  "File in which the ido state is saved between invocations")
+(defvar meta-tramp (concat metafiles-dir "/tramp")
+  "File used for tramp persistence.")
 #+END_SRC
 
 *** Non-packaged packages
@@ -152,7 +175,8 @@ order to handle loading these, I add the 3rd party libraries in the
 =vendor= directory.
 
 #+BEGIN_SRC emacs-lisp
-(setq vendor-dir (concat user-emacs-directory "vendor"))
+(defvar vendor-dir (concat user-emacs-directory "vendor")
+  "3rd party library directory for items not managed by Cask.")
 (unless (file-exists-p vendor-dir)
   (make-directory vendor-dir))
 (add-to-list 'load-path vendor-dir)
@@ -1494,12 +1518,16 @@ monoOne [[https://github.com/madmalik/monoOne][here]].
 Set appropriate fonts for the platform.
 
 #+BEGIN_SRC emacs-lisp
+  (defvar jme/default-font ""
+    "Default font to use.")
+  (defvar jme/presentation-font ""
+    "Font to use for presentations.")
   (when window-system
     (setq jme/default-font "-*-monoOne-normal-normal-normal-*-14-*-*-*-m-0-iso10646-1")
     (if (string-equal system-type "darwin")
         (setq jme/presentation-font "-apple-Monaco-medium-normal-normal-*-28-*-*-*-m-0-iso10646-1")
-      (setq jme/presentation-font "-bitstream-bitstream vera sans mono-medium-r-*-*-*-120-*-*-*-*-*-*"))
-    (set-face-attribute 'default nil :font jme/default-font))
+        (setq jme/presentation-font "-bitstream-bitstream vera sans mono-medium-r-*-*-*-120-*-*-*-*-*-*"))
+      (set-face-attribute 'default nil :font jme/default-font))
 #+END_SRC
 
 ** Load custom theme
@@ -1742,4 +1770,13 @@ Keep emacs Custom-settings in separate file.
 ;; Support for Chrome 'edit with emacs' extension
 (when (require 'edit-server nil 'noerror)
   (edit-server-start))
+#+END_SRC
+
+* Footer
+
+Add in the expected Emacs module footer.
+
+#+BEGIN_SRC emacs-lisp
+(provide 'init-ext)
+;;; init-ext.el ends here
 #+END_SRC
