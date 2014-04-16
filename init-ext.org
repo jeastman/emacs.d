@@ -123,7 +123,7 @@ I add the =user-emacs-directory= to the load path here to ensure we can pick up
 the additional configuration files.
 
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path user-emacs-directory)
+(add-to-list 'load-path (concat user-emacs-directory "/lisp"))
 #+END_SRC
 
 I also add all top-level subdirectories of =user-emacs-directory=.
@@ -1160,6 +1160,7 @@ loads the configuration based on my login name.
 ; Bring back indent after newline
 (add-hook 'python-mode-hook '(lambda ()
              (define-key python-mode-map "\C-m" 'newline-and-indent)))
+(add-hook 'python-mode-hook 'highlight-indentation-mode)
 
 #+END_SRC
 
@@ -1330,6 +1331,7 @@ I use diminish to hide most of minor modes from the modeline.
 (eval-after-load "undo-tree" '(diminish 'undo-tree-mode))
 (eval-after-load "whitespace" '(diminish 'global-whitespace-mode))
 (eval-after-load "yasnippet" '(diminish 'yas-minor-mode))
+(eval-after-load "highlight-indentation" '(diminish 'highlight-indentation-mode))
 #+END_SRC
 
 * Custom Configuration
