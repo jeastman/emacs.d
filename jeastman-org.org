@@ -42,6 +42,8 @@ I use a number of files to break up tasks into resonably grouped files.
   (setq org-agenda-files (list (concat org-directory "/work.org")
                                (concat org-directory "/tasks.org")
                                (concat org-directory "/home.org")
+                               (concat org-directory "/workcal.org")
+                               (concat org-directory "/homecal.org")
                                (concat org-directory "/notes.org")))
   (setq org-default-notes-file (concat org-directory "/notes.org"))
   (setq org-annotate-file-storage-file (concat org-directory "/annotated.org"))
@@ -59,10 +61,19 @@ Ensure we have support for programming languages used in code blocks.
      (dot . t)
      (gnuplot . t)
      (plantuml . t)
-     (python . t)))
+     (python . t)
+     (js . t)
+     (lisp . t)))
 #+END_SRC
 
 ** Look and Feel
+
+Use utf-8 bullets for nicer look.
+
+#+BEGIN_SRC emacs-lisp
+(require 'org-bullets)
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+#+END_SRC
 
 Startup with content folded.
 
@@ -172,7 +183,7 @@ To set an org file up for archiving you need to add the following at the
 top of the file (replace archive.text with the archive file):
 
 =-*- mode: org; after-save-hook: (archive-done-tasks) -*-=
-=#+ARCHIVE: archive.txt::=
+=#+ARCHIVE: archive.txt::* %s archive=
 
 #+BEGIN_SRC emacs-lisp
 (defvar jme/org-archive-expiry-days 7
