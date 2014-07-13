@@ -1,4 +1,4 @@
-#+TITLE: Emacs Configuration for Pecoux
+#+TITLE: Emacs Configuration for Scribble
 #+OPTIONS: toc:4 h:4
 #+STARTUP: showeverything
 
@@ -58,7 +58,7 @@ Jar file required for plantuml.
 Also see this [[https://gist.github.com/rpl/547521][gist]].
 
 #+BEGIN_SRC emacs-lisp
-(setq plantuml-jar-path "/usr/local/Cellar/plantuml/7985/libexec/plantuml.jar")
+(setq plantuml-jar-path "/usr/local/Cellar/plantuml/7999/plantuml.7999.jar")
 #+END_SRC
 
 *** Org
@@ -69,6 +69,10 @@ Org specific directories.
 (setq org-directory "~/Dropbox/org")
 (setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
 (setq my-notes "~/Dropbox/notes")
+(setq org-refile-targets '((org-agenda-files :maxlevel . 5)
+                           (("~/Dropbox/org/task_archive.txt") :maxlevel . 5)
+                           (nil :maxlevel . 5)))
+(setq org-archive-location "~/Dropbox/org/task_archive.txt::* %s")
 (setq org-ditaa-jar-path "/usr/local/Cellar/ditaa/0.9/libexec/ditaa0_9.jar")
 (setq org-plantuml-jar-path plantuml-jar-path)
 #+END_SRC
@@ -122,8 +126,29 @@ button. Fix that.
 
 ** Slime
 
+This currently has some problems under 24.4.
+
 #+BEGIN_SRC emacs-lisp
-(load (expand-file-name "~/quicklisp/slime-helper.el"))
-(setq inferior-lisp-program "/usr/local/bin/sbcl")
-(slime-setup '(slime-fancy))
+  (if (= emacs-major-version 24)
+      (if (= emacs-minor-version 3)
+          (progn
+            (load (expand-file-name "~/quicklisp/slime-helper.el"))
+            (setq inferior-lisp-program "/usr/local/bin/sbcl"))))
+#+END_SRC
+
+** Org Reveal
+
+#+BEGIN_SRC emacs-lisp
+(setq org-reveal-root "file:///Users/jeastman/Projects/r/reveal.js")
+#+END_SRC
+
+** Lisp Hyperspec
+
+#+BEGIN_SRC emacs-lisp
+(defvar jme/common-lisp-hyperspec-root
+  "file:/Users/jeastman/Projects/l/lisp_docs/"
+  "Local installation of Common Lisp Hyperspec")
+
+(when (boundp 'jme/common-lisp-hyperspec-root)
+  (setq common-lisp-hyperspec-root jme/common-lisp-hyperspec-root))
 #+END_SRC
