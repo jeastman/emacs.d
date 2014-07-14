@@ -203,7 +203,7 @@ similar to what [[https://github.com/eschulte/emacs24-starter-kit][Emacs Starter
 different forms of each file.
 
 #+BEGIN_SRC emacs-lisp
-  (flet ((jme/load (base)
+  (cl-flet ((jme/load (base)
                    (let* ((path          (expand-file-name base user-emacs-directory))
                           (literate      (concat path ".org"))
                           (encrypted-org (concat path ".org.gpg"))
@@ -217,7 +217,10 @@ different forms of each file.
          (remove-extension (name)
              (string-match "\\(.*?\\)\.\\(org\\(\\.el\\)?\\|el\\)\\(\\.gpg\\)?$" name)
              (match-string 1 name)))
-    (let ((user-dir (concat user-emacs-directory user-login-name)))
+    (let* ((user-dir (concat user-emacs-directory user-login-name))
+           (system-name (symbol-name system-type))
+           (base-name (replace-regexp-in-string "/" "-" system-name)))
+      (jme/load base-name)
       (jme/load (car (split-string (system-name) "\\.")))
       (jme/load user-login-name)
       (when (file-exists-p user-dir)
