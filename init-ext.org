@@ -1645,6 +1645,7 @@ they relate to, I find it better to have all global keys in one place.
 | =C-==      | expand-region               |                                     |
 | =C-c h=    | helm-mini                   |                                     |
 | =C-c n=    | jme/cleanup-buffer          | Destructive cleanup of buffer       |
+| =C-c on=   | jme/todays-daypage          | Open daypage for current day        |
 | =C-c t=    | multi-term-next             | Reuse terminal                      |
 | =C-c T=    | multi-term                  | Create a new terminal               |
 | =C-c w=    | jme/emacs-toggle-size       | Custom function for min/max size    |
@@ -1670,6 +1671,7 @@ they relate to, I find it better to have all global keys in one place.
 #+BEGIN_SRC emacs-lisp
 (bind-key "C-c h" 'helm-mini)
 (bind-key "C-c n" 'jme/cleanup-buffer)
+(bind-key "C-c on" 'jme/todays-daypage)
 (bind-key "C-c t" 'multi-term-next)
 (bind-key "C-c T" 'multi-term)
 (bind-key "C-c w" 'jme/emacs-toggle-size)
