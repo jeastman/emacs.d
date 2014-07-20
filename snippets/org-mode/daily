@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: daily
+# key: daily
+# --
+#+TITLE: `(format-time-string "%Y-%m-%d" (current-time))` (`(format-time-string "%A")`)
+#+DATE: `(format-time-string "%B %d, %Y" (current-time))`
+#+AUTHOR: John Eastman
+#+EMAIL: john.eastman@gmail.com
+
+* <`(format-time-string "%Y-%m-%d" (current-time))`> Notes
+
+  $0
