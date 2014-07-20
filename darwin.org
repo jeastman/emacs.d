@@ -95,19 +95,35 @@ This function posts messages to the Mac Notification Center. Provides a Mac
 specific way to display desktop notifications via simple AppleScript.
 
 #+BEGIN_SRC emacs-lisp
-(defun jme/message-notify (title text)
-    "Post a message with the given TITLE and TEXT to the notifications center.
+(cl-defun jme/message-notify (title text &key speak-it (max-text-len 64))
+  "Post a message with the given TITLE and TEXT to the notifications center.
+  If SPEAK-IT is not NIL, will also say the message. Any text over MAX-TEXT-LEN
+  will be truncated.
 
-  This is a Mac OS X specific function.  Note that double-quotes that occur
-  in the TITLE and the TEXT are replaced with single quotes."
+  If the ~deferred~ package is available, the notification is processed
+  asynchronously.
 
-      (let ((title (replace-regexp-in-string "\"" "'" title))
-            (text (replace-regexp-in-string "\"" "'" text)))
-        (do-applescript (concat
-                         "display notification \""
-                         text
-                         "\" with title \""
-                         title
-                         "\" sound name \"Pop\""))))
-
+  This is a Mac OS X specific function.  Note that double-quotes that occur in
+  the TITLE and the TEXT are replaced with single quotes."
+  
+  (let ((title (replace-regexp-in-string "\"" "'" title))
+        (text (replace-regexp-in-string "\"" "'" (if (> (length text) max-text-len)
+                                                     (substring text 0 max-text-len)
+                                                   text)))
+        (fn (lambda (title text speak-it) (do-applescript (concat
+                                                           "display notification \""
+                                                           text
+                                                           "\" with title \""
+                                                           title
+                                                           (if speak-it "\"" "\" sound name \"Pop\"")))
+              (when speak-it
+                (do-applescript (concat
+                                 "say \""
+                                 text
+                                 "\" using \""
+                                 "Tessa"
+                                 "\" without waiting until completion"))))))
+    (if (require 'deferred nil 'noerror)
+          (deferred:call fn title text speak-it)
+      (funcall fn title text speak-it))))
 #+END_SRC
