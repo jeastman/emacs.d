@@ -12,3 +12,5 @@ jeastman.org
 pecoux.el
 scribble.el
 swank.scm
+/darwin.el
+/sbcl.core-for-slime

@@ -4,7 +4,7 @@
 ;; Author: John Eastman
 ;; Date: 2013-10-24
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+(require 'cl)
 ;; Use cask for package management
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
