@@ -848,6 +848,21 @@ with Auto Complete. I use it everywhere I can.
 (yas-global-mode 1)
 #+END_SRC
 
+YASnippet does not provide a way to expand a snippet programmatically, so
+we create one. (Based on code from [[http://stackoverflow.com/questions/10211730/insert-yasnippet-by-name][this]] Stack Overflow question.)
+
+#+BEGIN_SRC emacs-lisp
+(defun jme/insert-yas-by-name (name)
+  (flet ((dummy-prompt
+          (prompt choices &optional display-fn)
+          (declare (ignore prompt))
+          (or (find name choices :key display-fn :test #'string=)
+              (throw 'notfound nil))))
+    (let ((yas/prompt-functions '(dummy-prompt)))
+      (catch 'notfound
+        (yas/insert-snippet t)))))
+#+END_SRC
+
 ** CoffeeScript
 
 Support for CoffeeScript.
