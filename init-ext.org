@@ -7,7 +7,7 @@
 
 Add some comments to the beginning of the generated elisp file.
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :padline no
 ;;; init-ext.el -- Automatically generated initialization file
 ;;;
 ;;; This file is generated based on the init-ext.org file.
@@ -79,43 +79,117 @@ packages installed are kept in sync with the dependency spec.
 This list is a /mostly/ up-to-date list of the packages I use. Refer to the
 =Cask= file for the list of packages actually installed.
 
-| Package                 | Description                                                               |
-|-------------------------+---------------------------------------------------------------------------|
-| =ace-jump-mode=         | A quick cursor location minor mode                                        |
-| =auto-complete=         | Auto completion                                                           |
-| =coffee-mode=           | Major mode to edit CoffeeScript files                                     |
-| =deferred=              | Simple asynchronous functions for emacs lisp                              |
-| =deft=                  | quickly browse, filter, and edit plain text notes                         |
-| =dired+=                | Extensions to Dired                                                       |
-| =dired-details=         | make file details hide-able in dired                                      |
-| =dired-details+=        | Enhancements to library `dired-details+.el'                               |
-| =dired-single=          | Reuse the current dired buffer to visit another directory                 |
-| =epc=                   | A RPC stack for the Emacs Lisp                                            |
-| =expand-region=         | Increase selected region by semantic units                                |
-| =git-gutter-fringe=     | Fringe version of git-gutter                                              |
-| =graphviz-dot-mode=     | Mode for the dot-language used by graphviz                                |
-| =handlebars-mode=       | A major mode for editing Handlebars files                                 |
-| =helm=                  | An Emacs incremental and narrowing framework                              |
-| =jabber=                | A Jabber client                                                           |
-| =jedi=                  | a Python auto-completion for Emacs                                        |
-| =js2-mode=              | Improved JavaScript editing mode                                          |
-| =magit=                 | Control Git from Emacs                                                    |
-| =markdown-mode=         | Major mode for Markdown-formatted text files                              |
-| =markdown-mode+=        | extra functions for markdown-mode                                         |
-| =multi-term=            | Managing multiple terminal buffers in Emacs                               |
-| =nose=                  | Easy Python test running in Emacs                                         |
-| =org=                   | Outline-based notes management and organizer                              |
-| =powerline=             | Rewrite of Powerline                                                      |
-| =pretty-mode=           | redisplay parts of the buffer as pretty symbols                           |
-| =rainbow-delimiters=    | Highlight nested parens, brackets, braces a different color at each depth |
-| =rainbow-mode=          | Colorize color names in buffers                                           |
-| =sauron=                | Track (erc/org/dbus/...) events and react to them                         |
-| =slime=                 | Superior Lisp Interaction Mode for Emacs                                  |
-| =slime-js=              | Slime extension for swank-js                                              |
-| =slime-repl=            | Read-Eval-Print Loop written in Emacs Lisp                                |
-| =smex=                  | M-x interface with Ido-style fuzzy matching                               |
-| =undo-tree=             | Treat undo history as a tree                                              |
-| =w3m=                   | an Emacs interface to w3m                                                 |
+My friend [[https://github.com/gordyt][Gordon]] put together the following script to generate a list of
+the packages installed, which means the list is more up-to-date than it
+used to be.
+
+#+BEGIN_SRC emacs-lisp :tangle no
+  (defun jme/gen-package-table ()
+    "Generate a table of all installed packages, along with their descriptions"
+    (cons '("_Package Name_" "_Package Description_")
+    (sort
+     (mapcar
+      (lambda (pkg-desc)
+        (list (car pkg-desc) (package-desc-doc (cdr pkg-desc))))
+      package-alist)
+     `(lambda (a b) (string-lessp (car a) (car b))))))
+
+  (jme/gen-package-table)
+#+END_SRC
+
+#+RESULTS:
+| _Package Name_                 | _Package Description_                                                              |
+| ace-jump-mode                  | a quick cursor location minor mode for emacs                                       |
+| alert                          | Growl-style notification system for Emacs                                          |
+| annoying-arrows-mode           | Ring the bell if using arrows too much [github]                                    |
+| auctex                         | Integrated environment for *TeX*                                                   |
+| auto-complete                  | Auto Completion for GNU Emacs                                                      |
+| bbdb                           | The Insidious Big Brother Database for GNU Emacs                                   |
+| bind-key                       | A simple way to manage personal keybindings                                        |
+| cask                           | Cask: Project management for Emacs package development                             |
+| cider                          | Clojure Integrated Development Environment and REPL                                |
+| clojure-mode                   | Major mode for Clojure code                                                        |
+| cm-mode                        | Minor mode for CriticMarkup                                                        |
+| cmake-mode                     | major-mode for editing CMake sources                                               |
+| coffee-mode                    | Major mode to edit CoffeeScript files in Emacs                                     |
+| color-theme-sanityinc-tomorrow | A version of Chris Kempson's various Tomorrow themes                               |
+| concurrent                     | Concurrent utility functions for emacs lisp                                        |
+| ctable                         | Table component for Emacs Lisp                                                     |
+| dash                           | A modern list library for Emacs                                                    |
+| deferred                       | Simple asynchronous functions for emacs lisp                                       |
+| deft                           | quickly browse, filter, and edit plain text notes                                  |
+| diminish                       | Diminished modes are minor modes with no modeline display [github]                 |
+| dired+                         | Extensions to Dired.                                                               |
+| dired-details                  | make file details hide-able in dired [wiki]                                        |
+| dired-details+                 | Enhancements to library `dired-details+.el'.                                       |
+| dired-single                   | Reuse the current dired buffer to visit another directory [wiki]                   |
+| direx                          | Simple Directory Explorer                                                          |
+| edit-server                    | server that responds to edit requests from Chrome                                  |
+| epc                            | A RPC stack for the Emacs Lisp                                                     |
+| epl                            | Emacs Package Library                                                              |
+| expand-region                  | Increase selected region by semantic units.                                        |
+| f                              | Modern API for working with files and directories                                  |
+| flx                            | fuzzy matching with good sorting                                                   |
+| flx-ido                        | flx integration for ido                                                            |
+| flycheck                       | Modern on-the-fly syntax checking for GNU Emacs                                    |
+| flycheck-haskell               | Flycheck: Cabal projects and sandboxes                                             |
+| fringe-helper                  | helper functions for fringe bitmaps                                                |
+| ghci-completion                | Completion for GHCi commands in inferior-haskell buffers                           |
+| git-commit-mode                | Major mode for editing git commit messages                                         |
+| git-gutter                     | Port of Sublime Text plugin GitGutter                                              |
+| git-gutter-fringe              | Fringe version of git-gutter.el                                                    |
+| git-messenger                  | Pop up last commit information of current line                                     |
+| git-rebase-mode                | Major mode for editing git rebase files                                            |
+| gntp                           | Growl Notification Protocol for Emacs                                              |
+| gnuplot                        | drive gnuplot from within emacs                                                    |
+| gnuplot-mode                   | Major mode for editing gnuplot scripts                                             |
+| graphviz-dot-mode              | Mode for the dot-language used by graphviz (att).                                  |
+| guide-key                      | Guide the following key bindings automatically and dynamically                     |
+| handlebars-mode                | A major mode for editing Handlebars files.                                         |
+| haskell-mode                   | A Haskell editing mode                                                             |
+| helm                           | Helm is an Emacs incremental and narrowing framework                               |
+| hi2                            | indentation module for Haskell Mode [github]                                       |
+| highlight-indentation          | Minor modes for highlighting indentation                                           |
+| htmlize                        | Convert buffer text and decorations to HTML. [git]                                 |
+| ido-ubiquitous                 | Use ido (nearly) everywhere.                                                       |
+| ido-vertical-mode              | Makes ido-mode display vertically.                                                 |
+| jabber                         | A Jabber client for Emacs.                                                         |
+| jedi                           | Python auto-completion for Emacs                                                   |
+| js2-mode                       | Improved JavaScript editing mode                                                   |
+| magit                          | control Git from Emacs                                                             |
+| markdown-mode                  | Emacs Major mode for Markdown-formatted text files                                 |
+| markdown-mode+                 | extra functions for markdown-mode [github]                                         |
+| multi-term                     | Managing multiple terminal buffers in Emacs.                                       |
+| nose                           | Easy Python test running in Emacs                                                  |
+| org                            | Outline-based notes management and organizer                                       |
+| org-bullets                    | Show bullets in org-mode as UTF-8 characters                                       |
+| org-gcal                       | Org sync with Google Calendar                                                      |
+| ox-reveal                      | reveal.js Presentation Back-End for Org Export Engine                              |
+| package-build                  | Tools for assembling a package archive                                             |
+| pallet                         | A package management tool for Emacs, using Cask.                                   |
+| pkg-info                       | Information about packages                                                         |
+| plantuml-mode                  | Major mode for plantuml [github]                                                   |
+| popup                          | Visual Popup User Interface                                                        |
+| popwin                         | Popup Window Manager.                                                              |
+| pretty-mode                    | Redisplay parts of the buffer as pretty symbols.                                   |
+| pydoc-info                     | Better Python support for info-lookup-symbol.                                      |
+| python-environment             | virtualenv API for Emacs Lisp                                                      |
+| racket-mode                    | Major mode for Racket language.                                                    |
+| rainbow-delimiters             | Highlight nested parens, brackets, braces a different color at each depth.         |
+| rainbow-mode                   | Colorize color names in buffers                                                    |
+| request                        | Compatible layer for URL request in Emacs                                          |
+| request-deferred               | Wrap request.el by deferred                                                        |
+| s                              | The long lost Emacs string manipulation library.                                   |
+| shut-up                        | Shut up would you!                                                                 |
+| slime                          | Superior Lisp Interaction Mode for Emacs                                           |
+| smartparens                    | Automatic insertion, wrapping and paredit-like navigation with user defined pairs. |
+| smex                           | M-x interface with Ido-style fuzzy matching.                                       |
+| stylus-mode                    | Major mode for editing .jade files                                                 |
+| sws-mode                       | (S)ignificant (W)hite(S)pace mode                                                  |
+| undo-tree                      | Treat undo history as a tree                                                       |
+| w3m                            | an Emacs interface to w3m                                                          |
+| window-layout                  | window layout manager                                                              |
+| yasnippet                      | Yet another snippet extension for Emacs.                                           |
 
 ** Additional Paths
 
@@ -161,9 +235,9 @@ and maintaining them.
 (defvar meta-recent (concat metafiles-dir "/recentf")
   "File to save the recent list into.")
 (defvar meta-saves (concat metafiles-dir "/auto-save-list/.saves-")
-  "Prefix to use for auto-save files")
+  "Prefix to use for auto-save files.")
 (defvar meta-ido (concat metafiles-dir "/ido.last")
-  "File in which the ido state is saved between invocations")
+  "File in which the ido state is saved between invocations.")
 (defvar meta-tramp (concat metafiles-dir "/tramp")
   "File used for tramp persistence.")
 #+END_SRC
@@ -217,7 +291,7 @@ several functions.
 (defun jme/load (directory base)
   "Look for files located in DIRECTORY whose base name is BASE.
 
-Check the base name against several extensions. If a file with 
+Check the base name against several extensions.  If a file with 
 that name exists, then load it."
   (let ((literate      (expand-file-name (concat base ".org") directory))
         (encrypted-org (expand-file-name (concat base ".org.gpg") directory))
@@ -306,6 +380,7 @@ This function resets the window to its minimal position.
 
 #+BEGIN_SRC emacs-lisp
 (defun jme/emacs-min ()
+"Reset frame size to minumum."
   (interactive)
   (set-frame-parameter (selected-frame) 'fullscreen nil)
   (set-frame-parameter (selected-frame) 'vertical-scroll-bars nil)
@@ -321,6 +396,7 @@ maximum position.
 
 #+BEGIN_SRC emacs-lisp
 (defun jme/emacs-max ()
+"Reset frame size to maximum."
   (interactive)
   (if t
       (progn
@@ -346,6 +422,7 @@ One last function to give me the ability to toggle between the two.
 
 #+BEGIN_SRC emacs-lisp
 (defun jme/emacs-toggle-size ()
+"Toggle between minimum and maximum size of frame."
   (interactive)
   (if (> (cdr (assq 'width (frame-parameters))) 100)
       (jme/emacs-min)
@@ -564,8 +641,10 @@ The result should look something like:
 
 #+BEGIN_SRC emacs-lisp
   (if (string-equal system-type "darwin")
-      (setq battery-mode-line-format "⚡️%b%p%% %t ")
-    (setq battery-mode-line-format "⚡︎ %b%p%%%% %t "))
+      (custom-set-variables
+        '(battery-mode-line-format "⚡️%b%p%% %t "))
+    (custom-set-variables
+      '(battery-mode-line-format "⚡︎ %b%p%%%% %t ")))
   (display-battery-mode)
 #+END_SRC
 
@@ -581,8 +660,10 @@ configure it here to my liking.
   (setq display-time-default-load-average nil)  ; Don't display load
   (setq display-time-day-and-date nil)  ; Don't display date
   (if (string-equal system-type "darwin")
-      (setq display-time-format "🕗%l:%M%p")
-    (setq display-time-format "%l:%M%p"))
+      (custom-set-variables
+        '(display-time-format "🕗%l:%M%p"))
+    (custom-set-variables
+      '(display-time-format "%l:%M%p")))
   (display-time-mode)
 #+END_SRC
 
@@ -617,7 +698,7 @@ Prefix used for generating the auto save file names.
 Save bookmarks into their own file in the meta information directory.
 
 #+BEGIN_SRC emacs-lisp
-(setq bookmark-default-file meta-bookmarks)
+(custom-set-variables '(bookmark-default-file meta-bookmarks))
 #+END_SRC
 
 **** Backup
@@ -666,13 +747,13 @@ Revert buffers when they change on disk.
 Auto-refresh dired buffers.
 
 #+BEGIN_SRC emacs-lisp
-(setq global-auto-revert-non-file-buffers t)
+(custom-set-variables '(global-auto-revert-non-file-buffers t))
 #+END_SRC
 
 But.. don't announce reversion of buffer
 
 #+BEGIN_SRC emacs-lisp
-(setq auto-revert-verbose nil)
+(custom-set-variables '(auto-revert-verbose nil))
 #+END_SRC
 
 **** Git gutter
@@ -1133,15 +1214,17 @@ These settings control the behavior of ido.
   (add-hook 'ido-minibuffer-setup-hook
     (function
       (lambda ()
-        (make-local-variable 'resize-minibuffer-window-max-height)
-        (setq resize-minibuffer-window-max-height 1))))
+        (set (make-local-variable 'resize-minibuffer-window-max-height) 1))))
 #+END_SRC
 
 ** Javascript
 
+If we have the ability to use javascript in an inferior process, use Node
+for that.
+
 #+BEGIN_SRC emacs-lisp
 (when (require 'js-comint nil 'noerror)
-  (setq inferior-js-program-command "node"))
+  (custom-set-variables '(inferior-js-program-command "node")))
 #+END_SRC
 
 ** LaTeX
@@ -1152,9 +1235,11 @@ buffer and to parse the file after loading to get style information.
 Also, query for the name of the master file.
 
 #+BEGIN_SRC emacs-lisp
-(setq TeX-auto-save t)
-(setq TeX-parse-self t)
-(setq-default TeX-master nil)
+(when (package-installed-p 'auctex)
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (setq-default TeX-master nil)  
+)
 #+END_SRC
 
 ** Lisp
@@ -1403,13 +1488,13 @@ same time. I came across this function to rotate buffers through windows
 
 #+BEGIN_SRC emacs-lisp
   (defun jme/rotate-windows ()
-    "Rotate your windows"
+    "Rotate your windows."
     (interactive)
     (cond ((not (> (count-windows)1))
            (message "You can't rotate a single window!"))
           (t
-           (setq i 1)
-           (setq numWindows (count-windows))
+           (let ((i 1)
+                 (numWindows (count-windows)))
            (while  (< i numWindows)
              (let* (
                     (w1 (elt (window-list) i))
@@ -1423,7 +1508,7 @@ same time. I came across this function to rotate buffers through windows
                (set-window-buffer w2 b1)
                (set-window-start w1 s2)
                (set-window-start w2 s1)
-               (setq i (1+ i)))))))
+               (setq i (1+ i))))))))
 #+END_SRC
 
 *** Window Split
@@ -1433,6 +1518,7 @@ windows. (Picked up from [[http://whattheemacsd.com/buffer-defuns.el-03.html][he
 
 #+BEGIN_SRC emacs-lisp
 (defun jme/toggle-window-split ()
+ "Toggle between horizontal and vertical layout of windows."
   (interactive)
   (if (= (count-windows) 2)
       (let* ((this-win-buffer (window-buffer))
@@ -1468,7 +1554,7 @@ to, allowing it to be safe for a =before-save-hook=. (see
 #+BEGIN_SRC emacs-lisp
 (defun jme/cleanup-buffer-safe ()
   "Perform a bunch of safe operations on the whitespace content of a buffer.
-Does not indent buffer, because it is used for a before-save-hook, and that
+Does not indent buffer, because it is used for a `before-save-hook', and that
 might be bad."
   (interactive)
   (untabify (point-min) (point-max))
@@ -1602,7 +1688,7 @@ Color source blocks in org to make them stand out. See [[http://www.howardism.or
 
 #+BEGIN_SRC emacs-lisp
 (defun jme/org-src-color-blocks-light ()
-  "Colors the block headers and footers to make them stand out more for lighter themes"
+  "Colors the block headers and footers to make them stand out more for lighter themes."
   (interactive)
   (custom-set-faces
    '(org-block-begin-line 
@@ -1614,7 +1700,7 @@ Color source blocks in org to make them stand out. See [[http://www.howardism.or
 )
 
 (defun jme/org-src-color-blocks-dark ()
-  "Colors the block headers and footers to make them stand out more for dark themes"
+  "Colors the block headers and footers to make them stand out more for dark themes."
   (interactive)
   (custom-set-faces
    '(org-block-begin-line 
@@ -1636,22 +1722,25 @@ Chris Kempson's tommorow themes.
 #+BEGIN_SRC emacs-lisp
 (require 'color-theme-sanityinc-tomorrow)
 (defun use-presentation-theme ()
+ "Switch to presentation theme."
   (interactive)
   (color-theme-sanityinc-tomorrow 'day)
   (jme/org-src-color-blocks-light)
   (when (boundp 'jme/presentation-font)
-    (set-default-font jme/presentation-font)
+    (set-frame-font jme/presentation-font :frames nil)
     (set-face-attribute 'default nil :font jme/presentation-font)))
 
 (defun use-default-theme ()
+ "Switch to the default theme."
   (interactive)
   (color-theme-sanityinc-tomorrow 'night)
   (jme/org-src-color-blocks-dark)
   (when (boundp 'jme/default-font)
-    (set-default-font jme/default-font)
+    (set-frame-font jme/default-font :frames nil)
     (set-face-attribute 'default nil :font jme/default-font)))
 
 (defun toggle-presentation-mode ()
+ "Toggle between presentation and default theme."
   (interactive)
   (if (string= (frame-parameter nil 'font) jme/default-font)
       (use-presentation-theme)
