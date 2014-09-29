@@ -1473,6 +1473,7 @@ I use diminish to hide most of minor modes from the modeline.
 (eval-after-load "whitespace" '(diminish 'global-whitespace-mode))
 (eval-after-load "yasnippet" '(diminish 'yas-minor-mode))
 (eval-after-load "highlight-indentation" '(diminish 'highlight-indentation-mode))
+(eval-after-load "magit" '(diminish 'magit-auto-revert-mode))
 #+END_SRC
 
 * Custom Configuration
