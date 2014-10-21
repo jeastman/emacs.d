@@ -187,7 +187,6 @@ used to be.
 | stylus-mode                    | Major mode for editing .jade files                                                 |
 | sws-mode                       | (S)ignificant (W)hite(S)pace mode                                                  |
 | undo-tree                      | Treat undo history as a tree                                                       |
-| w3m                            | an Emacs interface to w3m                                                          |
 | window-layout                  | window layout manager                                                              |
 | yasnippet                      | Yet another snippet extension for Emacs.                                           |
 
@@ -1274,7 +1273,6 @@ Also, query for the name of the master file.
    newsticker-obsolete-item-max-age (* 30 (* 24 3600))
    newsticker-hide-immortal-items-in-echo-area t
    newsticker-hide-obsolete-items-in-echo-area t
-   newsticker-html-renderer 'w3m-region
    newsticker-date-format "(%A, %B %d %I:%M%p)")
 #+END_SRC
 
@@ -1450,12 +1448,6 @@ for these exceptions.
 
 #+BEGIN_SRC emacs-lisp
 (setq uniquify-ignore-buffers-re "^\\*")
-#+END_SRC
-
-** w3m
-
-#+BEGIN_SRC emacs-lisp
-(setq w3m-use-cookies t)
 #+END_SRC
 
 ** Diminish
