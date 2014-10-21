@@ -239,6 +239,8 @@ and maintaining them.
   "File in which the ido state is saved between invocations.")
 (defvar meta-tramp (concat metafiles-dir "/tramp")
   "File used for tramp persistence.")
+(defvar meta-url (concat metafiles-dir "/url")
+  "directory for url files.")
 #+END_SRC
 
 *** Non-packaged packages
@@ -732,6 +734,15 @@ that are linked, instead of renaming.
   delete-old-versions t
   backup-by-copying-when-linked t)
 #+END_SRC
+
+**** URL Related
+
+     Make sure to store URL related stuff in the right place.
+
+     #+BEGIN_SRC emacs-lisp
+     (setq url-cookie-file (concat meta-url "/cookies"))
+     (setq url-cache-directory (concat temporary-file-directory "url/cache"))
+     #+END_SRC
 
 *** Global mode settings
 
