@@ -1312,6 +1312,10 @@ loads the configuration based on my login name.
              (define-key python-mode-map "\C-m" 'newline-and-indent)))
 (add-hook 'python-mode-hook 'highlight-indentation-mode)
 
+;; use ipython
+(setq python-shell-interpreter "ipython"
+       python-shell-interpreter-args "-i")
+
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
