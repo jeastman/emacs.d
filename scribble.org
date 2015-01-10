@@ -77,14 +77,9 @@ Org specific directories.
 
 ** Slime
 
-This currently has some problems under 24.4.
-
 #+BEGIN_SRC emacs-lisp
-  (if (= emacs-major-version 24)
-      (if (= emacs-minor-version 3)
-          (progn
-            (load (expand-file-name "~/quicklisp/slime-helper.el"))
-            (setq inferior-lisp-program "/usr/local/bin/sbcl"))))
+  (load (expand-file-name "~/quicklisp/slime-helper.el"))
+  (setq inferior-lisp-program "/usr/local/bin/sbcl --noinform")
 #+END_SRC
 
 ** Org Reveal
