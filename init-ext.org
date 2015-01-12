@@ -134,8 +134,6 @@ used to be.
 | deft                           | quickly browse, filter, and edit plain text notes                                  |
 | diminish                       | Diminished modes are minor modes with no modeline display                          |
 | dired+                         | Extensions to Dired.                                                               |
-| dired-details                  | make file details hide-able in dired                                               |
-| dired-details+                 | Enhancements to library `dired-details+.el'.                                       |
 | dired-single                   | Reuse the current dired buffer to visit another directory                          |
 | direx                          | Simple Directory Explorer                                                          |
 | edit-server                    | server that responds to edit requests from Chrome                                  |
@@ -296,7 +294,7 @@ it is a dependancy of =use-package=, but it doesn't hurt.
 
 #+BEGIN_SRC emacs-lisp
 (use-package bind-key
-  ensure: t)
+  :ensure t)
 #+END_SRC
 
 *** System and user specific configuration
@@ -1101,38 +1099,17 @@ very much experimental.
 
 I moved to using =dired+= to pick up some extra features.
 
-#+BEGIN_SRC emacs-lisp
-(use-package dired+
-  :config
-  (progn
-    (put 'dired-find-alternate-file 'disabled nil)  ;enable `a' command
-    (use-package dired-details
-      :init (dired-details-install))
-    (use-package dired-single
-      :init
-      (progn
-        (defun my-dired-init ()
-         "Bunch of stuff to run for dired, either immediately or when it's
-          loaded."
-;; <add other stuff here>
-    (define-key dired-mode-map [return] 'dired-single-buffer)
-    (define-key dired-mode-map [mouse-1] 'dired-single-buffer-mouse)
-    (define-key dired-mode-map "^"
-      (function
-       (lambda nil (interactive) (dired-single-buffer "..")))))
-  ;; if dired's already loaded, then the keymap will be bound
-  (if (boundp 'dired-mode-map)
-      ;; we're good to go; just add our bindings
-      (my-dired-init)
-    ;; it's not loaded yet, so add our bindings to the load-hook
-    (add-hook 'dired-load-hook 'my-dired-init))))))
-
-#+END_SRC
-
 Make sure =image-dired= keeps its files in the meta directory.
 
 #+BEGIN_SRC emacs-lisp
-(setq image-dired-dir (concat metafiles-dir "/image-dired"))
+;; diredp-toggle-find-file-reuse-dir 1
+  (use-package dired+
+    :config
+    (progn
+      (setq image-dired-dir (concat metafiles-dir "/image-dired"))
+      (put 'dired-find-alternate-file 'disabled nil)  ;enable `a' command
+      (diredp-toggle-find-file-reuse-dir 1)))
+
 #+END_SRC
 
 ** Erlang
@@ -1196,9 +1173,7 @@ make sure to show documentation.
   :commands haskell-mode
   :mode ("\\.l?hs\\'" . haskell-mode)
   :init
-  (progn
-    (add-to-list 'auto-mode-alist '("\\.l?hs$" . haskell-mode))
-    (add-to-list 'completion-ignored-extensions ".hi"))
+    (add-to-list 'completion-ignored-extensions ".hi")
   :config
   (progn
     (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
