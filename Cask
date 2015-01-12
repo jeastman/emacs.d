@@ -98,6 +98,7 @@
 (depends-on "stylus-mode")
 (depends-on "sws-mode")
 (depends-on "undo-tree")
+(depends-on "use-package")
 (depends-on "web")
 (depends-on "window-layout")
 (depends-on "xml-rpc")

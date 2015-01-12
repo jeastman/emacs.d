@@ -117,8 +117,10 @@ Ensure we have support for programming languages used in code blocks.
 Use utf-8 bullets for nicer look.
 
 #+BEGIN_SRC emacs-lisp
-(require 'org-bullets)
-(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+(use-package org-bullets
+  :ensure t
+  :init
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 #+END_SRC
 
 Startup with content folded.
@@ -550,7 +552,5 @@ Guide setup
   (bind-key "C-c a" 'org-agenda)
   (bind-key "C-c c" 'org-capture)
   (bind-key "C-c b" 'org-iswitchb)
-  (eval-after-load 'org
-    '(progn
-       (bind-key "C-c p" 'orgpan-panel org-mode-map)))
+  (bind-key "C-c p" 'orgpan-panel org-mode-map)
 #+END_SRC

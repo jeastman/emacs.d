@@ -63,18 +63,12 @@ Take advantage of the trash can on the Mac.
 Include spotlight data into helm.
 
 #+BEGIN_SRC emacs-lisp
-(if (package-installed-p 'helm)
-    (progn 
-     (require 'helm-misc)
-     (require 'helm-files)
-     (setq helm-for-files-preferred-list
-           (quote
-            (helm-source-buffers-list
-             helm-source-recentf
-             helm-source-bookmarks
-             helm-source-file-cache
-             helm-source-files-in-current-dir
-             helm-source-mac-spotlight)))))
+(setq jme/helm-sources '(helm-source-buffers-list
+                         helm-source-recentf
+                         helm-source-bookmarks
+                         helm-source-file-cache
+                         helm-source-files-in-current-dir
+                         helm-source-mac-spotlight))
 #+END_SRC
 
 * Tweaks
