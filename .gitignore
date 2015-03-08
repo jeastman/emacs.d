@@ -14,3 +14,4 @@ scribble.el
 swank.scm
 /darwin.el
 /sbcl.core-for-slime
+custom.el
