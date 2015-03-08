@@ -54,7 +54,7 @@ Jar file required for plantuml.
 Also see this [[https://gist.github.com/rpl/547521][gist]].
 
 #+BEGIN_SRC emacs-lisp
-(setq plantuml-jar-path "/usr/local/Cellar/plantuml/8002/plantuml.8002.jar")
+(setq plantuml-jar-path "/usr/local/Cellar/plantuml/8018/plantuml.8018.jar")
 #+END_SRC
 
 *** Org
