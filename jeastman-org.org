@@ -56,7 +56,7 @@ of modules that I am currently experimenting with.
   (setq daypage-path (concat org-directory "/days/"))
   (setq diary-file (concat org-directory "/diary"))
   (setq org-mobile-inbox-for-pull (concat org-directory "/flagged.org"))
-  (setq org-agenda-files (list (concat org-directory "/work.org")
+  (setq org-agenda-filesssssssssssssssssssssssssxxx (list (concat org-directory "/work.org")
                                (concat org-directory "/tasks.org")
                                (concat org-directory "/home.org")
                                (concat org-directory "/notes.org")

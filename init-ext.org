@@ -1,4 +1,4 @@
-∂#+TITLE: Emacs Configuration
+#+TITLE: Emacs Configuration
 #+OPTIONS: toc:4 h:4
 #+STARTUP: showeverything
 #+LATEX_CLASS: jmeorgdoc
@@ -19,19 +19,36 @@
 Add some comments to the beginning of the generated elisp file.
 
 #+BEGIN_SRC emacs-lisp :padline no
-;;; init-ext.el -- Automatically generated initialization file
-;;;
-;;; This file is generated based on the init-ext.org file.
-;;; Please see that file for complete documentation.
-;;;
-;;; Commentary:
-;;; See init-ext.org
-;;;
-;;; Code:
-;;;
+  ;;; init-ext.el -- Automatically generated initialization file
+  ;;;
+  ;;; This file is generated based on the init-ext.org file.
+  ;;; Please see that file for complete documentation.
+  ;;;
+  ;;; Commentary:
+  ;;; See init-ext.org
+  ;;;
+  ;;; Code:
+  ;;;
+  (require 'cl-lib)
+
+  (add-to-list 'package-pinned-packages '(dash . "marmalade") t)
+
+  ;force proper version of dash
+  (use-package dash
+    :ensure t
+    :pin marmalade)
+
 #+END_SRC
 
 * General Configuration
+** Exec path
+
+   Ensure that =/usr/local/bin= is in the exec path.
+
+   #+BEGIN_SRC emacs-lisp
+   (when (not (member "/usr/local/bin" exec-path))
+     (add-to-list 'exec-path "/usr/local/bin"))
+   #+END_SRC
 
 ** Library Paths
 
@@ -267,7 +284,7 @@ and maintaining them.
 (defvar meta-tramp (concat metafiles-dir "/tramp")
   "File used for tramp persistence.")
 (defvar meta-url (concat metafiles-dir "/url")
-  "directory for url files.")
+  "Directory for url files.")
 #+END_SRC
 
 *** Non-packaged packages
@@ -901,9 +918,11 @@ original =show paren= with =smartparens=.
 (use-package smartparens
   :diminish smartparens-mode
   :ensure t
-  :init 
-  (progn (smartparens-global-mode t)
-         (show-smartparens-global-mode t)))
+  :config
+  (progn 
+         (use-package smartparens-config)
+         ;(smartparens-global-mode) ;; commented out until bug? fixed
+         (show-smartparens-global-mode)))
 #+END_SRC
 
 **** Undo-tree-mode
@@ -968,6 +987,7 @@ have been using =winner= mode.
 
 #+BEGIN_SRC emacs-lisp
 (defun hide-or-expand ()
+  "Hide or expand a window."
   (interactive)
   (if (> (length (window-list)) 1)
       (delete-other-windows)
@@ -1033,7 +1053,7 @@ we create one. (Based on code from [[http://stackoverflow.com/questions/10211730
   :ensure t
   :config
   (defun jme/insert-yas-by-name (name)
-    (flet ((dummy-prompt
+    (cl-flet ((dummy-prompt
             (prompt choices &optional display-fn)
             (declare (ignore prompt))
             (or (find name choices :key display-fn :test #'string=)
@@ -1043,6 +1063,63 @@ we create one. (Based on code from [[http://stackoverflow.com/questions/10211730
           (yas/insert-snippet t))))))
 #+END_SRC
 
+** Clojure
+
+   Support for Clojure.
+
+*** Clojure Mode
+
+    #+BEGIN_SRC emacs-lisp
+    (use-package clojure-mode
+      :ensure t
+      :init
+      (progn
+        (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
+        (add-hook 'clojure-mode-hook #'smartparens-strict-mode)))
+    #+END_SRC
+
+*** Cider
+
+    #+BEGIN_SRC emacs-lisp
+    (use-package cider
+      :ensure t
+      :init
+      (progn
+        (add-hook 'cider-mode-hook #'eldoc-mode)
+        (add-hook 'cider-mode-hook #'rainbow-delimiters-mode)
+        (add-hook 'cider-repl-mode-hook #'smartparens-strict-mode)
+        (add-hook 'cider-repl-mode-hook #'rainbow-delimiters-mode)))
+    #+END_SRC
+
+*** Clojure Cheatsheet
+    #+BEGIN_SRC emacs-lisp
+    (use-package clojure-cheatsheet
+      :ensure t)
+    #+END_SRC
+
+*** Clojure mode extra font locking
+    #+BEGIN_SRC emacs-lisp
+    (use-package clojure-mode-extra-font-locking
+      :ensure t)
+    #+END_SRC
+
+*** Clojure snippets for Yasnippets
+    #+BEGIN_SRC emacs-lisp
+    (use-package clojure-snippets
+      :ensure t)    
+    #+END_SRC
+
+*** Flycheck for Clojure
+    #+BEGIN_SRC emacs-lisp
+    (use-package flycheck-clojure
+      :ensure t)
+    #+END_SRC
+
+*** Slamhound
+    #+BEGIN_SRC emacs-lisp
+    (use-package slamhound
+      :ensure t)
+    #+END_SRC
 ** CoffeeScript
 
 Support for CoffeeScript.
@@ -1131,8 +1208,21 @@ Make sure =image-dired= keeps its files in the meta directory.
 
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
-  :init (global-flycheck-mode))
+  :ensure t
+  :init 
+  (progn
+    (add-hook 'after-init-hook #'global-flycheck-mode))
+  :config
+  (progn
+    (eval-after-load 'flycheck '(flycheck-clojure-setup)))
+    (eval-after-load 'flycheck
+      '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
 #+END_SRC
+
+   #+BEGIN_SRC emacs-lisp
+   (use-package flycheck-pos-tip
+     :ensure t)
+   #+END_SRC
 
 ** Flyspell
 
@@ -1195,7 +1285,9 @@ make sure to show documentation.
   (progn
     (use-package helm-misc)
     (use-package help-files)
-    (setq helm-for-files-preferred-list jme/helm-sources))
+    (setq helm-for-files-preferred-list jme/helm-sources
+          helm-split-window-in-side-p t
+          helm-scoll-amount 8))
   :bind (("C-c M-x" . helm-M-x)
          ("C-h a" . helm-apropos)
          ("M-s a" . helm-do-grep)
@@ -1697,7 +1789,7 @@ want to set the mark but not engage /tmm/. ~Mastering Emacs~ has a good
 
 #+BEGIN_SRC emacs-lisp
 (defun jme/push-mark-no-activate ()
-  "Pushes `point' to `mark-ring' and does not activate the region
+  "Pushes `point' to `mark-ring' and does not activate the region.
 Equivalent to \\[set-mark-command] when \\[transient-mark-mode] is disabled"
   (interactive)
   (push-mark (point) t nil)
