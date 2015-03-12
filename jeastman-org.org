@@ -552,5 +552,4 @@ Guide setup
   (bind-key "C-c a" 'org-agenda)
   (bind-key "C-c c" 'org-capture)
   (bind-key "C-c b" 'org-iswitchb)
-  (bind-key "C-c p" 'orgpan-panel org-mode-map)
 #+END_SRC

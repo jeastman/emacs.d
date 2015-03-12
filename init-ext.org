@@ -126,113 +126,125 @@ used to be.
 #+END_SRC
 
 #+RESULTS:
-| _Package Name_                 | _Package Description_                                                              |
-| ace-jump-mode                  | a quick cursor location minor mode for emacs                                       |
-| alert                          | Growl-style notification system for Emacs                                          |
-| annoying-arrows-mode           | Ring the bell if using arrows too much                                             |
-| async                          | Asynchronous processing in Emacs                                                   |
-| auctex                         | Integrated environment for *TeX*                                                   |
-| auto-complete                  | Auto Completion for GNU Emacs                                                      |
-| bbdb                           | The Insidious Big Brother Database for GNU Emacs                                   |
-| bind-key                       | A simple way to manage personal keybindings                                        |
-| cask                           | Cask: Project management for Emacs package development                             |
-| cider                          | Clojure Integrated Development Environment and REPL                                |
-| clojure-mode                   | Major mode for Clojure code                                                        |
-| cm-mode                        | Minor mode for CriticMarkup                                                        |
-| cmake-mode                     | major-mode for editing CMake sources                                               |
-| coffee-mode                    | Major mode to edit CoffeeScript files in Emacs                                     |
-| color-theme-sanityinc-tomorrow | A version of Chris Kempson's various Tomorrow themes                               |
-| concurrent                     | Concurrent utility functions for emacs lisp                                        |
-| creole                         | A parser for the Creole Wiki language                                              |
-| ctable                         | Table component for Emacs Lisp                                                     |
-| dash                           | A modern list library for Emacs                                                    |
-| db                             | A database for EmacsLisp                                                           |
-| deferred                       | Simple asynchronous functions for emacs lisp                                       |
-| deft                           | quickly browse, filter, and edit plain text notes                                  |
-| diminish                       | Diminished modes are minor modes with no modeline display                          |
-| dired+                         | Extensions to Dired.                                                               |
-| dired-single                   | Reuse the current dired buffer to visit another directory                          |
-| direx                          | Simple Directory Explorer                                                          |
-| edit-server                    | server that responds to edit requests from Chrome                                  |
-| elnode                         | The Emacs webserver.                                                               |
-| epc                            | A RPC stack for the Emacs Lisp                                                     |
-| epl                            | Emacs Package Library                                                              |
-| expand-region                  | Increase selected region by semantic units.                                        |
-| f                              | Modern API for working with files and directories                                  |
-| fakir                          | fakeing bits of Emacs                                                              |
-| flx                            | fuzzy matching with good sorting                                                   |
-| flx-ido                        | flx integration for ido                                                            |
-| flycheck                       | Modern on-the-fly syntax checking for GNU Emacs                                    |
-| flycheck-haskell               | Flycheck: Cabal projects and sandboxes                                             |
-| fringe-helper                  | helper functions for fringe bitmaps                                                |
-| ghci-completion                | Completion for GHCi commands in inferior-haskell buffers                           |
-| git-commit-mode                | Major mode for editing git commit messages                                         |
-| git-gutter                     | Port of Sublime Text plugin GitGutter                                              |
-| git-gutter-fringe              | Fringe version of git-gutter.el                                                    |
-| git-messenger                  | Pop up last commit information of current line                                     |
-| git-rebase-mode                | Major mode for editing git rebase files                                            |
-| git-timemachine                | Walk through git revisions of a file                                               |
-| gntp                           | Growl Notification Protocol for Emacs                                              |
-| gnuplot                        | drive gnuplot from within emacs                                                    |
-| gnuplot-mode                   | Major mode for editing gnuplot scripts                                             |
-| graphviz-dot-mode              | Mode for the dot-language used by graphviz (att).                                  |
-| guide-key                      | Guide the following key bindings automatically and dynamically                     |
-| handlebars-mode                | A major mode for editing Handlebars files.                                         |
-| haskell-mode                   | A Haskell editing mode                                                             |
-| helm                           | Helm is an Emacs incremental and narrowing framework                               |
-| helm-git-files                 | helm for git files                                                                 |
-| hi2                            | indentation module for Haskell Mode                                                |
-| highlight-indentation          | Minor modes for highlighting indentation                                           |
-| htmlize                        | Convert buffer text and decorations to HTML.                                       |
-| ido-ubiquitous                 | Use ido (nearly) everywhere.                                                       |
-| ido-vertical-mode              | Makes ido-mode display vertically.                                                 |
-| jabber                         | A Jabber client for Emacs.                                                         |
-| jedi                           | Python auto-completion for Emacs                                                   |
-| js2-mode                       | Improved JavaScript editing mode                                                   |
-| json-reformat                  | Reformatting tool for JSON                                                         |
-| kv                             | key/value data structure functions                                                 |
-| let-alist                      | Easily let-bind values of an assoc-list by their names                             |
-| magit                          | control Git from Emacs                                                             |
-| markdown-mode                  | Emacs Major mode for Markdown-formatted text files                                 |
-| markdown-mode+                 | extra functions for markdown-mode                                                  |
-| multi-term                     | Managing multiple terminal buffers in Emacs.                                       |
-| noflet                         | locally override functions                                                         |
-| nose                           | Easy Python test running in Emacs                                                  |
-| org                            | Outline-based notes management and organizer                                       |
-| org-bullets                    | Show bullets in org-mode as UTF-8 characters                                       |
-| org-gcal                       | Org sync with Google Calendar                                                      |
-| ox-reveal                      | reveal.js Presentation Back-End for Org Export Engine                              |
-| package-build                  | Tools for assembling a package archive                                             |
-| pallet                         | A package management tool for Emacs, using Cask.                                   |
-| pkg-info                       | Information about packages                                                         |
-| plantuml-mode                  | Major mode for plantuml                                                            |
-| popup                          | Visual Popup User Interface                                                        |
-| popwin                         | Popup Window Manager.                                                              |
-| pretty-mode                    | Redisplay parts of the buffer as pretty symbols.                                   |
-| pydoc-info                     | Better Python support for info-lookup-symbol.                                      |
-| python-environment             | virtualenv API for Emacs Lisp                                                      |
-| queue                          | Queue data structure                                                               |
-| racket-mode                    | Major mode for Racket language.                                                    |
-| rainbow-delimiters             | Highlight brackets according to their depth                                        |
-| rainbow-mode                   | Colorize color names in buffers                                                    |
-| request                        | Compatible layer for URL request in Emacs                                          |
-| request-deferred               | Wrap request.el by deferred                                                        |
-| restclient                     | An interactive HTTP client for Emacs                                               |
-| s                              | The long lost Emacs string manipulation library.                                   |
-| scala-mode2                    | Major mode for editing Scala >= 2.9                                                |
-| shut-up                        | Shut up would you!                                                                 |
-| slime                          | Superior Lisp Interaction Mode for Emacs                                           |
-| smartparens                    | Automatic insertion, wrapping and paredit-like navigation with user defined pairs. |
-| smex                           | M-x interface with Ido-style fuzzy matching.                                       |
-| stylus-mode                    | Major mode for editing .jade files                                                 |
-| sws-mode                       | (S)ignificant (W)hite(S)pace mode                                                  |
-| test-simple                    | Simple Unit Test Framework for Emacs Lisp                                          |
-| undo-tree                      | Treat undo history as a tree                                                       |
-| use-package                    | A use-package declaration for simplifying your .emacs                              |
-| web                            | useful HTTP client                                                                 |
-| window-layout                  | window layout manager                                                              |
-| xml-rpc                        | An elisp implementation of clientside XML-RPC                                      |
-| yasnippet                      | Yet another snippet extension for Emacs.                                           |
+| _Package Name_                  | _Package Description_                                                              |
+| ace-jump-mode                   | a quick cursor location minor mode for emacs                                       |
+| alert                           | Growl-style notification system for Emacs                                          |
+| annoying-arrows-mode            | Ring the bell if using arrows too much                                             |
+| async                           | Asynchronous processing in Emacs                                                   |
+| auctex                          | Integrated environment for *TeX*                                                   |
+| auto-complete                   | Auto Completion for GNU Emacs                                                      |
+| bbdb                            | The Insidious Big Brother Database for GNU Emacs                                   |
+| bind-key                        | A simple way to manage personal keybindings                                        |
+| cask                            | Cask: Project management for Emacs package development                             |
+| cider                           | Clojure Integrated Development Environment and REPL                                |
+| clojure-cheatsheet              | The Clojure Cheatsheet for Emacs                                                   |
+| clojure-mode                    | Major mode for Clojure code                                                        |
+| clojure-mode-extra-font-locking | Extra font-locking for Clojure mode                                                |
+| clojure-snippets                | Yasnippets for clojure                                                             |
+| cm-mode                         | Minor mode for CriticMarkup                                                        |
+| cmake-mode                      | major-mode for editing CMake sources                                               |
+| coffee-mode                     | Major mode to edit CoffeeScript files in Emacs                                     |
+| color-theme-sanityinc-tomorrow  | A version of Chris Kempson's various Tomorrow themes                               |
+| company                         | Modular text completion framework                                                  |
+| concurrent                      | Concurrent utility functions for emacs lisp                                        |
+| creole                          | A parser for the Creole Wiki language                                              |
+| ctable                          | Table component for Emacs Lisp                                                     |
+| dash                            | A modern list library for Emacs                                                    |
+| db                              | A database for EmacsLisp                                                           |
+| deferred                        | Simple asynchronous functions for emacs lisp                                       |
+| deft                            | quickly browse, filter, and edit plain text notes                                  |
+| diminish                        | Diminished modes are minor modes with no modeline display                          |
+| dired+                          | Extensions to Dired.                                                               |
+| direx                           | Simple Directory Explorer                                                          |
+| edit-server                     | server that responds to edit requests from Chrome                                  |
+| elnode                          | The Emacs webserver.                                                               |
+| epc                             | A RPC stack for the Emacs Lisp                                                     |
+| epl                             | Emacs Package Library                                                              |
+| expand-region                   | Increase selected region by semantic units.                                        |
+| f                               | Modern API for working with files and directories                                  |
+| faceup                          | Regression test system for font-lock                                               |
+| fakir                           | fakeing bits of Emacs                                                              |
+| flx                             | fuzzy matching with good sorting                                                   |
+| flx-ido                         | flx integration for ido                                                            |
+| flycheck                        | Modern on-the-fly syntax checking for GNU Emacs                                    |
+| flycheck-clojure                | Flycheck: Clojure support                                                          |
+| flycheck-haskell                | Flycheck: Cabal projects and sandboxes                                             |
+| flycheck-pos-tip                | Flycheck errors display in tooltip                                                 |
+| fringe-helper                   | helper functions for fringe bitmaps                                                |
+| ghci-completion                 | Completion for GHCi commands in inferior-haskell buffers                           |
+| git-commit-mode                 | Major mode for editing git commit messages                                         |
+| git-gutter                      | Port of Sublime Text plugin GitGutter                                              |
+| git-gutter-fringe               | Fringe version of git-gutter.el                                                    |
+| git-messenger                   | Pop up last commit information of current line                                     |
+| git-rebase-mode                 | Major mode for editing git rebase files                                            |
+| git-timemachine                 | Walk through git revisions of a file                                               |
+| gntp                            | Growl Notification Protocol for Emacs                                              |
+| gnuplot                         | drive gnuplot from within emacs                                                    |
+| gnuplot-mode                    | Major mode for editing gnuplot scripts                                             |
+| graphviz-dot-mode               | Mode for the dot-language used by graphviz (att).                                  |
+| guide-key                       | Guide the following key bindings automatically and dynamically                     |
+| handlebars-mode                 | A major mode for editing Handlebars files.                                         |
+| haskell-mode                    | A Haskell editing mode                                                             |
+| helm                            | Helm is an Emacs incremental and narrowing framework                               |
+| helm-git-files                  | helm for git files                                                                 |
+| helm-swoop                      | Efficiently hopping squeezed lines powered by helm interface                       |
+| hi2                             | indentation module for Haskell Mode                                                |
+| highlight-indentation           | Minor modes for highlighting indentation                                           |
+| htmlize                         | Convert buffer text and decorations to HTML.                                       |
+| hydra                           | Make bindings that stick around                                                    |
+| ido-ubiquitous                  | Use ido (nearly) everywhere.                                                       |
+| ido-vertical-mode               | Makes ido-mode display vertically.                                                 |
+| jabber                          | A Jabber client for Emacs.                                                         |
+| jedi                            | a Python auto-completion for Emacs                                                 |
+| jedi-core                       | Common code of jedi.el and company-jedi.el                                         |
+| js2-mode                        | Improved JavaScript editing mode                                                   |
+| kv                              | key/value data structure functions                                                 |
+| let-alist                       | Easily let-bind values of an assoc-list by their names                             |
+| log4e                           | provide logging framework for elisp                                                |
+| magit                           | control Git from Emacs                                                             |
+| markdown-mode                   | Emacs Major mode for Markdown-formatted text files                                 |
+| markdown-mode+                  | extra functions for markdown-mode                                                  |
+| multi-term                      | Managing multiple terminal buffers in Emacs.                                       |
+| noflet                          | locally override functions                                                         |
+| nose                            | Easy Python test running in Emacs                                                  |
+| org                             | Outline-based notes management and organizer                                       |
+| org-bullets                     | Show bullets in org-mode as UTF-8 characters                                       |
+| org-gcal                        | Org sync with Google Calendar                                                      |
+| ox-reveal                       | reveal.js Presentation Back-End for Org Export Engine                              |
+| package-build                   | Tools for assembling a package archive                                             |
+| pallet                          | A package management tool for Emacs, using Cask.                                   |
+| paradox                         | A modern Packages Menu. Colored, with package ratings, and customizable.           |
+| pkg-info                        | Information about packages                                                         |
+| plantuml-mode                   | Major mode for plantuml                                                            |
+| popup                           | Visual Popup User Interface                                                        |
+| popwin                          | Popup Window Manager.                                                              |
+| pretty-mode                     | Redisplay parts of the buffer as pretty symbols.                                   |
+| pydoc-info                      | Better Python support for info-lookup-symbol.                                      |
+| python-environment              | virtualenv API for Emacs Lisp                                                      |
+| queue                           | Queue data structure                                                               |
+| racket-mode                     | Major mode for Racket language.                                                    |
+| rainbow-delimiters              | Highlight brackets according to their depth                                        |
+| rainbow-mode                    | Colorize color names in buffers                                                    |
+| request                         | Compatible layer for URL request in Emacs                                          |
+| request-deferred                | Wrap request.el by deferred                                                        |
+| restclient                      | An interactive HTTP client for Emacs                                               |
+| s                               | The long lost Emacs string manipulation library.                                   |
+| scala-mode2                     | Major mode for editing Scala >= 2.9                                                |
+| shut-up                         | Shut up would you!                                                                 |
+| slamhound                       | Rip Clojure namespaces apart and rebuild them.                                     |
+| slime                           | Superior Lisp Interaction Mode for Emacs                                           |
+| smartparens                     | Automatic insertion, wrapping and paredit-like navigation with user defined pairs. |
+| smex                            | M-x interface with Ido-style fuzzy matching.                                       |
+| spinner                         | Add spinners and progress-bars to the mode-line for ongoing operations             |
+| stylus-mode                     | Major mode for editing .jade files                                                 |
+| sws-mode                        | (S)ignificant (W)hite(S)pace mode                                                  |
+| test-simple                     | Simple Unit Test Framework for Emacs Lisp                                          |
+| undo-tree                       | Treat undo history as a tree                                                       |
+| use-package                     | A use-package declaration for simplifying your .emacs                              |
+| web                             | useful HTTP client                                                                 |
+| window-layout                   | window layout manager                                                              |
+| xml-rpc                         | An elisp implementation of clientside XML-RPC                                      |
+| yasnippet                       | Yet another snippet extension for Emacs.                                           |
 
 ** Additional Paths
 
@@ -342,7 +354,7 @@ several functions.
 (defun jme/load (directory base)
   "Look for files located in DIRECTORY whose base name is BASE.
 
-Check the base name against several extensions.  If a file with 
+Check the base name against several extensions.  If a file with
 that name exists, then load it."
   (let ((literate      (expand-file-name (concat base ".org") directory))
         (encrypted-org (expand-file-name (concat base ".org.gpg") directory))
@@ -884,7 +896,7 @@ where the history should be stored. Additionally, I have it set to save:
 
 #+BEGIN_SRC emacs-lisp
 (use-package savehist
-  :init 
+  :init
   (progn
     (setq savehist-additional-variables
       '(search-ring regexp-search-ring)
@@ -919,7 +931,7 @@ original =show paren= with =smartparens=.
   :diminish smartparens-mode
   :ensure t
   :config
-  (progn 
+  (progn
          (use-package smartparens-config)
          ;(smartparens-global-mode) ;; commented out until bug? fixed
          (show-smartparens-global-mode)))
@@ -1018,24 +1030,23 @@ adopted this from a [[https://gist.github.com/magnars/2350388][gist]] by Magnar 
   :bind ("C-. C-s" . ace-jump-mode))
 #+END_SRC
 
-** Auto complete
+** Auto complete (Company)
 
 I have fiddled around with different auto-completion packages and
 extensions over time. This one works.
 
 #+BEGIN_SRC emacs-lisp
-(use-package auto-complete
-  :diminish auto-complete-mode
-  :demand t
-  :ensure t
-  :init
-  (progn
-    (setq ac-dictionary-files (concat metafiles-dir "/.dict"))
-    (setq ac-comphist-file (concat metafiles-dir "/ac-comphist.dat")))
-  :config
-  (progn
-    (ac-config-default)
-    (bind-key "S-TAB" 'auto-complete ac-mode-map)))
+(use-package company
+   :commands global-company-mode
+   :ensure t
+   :init
+     (global-company-mode)
+   :config
+   (progn
+     (setq company-tooltip-limit 20
+           company-idle-delay .3
+           company-echo-delay 0
+           company-begin-commands '(self-insert-comman))))
 #+END_SRC
 
 ** YASnippet
@@ -1106,7 +1117,7 @@ we create one. (Based on code from [[http://stackoverflow.com/questions/10211730
 *** Clojure snippets for Yasnippets
     #+BEGIN_SRC emacs-lisp
     (use-package clojure-snippets
-      :ensure t)    
+      :ensure t)
     #+END_SRC
 
 *** Flycheck for Clojure
@@ -1131,7 +1142,7 @@ Support for CoffeeScript.
     :mode ("\\.coffee\\'" . coffee-custom)
     :init
     (progn
-      (setq 
+      (setq
         coffee-js-mode 'javascript-mode      ;; If you don't have js2-mode
         coffee-args-compile '("-c" "--bare") ;; If you don't want your compiled files to be wrapped
         coffee-debug-mode t)                 ;; *Messages* spam
@@ -1209,7 +1220,7 @@ Make sure =image-dired= keeps its files in the meta directory.
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
   :ensure t
-  :init 
+  :init
   (progn
     (add-hook 'after-init-hook #'global-flycheck-mode))
   :config
@@ -1232,7 +1243,7 @@ advice ensures that the buffer is checked when I turn =flyspell= on.
 
 #+BEGIN_SRC emacs-lisp
 (use-package flyspell
-  :init 
+  :init
   (defadvice flyspell-mode (after advice-flyspell-check-buffer-on-start activate)
     (flyspell-buffer)))
 #+END_SRC
@@ -1270,32 +1281,6 @@ make sure to show documentation.
     (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)))
 #+END_SRC
 
-** Helm
-
-#+BEGIN_SRC emacs-lisp
-(defvar jme/helm-sources '(helm-source-buffers-list
-                           helm-source-recentf
-                           helm-source-bookmarks
-                           helm-source-file-cache
-                           helm-source-files-in-current-dir))
-(use-package helm
-  :commands (helm-M-x helm-apropos helm-do-grep helm-occur helm-for-files helm-mini)
-  :ensure t
-  :config
-  (progn
-    (use-package helm-misc)
-    (use-package help-files)
-    (setq helm-for-files-preferred-list jme/helm-sources
-          helm-split-window-in-side-p t
-          helm-scoll-amount 8))
-  :bind (("C-c M-x" . helm-M-x)
-         ("C-h a" . helm-apropos)
-         ("M-s a" . helm-do-grep)
-         ("M-s b" . helm-occur)
-         ("M-s F" . helm-for-files)
-         ("C-c h" . helm-mini)))
-#+END_SRC
-
 ** Ido
 
 Provide an easy way to load a recent file utilizing ido.
@@ -1312,7 +1297,7 @@ Provide an easy way to load a recent file utilizing ido.
 Configure ido to use vertical mode. Much easier to see matches.
 
 #+BEGIN_SRC emacs-lisp
-(use-package ido-vertical-mode 
+(use-package ido-vertical-mode
   :ensure t
   :init (ido-vertical-mode))
 #+END_SRC
@@ -1373,6 +1358,58 @@ These settings control the behavior of ido.
 (setq confirm-nonexistent-file-or-buffer nil)
 #+END_SRC
 
+** Helm
+
+#+BEGIN_SRC emacs-lisp
+(defvar jme/helm-sources '(helm-source-buffers-list
+                           helm-source-recentf
+                           helm-source-bookmarks
+                           helm-source-file-cache
+                           helm-source-files-in-current-dir))
+(use-package helm
+  :commands (helm-M-x
+             helm-apropos
+             helm-do-grep
+             helm-occur
+             helm-find-files
+             helm-for-files
+             helm-all-mark-rings
+             helm-man-woman
+             helm-mini
+             helm-register
+             helm-semantic-or-imenu
+             helm-show-kill-ring)
+  :ensure t
+  :config
+  (progn
+    (use-package helm-config)
+    (use-package helm-misc)
+    (use-package help-files)
+    (setq helm-for-files-preferred-list jme/helm-sources
+          helm-split-window-in-side-p t
+          helm-scoll-amount 8)
+    (helm-mode 1)
+    (helm-autoresize-mode 1))
+  :bind (("M-x" . helm-M-x)
+         ("M-y" . helm-show-kill-ring)
+         ("C-x b" . helm-mini)
+         ("C-x C-f" . helm-find-files)
+         ("C-c h o" . helm-occur)
+         ("C-c h x" . helm-register)
+         ("C-h a" . helm-apropos)
+         ("C-h SPC" . helm-all-mark-rings)
+         ("C-c h g" . helm-google-suggest)
+         ("M-s a" . helm-do-grep)
+         ("M-s f" . helm-for-files)))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(use-package helm-swoop
+  :ensure t
+  :bind (("M-i" . helm-swoop)
+         ("M-I" . helm-swoop-back-to-last-point)))
+#+END_SRC
+
 ** Javascript
 
 If we have the ability to use javascript in an inferior process, use Node
@@ -1396,7 +1433,7 @@ Also, query for the name of the master file.
 (use-package tex-site
   :mode ("\\.tex\\'" . TeX-latex-mode)
   :init
-  (progn 
+  (progn
     (setq
       TeX-auto-save t
       TeX-parse-self t)
@@ -1429,6 +1466,7 @@ Also, query for the name of the master file.
 (use-package magit
   :commands magit-status
   :ensure t
+  :bind ("C-x g" . magit-status)
   :diminish magit-auto-revert-mode)
 #+END_SRC
 
@@ -1436,7 +1474,7 @@ Also, query for the name of the master file.
 
 #+BEGIN_SRC emacs-lisp
 (use-package markdown-mode
-  :mode 
+  :mode
   (("\\.markdown$" . markdown-mode)
    ("\\.md$" . markdown-mode)))
 #+END_SRC
@@ -1583,8 +1621,7 @@ I provide a regexp to match my prompts.
   (setq smex-save-file (concat metafiles-dir "/.smex-items"))
   :config
   (smex-initialize)
-  :bind (("M-x" . smex)
-         ("M-X" . smex-major-mode-commands)
+  :bind (("M-X" . smex-major-mode-commands)
          ("C-c C-c M-x" . execute-extended-command)))
 #+END_SRC
 
@@ -1743,6 +1780,12 @@ Including indent-buffer, which should not be called automatically on save."
   (indent-region (point-min) (point-max)))
 #+END_SRC
 
+Make sure we hook this into our save process.
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'before-save-hook 'jme/cleanup-buffer-safe)
+#+END_SRC
+
 ** Movement
 
 *** Better handling of move to beginning of line
@@ -1861,7 +1904,7 @@ Color source blocks in org to make them stand out. See [[http://www.howardism.or
   "Colors the block headers and footers to make them stand out more for lighter themes."
   (interactive)
   (custom-set-faces
-   '(org-block-begin-line 
+   '(org-block-begin-line
     ((t (:underline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF"))))
    '(org-block-background
      ((t (:background "#FFFFEA"))))
@@ -1873,7 +1916,7 @@ Color source blocks in org to make them stand out. See [[http://www.howardism.or
   "Colors the block headers and footers to make them stand out more for dark themes."
   (interactive)
   (custom-set-faces
-   '(org-block-begin-line 
+   '(org-block-begin-line
      ((t (:foreground "#008ED1" :background "#002E41"))))
    '(org-block-background
      ((t (:background "#111111"))))
@@ -1947,7 +1990,6 @@ they relate to, I find it better to have all global keys in one place.
 | =C-c oN=   | jme/jme/find-daypage        | Open a specific day page            |
 | =C-c t=    | multi-term-next             | Reuse terminal                      |
 | =C-c T=    | multi-term                  | Create a new terminal               |
-| =C-c w=    | jme/emacs-toggle-size       | Custom function for min/max size    |
 | =C-c v p=  | git-messenger:popup-message | Popup the last git commit message   |
 | =C-x <up>= | jme/rotate-windows          | Rotates windows                     |
 | =C-. C-s=  | ace-jump-mode               |                                     |
@@ -1969,7 +2011,6 @@ they relate to, I find it better to have all global keys in one place.
 (bind-key "C-c n" 'jme/cleanup-buffer)
 (bind-key "C-c on" 'jme/todays-daypage)
 (bind-key "C-c oN" 'jme/find-daypage)
-(bind-key "C-c w" 'jme/emacs-toggle-size)
 #+END_SRC
 
 ** =C-x= mappings
@@ -1990,7 +2031,7 @@ they relate to, I find it better to have all global keys in one place.
 ;; Don't start the server unless we can verify that it isn't running.
 (use-package server
   :if window-system
-  :idle 
+  :idle
   (when (and (functionp 'server-running-p) (not (server-running-p)))
      (server-start)))
 

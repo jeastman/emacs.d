@@ -64,7 +64,7 @@ Org specific directories.
 #+BEGIN_SRC emacs-lisp
 (setq org-directory "~/Dropbox/org")
 (setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
-(setq my-notes "~/Dropbox/notes")
+(setq my-notes "~/Dropbox/org/notes")
 (setq org-refile-targets '((org-agenda-files :maxlevel . 5)
                            (("~/Dropbox/org/task_archive.txt") :maxlevel . 5)
                            (nil :maxlevel . 5)))
