@@ -4,6 +4,7 @@
 (source org)
 
 (depends-on "ace-jump-mode")
+(depends-on "ace-window")
 (depends-on "alert")
 (depends-on "annoying-arrows-mode")
 (depends-on "async")
@@ -60,6 +61,7 @@
 (depends-on "handlebars-mode")
 (depends-on "haskell-mode")
 (depends-on "helm")
+(depends-on "helm-descbinds")
 (depends-on "helm-git-files")
 (depends-on "helm-projectile")
 (depends-on "helm-swoop")

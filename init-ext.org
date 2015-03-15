@@ -316,6 +316,16 @@ reference, though it is no longer tangled to the generated file.
      (normal-top-level-add-subdirs-to-load-path))
 #+END_SRC
 
+Make sure we are not using stale files. The =auto-compile= package helps
+ensure the latest version of source files are compiled.
+
+#+BEGIN_SRC emacs-lisp :tangle no
+(use-package auto-compile
+  :ensure t
+  :init (auto-compile-on-load-mode))
+(setq load-prefer-newer t)
+#+END_SRC
+
 I leverage the =bind-key= package to do all of my key-binding. I need
 to =require= it in early to handle all of my mode-specific key
 bindings. Not sure this is technically required to be loaded anymore since
@@ -516,6 +526,8 @@ I am a fan of UTF-8. Make sure everything is set up to handle it.
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
+(when (display-graphic-p)
+  (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
 #+END_SRC
 
 *** Interface settings
@@ -759,6 +771,12 @@ Prefix used for generating the auto save file names.
 (setq auto-save-list-file-prefix meta-saves)
 #+END_SRC
 
+Use "y" in place of "yes", who wants to type all of those extra characters?
+
+#+BEGIN_SRC emacs-lisp
+(fset 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+
 **** Bookmarks
 
 Save bookmarks into their own file in the meta information directory.
@@ -851,6 +869,8 @@ denote changes in a file. I like this everywhere, so I turn it on globally.
 #+BEGIN_SRC emacs-lisp
 (use-package git-messenger
   :commands git-messenger:popup-message
+  :ensure t
+  :defer t
   :bind ("C-x v p" . git-messenger:popup-message))
 #+END_SRC
 
@@ -899,9 +919,10 @@ where the history should be stored. Additionally, I have it set to save:
   :init
   (progn
     (setq savehist-additional-variables
-      '(search-ring regexp-search-ring)
+      '(kill-ring search-ring regexp-search-ring)
       savehist-autosave-interval 300
-      savehist-file meta-savehist)
+      savehist-file meta-savehist
+      history-delete-duplicates t)
     (savehist-mode t)))
 #+END_SRC
 
@@ -947,8 +968,14 @@ Enable =Undo-tree-mode= globally.
 
 #+BEGIN_SRC emacs-lisp
 (use-package undo-tree
+  :defer t
+  :ensure t
   :diminish undo-tree-mode
-  :init (global-undo-tree-mode))
+  :idle
+  (progn
+    (global-undo-tree-mode)
+    (setq undo-tree-visualizer-timestanps t
+          undo-tree-visualizer-diff t)))
 #+END_SRC
 
 **** Whitespace
@@ -983,7 +1010,9 @@ I also specify the column beyond which the line is highlighted.
 
 #+BEGIN_SRC emacs-lisp
 (use-package winner
-  :init (winner-mode 1))
+  :ensure t
+  :defer t
+  :idle (winner-mode 1))
 #+END_SRC
 
 * Utility functions
@@ -1059,20 +1088,59 @@ YASnippet does not provide a way to expand a snippet programmatically, so
 we create one. (Based on code from [[http://stackoverflow.com/questions/10211730/insert-yasnippet-by-name][this]] Stack Overflow question.)
 
 #+BEGIN_SRC emacs-lisp
-(use-package yasnippet
-  :idle (yas-global-mode 1)
-  :diminish yas-minor-mode
-  :ensure t
-  :config
+  (use-package yasnippet
+    :idle (yas-global-mode 1)
+    :defer t
+    :diminish yas-minor-mode
+    :ensure t)
+
   (defun jme/insert-yas-by-name (name)
     (cl-flet ((dummy-prompt
-            (prompt choices &optional display-fn)
-            (declare (ignore prompt))
-            (or (find name choices :key display-fn :test #'string=)
-                (throw 'notfound nil))))
+               (prompt choices &optional display-fn)
+               (declare (ignore prompt))
+               (or (find name choices :key display-fn :test #'string=)
+                   (throw 'notfound nil))))
       (let ((yas/prompt-functions '(dummy-prompt)))
         (catch 'notfound
-          (yas/insert-snippet t))))))
+          (yas/insert-snippet t)))))
+#+END_SRC
+
+Here we provide an indication that there is a yasnippet available to be
+used. (From [[https://github.com/pcmantz/elisp/blob/master/my-bindings.el][here]] and [[http://pages.sachachua.com/.emacs.d/Sacha.html#unnumbered-132][here]]).
+
+#+BEGIN_SRC emacs-lisp
+(defvar default-cursor-color (cdr (assoc 'cursor-color (frame-parameters)))
+  "Capture the default cursor color so we can switch back to it if needed.")
+(defvar yasnippet-can-fire-cursor-color "purple"
+  "Color to change cursor when yasnippet is available.")
+
+(defun jme/yasnippet-can-fire-p (&optional field)
+  "Test if yasnippet can expand."
+  (interactive)
+  (setq yas--condition-cache-timestamp (current-time))
+  (let (templates-and-pos)
+    (unless (and yas-expand-only-for-last-commands
+                 (not (member last-command yas-expand-only-for-last-commands)))
+      (setq templates-and-pos (if field
+                                  (save-restriction
+                                    (narrow-to-region (yas--field-start field)
+                                                      (yas--field-end field))
+                                    (yas--templates-for-key-at-point))
+                                (yas--templates-for-key-at-point))))
+    (and templates-and-pos (first templates-and-pos))))
+
+(defun jme/change-cursor-color-when-can-expand (&optional field)
+  (interactive)
+  (when (eq last-command 'self-insert-command)
+    (set-cursor-color (if (jme/can-expand)
+                          yasnippet-can-fire-cursor-color
+                        default-cursor-color))))
+
+(defun jme/can-expand ()
+  "Return true if right after an expandable thing."
+  (or (abbrev--before-point) (jme/yasnippet-can-fire-p)))
+
+(add-hook 'post-command-hook 'jme/change-cursor-color-when-can-expand)
 #+END_SRC
 
 ** Clojure
@@ -1140,23 +1208,14 @@ Support for CoffeeScript.
   (use-package coffee-mode
     :commands coffee-mode
     :ensure t
+    :defer
     :mode ("\\.coffee\\'" . coffee-custom)
     :init
-    (progn
-      (setq
-        coffee-js-mode 'javascript-mode      ;; If you don't have js2-mode
-        coffee-args-compile '("-c" "--bare") ;; If you don't want your compiled files to be wrapped
-        coffee-debug-mode t)                 ;; *Messages* spam
-      (defun coffee-custom ()
-        "coffee-mode-hook"
-
-        ;; CoffeeScript uses two spaces.
-        (set (make-local-variable 'tab-width) 2)
-
-        ;; Compile '.coffee' files on every save
-        (and (file-exists-p (buffer-file-name))
-             (file-exists-p (coffee-compiled-file-name))
-             (coffee-cos-mode t))))
+    (setq
+      coffee-js-mode 'js2-mode
+      coffee-tab-width 2
+      coffee-args-compile '("-c" "--bare") ;; If you don't want your compiled files to be wrapped
+      coffee-debug-mode t)
     :config
     (bind-key "M-r" 'coffee-compile-buffer coffee-mode-map))
 #+END_SRC
@@ -1209,9 +1268,12 @@ Make sure =image-dired= keeps its files in the meta directory.
 
 ** Expand Region
 
+A fantastically useful package to gradually expand selected region.
+
 #+BEGIN_SRC emacs-lisp
 (use-package expand-region
   :ensure t
+  :defer t
   :commands er/expand-region
   :bind ("C-=" . er/expand-region))
 #+END_SRC
@@ -1255,10 +1317,11 @@ Nice utility for providing a guide for key bindings.
 
 #+BEGIN_SRC emacs-lisp
 (use-package guide-key
+  :defer t
   :diminish guide-key-mode
   :init
   (progn
-    (setq guide-key/guide-key-sequence '("C-x"))
+    (setq guide-key/guide-key-sequence '("C-x" "C-c"))
     (guide-key-mode 1)
     (setq guide-key/recursive-key-sequence-flag t)
     (setq guide-key/popup-window-position 'bottom)))
@@ -1361,6 +1424,9 @@ These settings control the behavior of ido.
 
 ** Helm
 
+   Helm helps with completion of many things. I am finding it easier to
+   work with than other modules.
+
 #+BEGIN_SRC emacs-lisp
 (defvar jme/helm-sources '(helm-source-buffers-list
                            helm-source-recentf
@@ -1382,37 +1448,68 @@ These settings control the behavior of ido.
              helm-show-kill-ring)
   :ensure t
   :diminish helm-mode
-  :config
+  :init
   (progn
-    (use-package helm-config)
-    (use-package helm-misc)
-    (use-package help-files)
+    (require 'helm-config)
     (setq helm-for-files-preferred-list jme/helm-sources
           helm-split-window-in-side-p t
           helm-scoll-amount 8)
     (helm-mode 1)
     (helm-autoresize-mode 1))
-  :bind (("M-x" . helm-M-x)
-         ("M-y" . helm-show-kill-ring)
-         ("C-x b" . helm-mini)
+  :bind (("C-x b" . helm-mini)
          ("C-x C-f" . helm-find-files)
+         ("M-x" . helm-M-x)
+         ("M-y" . helm-show-kill-ring)
+         ("C-c h g" . helm-google-suggest)
          ("C-c h o" . helm-occur)
          ("C-c h x" . helm-register)
+         ("C-c h SPC" . helm-all-mark-rings)
          ("C-h a" . helm-apropos)
-         ("C-h SPC" . helm-all-mark-rings)
-         ("C-c h g" . helm-google-suggest)
          ("M-s a" . helm-do-grep)
          ("M-s f" . helm-for-files)))
+#+END_SRC
+
+Helm can do a great job of describing bindings.
+
+#+BEGIN_SRC emacs-lisp
+(use-package helm-descbinds
+  :defer t
+  :bind ("C-h b" . helm-descbinds))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
 (use-package helm-swoop
   :ensure t
-  :bind (("M-i" . helm-swoop)
-         ("M-I" . helm-swoop-back-to-last-point)))
+  :bind (("C-c h s" . helm-swoop)
+         ("M-i" . helm-swoop)
+         ("M-I" . helm-swoop-back-to-last-point))
+  :config
+  (progn
+   (define-key isearch-mode-map (kbd "M-i") 'helm-swoop-from-isearch)
+   (define-key helm-swoop-map (kbd "M-i") 'helm-multi-swoop-all-from-helm-swoop)))
 #+END_SRC
 
 ** Javascript
+
+#+BEGIN_SRC emacs-lisp
+(use-package js2-mode
+  :ensure t
+  :defer t
+  :commands js2-mode
+  :init
+  (progn
+    (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+    (setq-default js2-basic-offset 2)
+    (add-to-list 'interpreter-mode-alist (cons "node" 'js2-mode)))
+  :config
+  (progn
+    (bind-key "C-x C-e" 'js-send-last-sexp js2-mode-map)
+    (bind-key "C-M-x" 'js-send-last-sexp-and-go js2-mode-map)
+    (bind-key "C-c b" 'js-send-buffer js2-mode-map)
+    (bind-key "C-c C-b" 'js-send-buffer-and-go js2-mode-map)
+    (bind-key "C-c w" 'my/copy-javascript-region-or-buffer js2-mode-map)
+    (bind-key "C-c l" 'js-load-file-and-go js2-mode-map)))
+#+END_SRC
 
 If we have the ability to use javascript in an inferior process, use Node
 for that.
@@ -1455,9 +1552,21 @@ Also, query for the name of the master file.
 
 ** Lisp
 
+   Eldoc provides minibuffer hints when working with Emacs lisp.
 #+BEGIN_SRC emacs-lisp
 (use-package eldoc
-  :diminish eldoc-mode)
+  :diminish eldoc-mode
+  :commands eldoc-mode
+  :defer t
+  :init
+  (progn
+    (add-hook 'lisp-interaction-mode-hook 'eldoc-mode)
+    (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)))
+
+(bind-key "C-c ." 'find-function-at-point emacs-lisp-mode-map)
+(bind-key "C-c f" 'find-function emacs-lisp-mode-map)
+(bind-key "M-:" 'pp-eval-expression)
+
 (add-hook 'lisp-mode-hook (lambda () (local-set-key (kbd "RET") 'newline-and-indent)))
 (add-hook 'emacs-lisp-mode-hook (lambda () (local-set-key (kbd "RET") 'newline-and-indent)))
 #+END_SRC
@@ -1468,7 +1577,8 @@ Also, query for the name of the master file.
 (use-package magit
   :commands magit-status
   :ensure t
-  :bind ("C-x g" . magit-status)
+  :defer t
+  :bind ("C-x d" . magit-status)
   :diminish magit-auto-revert-mode)
 #+END_SRC
 
@@ -1522,14 +1632,19 @@ loads the configuration based on my login name.
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
   :ensure t
-  :init (projectile-global-mode)
-  :config
+  :defer t
+  :diminish projectile-mode
+  :idle
   (progn
-    (setq projectile-completion-system 'helm)
-    (setq projectile-switch-project-action 'helm-projectile)))
+    (setq projectile-keymap-prefix (kbd "C-c p")
+          projectile-completion-system 'helm
+          projectile-switch-project-action 'helm-projectile
+          projectile-enable-caching t)
+    (projectile-global-mode)))
 
 (use-package helm-projectile
   :ensure t
+  :defer t
   :config (helm-projectile-on))
 #+END_SRC
 
@@ -1770,6 +1885,37 @@ windows. (Picked up from [[http://whattheemacsd.com/buffer-defuns.el-03.html][he
           (if this-win-2nd (other-window 1))))))
 #+END_SRC
 
+*** More window splitting
+
+I really like the idea of the following functions (covered by Sacha [[https://www.youtube.com/watch?v%3DnKCKuRuvAOw&feature%3Dyoutu.be][here]],
+original source [[http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tricks/chldury][here]]). I don't override the normal split keybindings since
+I very often want several windows with the same buffer.
+
+#+BEGIN_SRC emacs-lisp
+(defun jme/vsplit-last-buffer (prefix)
+  "Split the window vertically and display the previous buffer."
+  (interactive "p")
+  (split-window-vertically)
+  (other-window 1 nil)
+  (if (= prefix 1)
+    (switch-to-next-buffer)))
+(defun jme/hsplit-last-buffer (prefix)
+  "Split the window horizontally and display the previous buffer."
+  (interactive "p")
+  (split-window-horizontally)
+  (other-window 1 nil)
+  (if (= prefix 1) (switch-to-next-buffer)))
+#+END_SRC
+
+*** Window switching
+#+BEGIN_SRC emacs-lisp
+(use-package ace-window
+  :ensure t
+  :defer t
+  :config (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+  :bind ("C-x o" . ace-window))
+#+END_SRC
+
 ** Cleanup
 
 Whitespace cleanup can be dangerous if it changes the content of the
@@ -1951,6 +2097,9 @@ when projecting on a larger screen. The following provides functions for
 switching themes. I have updated this to use the sanityinc versions of
 Chris Kempson's tommorow themes.
 
+Need to make sure to capture the default cursor color so we can switch it
+when appropriate.
+
 #+BEGIN_SRC emacs-lisp
 (use-package color-theme-sanityinc-tomorrow)
 
@@ -1961,7 +2110,8 @@ Chris Kempson's tommorow themes.
   (jme/org-src-color-blocks-light)
   (when (boundp 'jme/presentation-font)
     (set-frame-font jme/presentation-font :frames nil)
-    (set-face-attribute 'default nil :font jme/presentation-font)))
+    (set-face-attribute 'default nil :font jme/presentation-font))
+  (setq default-cursor-color (cdr (assoc 'cursor-color (frame-parameters)))))
 
 (defun use-default-theme ()
  "Switch to the default theme."
@@ -1970,7 +2120,8 @@ Chris Kempson's tommorow themes.
   (jme/org-src-color-blocks-dark)
   (when (boundp 'jme/default-font)
     (set-frame-font jme/default-font :frames nil)
-    (set-face-attribute 'default nil :font jme/default-font)))
+    (set-face-attribute 'default nil :font jme/default-font))
+  (setq default-cursor-color (cdr (assoc 'cursor-color (frame-parameters)))))
 
 (defun toggle-presentation-mode ()
  "Toggle between presentation and default theme."
@@ -1988,7 +2139,7 @@ My own invention of a mode line layout.
 
 #+BEGIN_SRC emacs-lisp
 (use-package monkey-mode-line
-  :init (monkeyml/monkey-mode-line))
+  :config (monkeyml/monkey-mode-line))
 #+END_SRC
 
 * Key Bindings
