@@ -4,7 +4,7 @@
 
 * Overview
 
-This file contains configuration items specific to the Mac. 
+This file contains configuration items specific to the Mac.
 
 #+BEGIN_SRC emacs-lisp :padline no
 ;;; darwin.el -- Automatically generated darwin configuration
@@ -15,7 +15,7 @@ This file contains configuration items specific to the Mac.
 ;;; Commentary:
 ;;;
 ;;; See darwin.org for complete documentation
-;;; 
+;;;
 ;;; Code:
 ;;;
 
@@ -28,6 +28,10 @@ Use =aspell= instead of =ispell=.
 
 #+BEGIN_SRC emacs-lisp
 (setq-default ispell-program-name "/usr/local/bin/aspell")
+#+END_SRC
+** Calendar
+#+BEGIN_SRC emacs-lisp
+(use-package org-mac-iCal)
 #+END_SRC
 ** markown
 
@@ -99,7 +103,7 @@ specific way to display desktop notifications via simple AppleScript.
 
   This is a Mac OS X specific function.  Note that double-quotes that occur in
   the TITLE and the TEXT are replaced with single quotes."
-  
+
   (let ((title (replace-regexp-in-string "\"" "'" title))
         (text (replace-regexp-in-string "\"" "'" (if (> (length text) max-text-len)
                                                      (substring text 0 max-text-len)

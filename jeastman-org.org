@@ -8,7 +8,7 @@
 Just about everything.
 
 Anything I write these days is written completely, or at least starts, in
-Org. 
+Org.
 
 I have recently started keeping day specific notes. Each day is represented
 by an individual Org file, referred to as a ~daypage~. The original
@@ -50,7 +50,7 @@ of modules that I am currently experimenting with.
     =notes.org= - General notes file.
 
     Daypages have their own directory and the files are generated
-    on-demand. 
+    on-demand.
 
 #+BEGIN_SRC emacs-lisp
   (setq daypage-path (concat org-directory "/days/"))
@@ -63,6 +63,7 @@ of modules that I am currently experimenting with.
                                (expand-file-name daypage-path)))
   (setq org-default-notes-file (concat org-directory "/notes.org"))
   (setq org-annotate-file-storage-file (concat org-directory "/annotated.org"))
+  (setq org-agenda-include-diary t)
 #+END_SRC
 
 ** Daypages
@@ -361,7 +362,7 @@ See http://orgmode.org/worg/org-contrib/org-mac-iCal.html
 
 #+BEGIN_SRC emacs-lisp
 (defvar org-sec-with "nobody"
-  "Value of the :with: peoperty when doing an org-sec-tag-entry. 
+  "Value of the :with: peoperty when doing an org-sec-tag-entry.
    Change it with org-sec-set-with, set to C-c ow")
 
 (defvar org-sec-where ""
