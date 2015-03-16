@@ -322,7 +322,7 @@ ensure the latest version of source files are compiled.
 #+BEGIN_SRC emacs-lisp :tangle no
 (use-package auto-compile
   :ensure t
-  :init (auto-compile-on-load-mode))
+  :config (auto-compile-on-load-mode))
 (setq load-prefer-newer t)
 #+END_SRC
 
@@ -858,7 +858,7 @@ denote changes in a file. I like this everywhere, so I turn it on globally.
 (use-package git-gutter-fringe
   :ensure t
   :diminish git-gutter-mode
-  :init
+  :config
   (progn
     (setq git-gutter:lighter " GG")
     (global-git-gutter-mode)))
@@ -870,7 +870,6 @@ denote changes in a file. I like this everywhere, so I turn it on globally.
 (use-package git-messenger
   :commands git-messenger:popup-message
   :ensure t
-  :defer t
   :bind ("C-x v p" . git-messenger:popup-message))
 #+END_SRC
 
@@ -893,7 +892,7 @@ turn it on once things are idle.
 
 #+BEGIN_SRC emacs-lisp
 (use-package recentf
-  :idle
+  :config
   (progn
     (setq
       recentf-save-file meta-recent
@@ -916,7 +915,7 @@ where the history should be stored. Additionally, I have it set to save:
 
 #+BEGIN_SRC emacs-lisp
 (use-package savehist
-  :init
+  :config
   (progn
     (setq savehist-additional-variables
       '(kill-ring search-ring regexp-search-ring)
@@ -935,7 +934,7 @@ contents go into the =meta= area and activate it for all buffers.
 
 #+BEGIN_SRC emacs-lisp
 (use-package saveplace
-  :pre-load
+  :init
   (progn
     (setq save-place-file meta-saveplace)
     (setq-default save-place t)))
@@ -968,10 +967,9 @@ Enable =Undo-tree-mode= globally.
 
 #+BEGIN_SRC emacs-lisp
 (use-package undo-tree
-  :defer t
   :ensure t
   :diminish undo-tree-mode
-  :idle
+  :config
   (progn
     (global-undo-tree-mode)
     (setq undo-tree-visualizer-timestanps t
@@ -997,7 +995,7 @@ I also specify the column beyond which the line is highlighted.
 #+BEGIN_SRC emacs-lisp
 (use-package whitespace
   :diminish global-whitespace-mode
-  :init
+  :config
   (progn
     (setq whitespace-style '(face trailing space-before-tab
                        indentation space-after-tab)
@@ -1011,8 +1009,7 @@ I also specify the column beyond which the line is highlighted.
 #+BEGIN_SRC emacs-lisp
 (use-package winner
   :ensure t
-  :defer t
-  :idle (winner-mode 1))
+  :config (winner-mode 1))
 #+END_SRC
 
 * Utility functions
@@ -1069,9 +1066,9 @@ extensions over time. This one works.
    :commands global-company-mode
    :ensure t
    :diminish company-mode
-   :init
-     (global-company-mode)
    :config
+     (global-company-mode)
+   :init
    (progn
      (setq company-tooltip-limit 20
            company-idle-delay .3
@@ -1089,10 +1086,9 @@ we create one. (Based on code from [[http://stackoverflow.com/questions/10211730
 
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
-    :idle (yas-global-mode 1)
-    :defer t
+    :ensure t
     :diminish yas-minor-mode
-    :ensure t)
+    :config (yas-global-mode 1))
 
   (defun jme/insert-yas-by-name (name)
     (cl-flet ((dummy-prompt
@@ -1207,8 +1203,6 @@ Support for CoffeeScript.
 #+BEGIN_SRC emacs-lisp
   (use-package coffee-mode
     :commands coffee-mode
-    :ensure t
-    :defer
     :mode ("\\.coffee\\'" . coffee-custom)
     :init
     (setq
@@ -1273,7 +1267,6 @@ A fantastically useful package to gradually expand selected region.
 #+BEGIN_SRC emacs-lisp
 (use-package expand-region
   :ensure t
-  :defer t
   :commands er/expand-region
   :bind ("C-=" . er/expand-region))
 #+END_SRC
@@ -1283,14 +1276,11 @@ A fantastically useful package to gradually expand selected region.
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
   :ensure t
-  :init
-  (progn
-    (add-hook 'after-init-hook #'global-flycheck-mode))
   :config
   (progn
-    (eval-after-load 'flycheck '(flycheck-clojure-setup)))
-    (eval-after-load 'flycheck
-      '(setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
+    (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)
+    (flycheck-clojure-setup)
+    (global-flycheck-mode)))
 #+END_SRC
 
    #+BEGIN_SRC emacs-lisp
@@ -1306,7 +1296,7 @@ advice ensures that the buffer is checked when I turn =flyspell= on.
 
 #+BEGIN_SRC emacs-lisp
 (use-package flyspell
-  :init
+  :config
   (defadvice flyspell-mode (after advice-flyspell-check-buffer-on-start activate)
     (flyspell-buffer)))
 #+END_SRC
@@ -1317,9 +1307,8 @@ Nice utility for providing a guide for key bindings.
 
 #+BEGIN_SRC emacs-lisp
 (use-package guide-key
-  :defer t
   :diminish guide-key-mode
-  :init
+  :config
   (progn
     (setq guide-key/guide-key-sequence '("C-x" "C-c"))
     (guide-key-mode 1)
@@ -1363,15 +1352,17 @@ Configure ido to use vertical mode. Much easier to see matches.
 #+BEGIN_SRC emacs-lisp
 (use-package ido-vertical-mode
   :ensure t
-  :init (ido-vertical-mode))
+  :config (ido-vertical-mode))
 #+END_SRC
 
 Use ido everywhere.
 
 #+BEGIN_SRC emacs-lisp
 (use-package ido-ubiquitous
+  :disabled t
   :ensure t
-  :init (ido-ubiquitous-mode 1))
+  :init
+  (eval-after-load "ido" (ido-ubiquitous-mode 1)))
 #+END_SRC
 
 *** Configuration
@@ -1396,7 +1387,7 @@ These settings control the behavior of ido.
 #+BEGIN_SRC emacs-lisp
 (use-package flx-ido
   :ensure t
-  :init
+  :config
   (progn
     (ido-mode t)
     (setq
@@ -1448,7 +1439,7 @@ These settings control the behavior of ido.
              helm-show-kill-ring)
   :ensure t
   :diminish helm-mode
-  :init
+  :config
   (progn
     (require 'helm-config)
     (setq helm-for-files-preferred-list jme/helm-sources
@@ -1473,20 +1464,21 @@ Helm can do a great job of describing bindings.
 
 #+BEGIN_SRC emacs-lisp
 (use-package helm-descbinds
-  :defer t
+  :commands (helm-descbinds)
   :bind ("C-h b" . helm-descbinds))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
 (use-package helm-swoop
+  :commands (helm-swoop helm-swoop-back-to-last-point)
   :ensure t
   :bind (("C-c h s" . helm-swoop)
          ("M-i" . helm-swoop)
          ("M-I" . helm-swoop-back-to-last-point))
   :config
   (progn
-   (define-key isearch-mode-map (kbd "M-i") 'helm-swoop-from-isearch)
-   (define-key helm-swoop-map (kbd "M-i") 'helm-multi-swoop-all-from-helm-swoop)))
+   (bind-key "M-i" 'helm-swoop-from-isearch isearch-mode-map)
+   (bind-key "M-i" 'helm-multi-swoop-all-from-helm-swoop helm-swoop-map)))
 #+END_SRC
 
 ** Javascript
@@ -1494,7 +1486,6 @@ Helm can do a great job of describing bindings.
 #+BEGIN_SRC emacs-lisp
 (use-package js2-mode
   :ensure t
-  :defer t
   :commands js2-mode
   :init
   (progn
@@ -1539,7 +1530,6 @@ Also, query for the name of the master file.
     (setq-default TeX-master nil))
   :config
   (use-package latex-mode
-    :defer t
     :config
     (progn
       (use-package preview)
@@ -1557,7 +1547,6 @@ Also, query for the name of the master file.
 (use-package eldoc
   :diminish eldoc-mode
   :commands eldoc-mode
-  :defer t
   :init
   (progn
     (add-hook 'lisp-interaction-mode-hook 'eldoc-mode)
@@ -1577,7 +1566,6 @@ Also, query for the name of the master file.
 (use-package magit
   :commands magit-status
   :ensure t
-  :defer t
   :bind ("C-x d" . magit-status)
   :diminish magit-auto-revert-mode)
 #+END_SRC
@@ -1632,9 +1620,8 @@ loads the configuration based on my login name.
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
   :ensure t
-  :defer t
   :diminish projectile-mode
-  :idle
+  :config
   (progn
     (setq projectile-keymap-prefix (kbd "C-c p")
           projectile-completion-system 'helm
@@ -1644,7 +1631,6 @@ loads the configuration based on my login name.
 
 (use-package helm-projectile
   :ensure t
-  :defer t
   :config (helm-projectile-on))
 #+END_SRC
 
@@ -1911,8 +1897,7 @@ I very often want several windows with the same buffer.
 #+BEGIN_SRC emacs-lisp
 (use-package ace-window
   :ensure t
-  :defer t
-  :config (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+  :init (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
   :bind ("C-x o" . ace-window))
 #+END_SRC
 
@@ -2074,8 +2059,7 @@ Color source blocks in org to make them stand out. See [[http://www.howardism.or
    '(org-block-background
      ((t (:background "#FFFFEA"))))
    '(org-block-end-line
-     ((t (:overline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF")))))
-)
+     ((t (:overline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF"))))))
 
 (defun jme/org-src-color-blocks-dark ()
   "Colors the block headers and footers to make them stand out more for dark themes."
@@ -2086,8 +2070,7 @@ Color source blocks in org to make them stand out. See [[http://www.howardism.or
    '(org-block-background
      ((t (:background "#111111"))))
    '(org-block-end-line
-     ((t (:foreground "#008ED1" :background "#002E41")))))
-)
+     ((t (:foreground "#008ED1" :background "#002E41"))))))
 #+END_SRC
 
 *** Presentation and Default theme
@@ -2201,16 +2184,15 @@ they relate to, I find it better to have all global keys in one place.
 ;; Don't start the server unless we can verify that it isn't running.
 (use-package server
   :if window-system
-  :idle
+  :config
   (when (and (functionp 'server-running-p) (not (server-running-p)))
      (server-start)))
 
 ;; Support for Chrome 'edit with emacs' extension
 (use-package edit-server
   :if window-system
-  :init
-  (progn
-    (add-hook 'after-init-hook 'edit-server-start t)))
+  :config
+  (edit-server-start t))
 #+END_SRC
 
 * Footer
