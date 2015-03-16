@@ -58,7 +58,7 @@ of modules that I am currently experimenting with.
   (setq org-mobile-inbox-for-pull (concat org-directory "/flagged.org"))
   (setq org-agenda-files (list (concat org-directory "/work.org")
                                (concat org-directory "/tasks.org")
-                               (concat org-directory "/home.org")
+                               (concat org-directory "/journal.org")
                                (concat org-directory "/notes.org")
                                (expand-file-name daypage-path)))
   (setq org-default-notes-file (concat org-directory "/notes.org"))
@@ -163,7 +163,7 @@ Targets include this file and any file contributing to the agenda - up to
 5 levels deep.
 
 #+BEGIN_SRC emacs-lisp
-(setq org-refile-targets (quote ((org-agenda-files :maxlevel . 5) (nil :maxlevel . 5))))
+(setq org-refile-targets '((org-agenda-files . (:maxlevel . 5))))
 #+END_SRC
 
 Targets start with the file name. This allows creating level 1 tasks.
@@ -191,7 +191,8 @@ Allow refile to create parent tasks with confirmation.
 Add a timestamp to the task when it moves to the DONE state.
 
 #+BEGIN_SRC emacs-lisp
-(setq org-log-done 'time)
+(setq org-log-done 'time
+      org-log-into-drawer "LOGBOOK")
 #+END_SRC
 
 *** Effort
@@ -210,7 +211,7 @@ Add a timestamp to the task when it moves to the DONE state.
 (setq org-todo-keywords
       '((sequence "TODO(t)" "STARTED(s)" "WAITING(w)" "STALLED(x)" "|" "DONE(d)" "CANCELLED(c)")
         (sequence "TASK(f)" "|" "DONE(d)")
-        (sequence "MAYBE(m)" "|" "CANCELLED(c)")
+        (sequence "MAYBE(m)" "|" "DONE(d)" "CANCELLED(c)")
         (sequence "RISK(r)" "|" "MITIGATED(i)")))
 #+END_SRC
 
@@ -244,16 +245,28 @@ Add a timestamp to the task when it moves to the DONE state.
 
 *** Templates
 #+BEGIN_SRC emacs-lisp
-(setq org-capture-templates
-      '(("m" "Zimbra Task" entry (file+headline
-                                  (concat org-directory "/work.org") "General")
-         "* TODO %^{Brief Description} %^g\n  %?\n  Added: %U")
-        ("t" "Todo" entry (file+headline
-                           (concat org-directory "/tasks.org") "Tasks")
-         "* TODO %^{Brief Description} %^g\n  %?\n  Added: %U")
-        ("n" "Notes" entry (file+datetree
-                              (concat org-directory "/notes.org") "Inbox")
-         "* %^{Description} %^g\n  %?\n  Added: %U")))
+  (setq org-capture-templates
+        '(("m" "Zimbra Task" entry (file+headline
+                                    (concat org-directory "/work.org") "General")
+           "* TODO %^{Brief Description} %^g\n  %?\n  Added: %U")
+          ("t" "Todo" entry (file+headline
+                             (concat org-directory "/tasks.org") "Tasks")
+           "* TODO %^{Brief Description} %^g\n  %?\n  Added: %U")
+          ("T" "Quick task" entry (file+headline
+                                   (concat org-directory "/tasks.org") "Tasks")
+           "* TASK %^{Task}"
+           :immediate-finish t)
+          ("j" "Journal entry" plain (file+datetree
+                                      (concat org-directory "/journal.org"))
+           "%K - %a\n%i\n%?\n"
+           :unnarrowed t)
+          ("J" "Journal entry with date" plain (file+datetree+prompt
+                                                (concat org-directory "/journal.org"))
+           "%K - %a\n%i\n%?\n"
+           :unnarrowed t)
+          ("n" "Notes" entry (file+datetree
+                                (concat org-directory "/notes.org") "Inbox")
+           "* %^{Description} %^g\n  %?\n  Added: %U")))
 #+END_SRC
 
 *** Archiving
@@ -303,6 +316,18 @@ This can be 0 for immediate, or a floating point value.")
 #+END_SRC
 
 ** Agenda Settings
+
+Look ahead two days of my agenda at a time.
+
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-span 2)
+#+END_SRC
+
+Set a relevant set of columns which includes effort.
+
+#+BEGIN_SRC emacs-lisp
+(setq org-columns-default-format "%50ITEM %12SCHEDULED %TODO %3PRIORITY %Effort{:} %TAGS")
+#+END_SRC
 
 #+BEGIN_SRC emacs-lisp
   (setq org-agenda-custom-commands
@@ -474,6 +499,27 @@ See http://orgmode.org/worg/org-contrib/org-mac-iCal.html
     (org-sec-with-view "TODO dowith" who)
     (org-sec-assigned-with-view "TASK with" who)
     (org-sec-stuck-with-view "STUCK with" who)))
+#+END_SRC
+
+*** Allow quickly marking items as done in the agenda view. (From [[http://pages.sachachua.com/.emacs.d/Sacha.html#unnumbered-82][here]]).
+
+#+BEGIN_SRC emacs-lisp
+(defun jme/org-agenda-done (&optional arg)
+  "Mark current TODO as done.
+This changes the line at point, all other lines in the agenda referring to
+the same tree node, and the headline of the tree node in the org file."
+  (interactive "P")
+  (org-agenda-todo "DONE"))
+;(bind-key "x" 'jme/org-agenda-done org-agenda-mode-map)
+
+(defun jme/org-agenda-done-and-add-followup ()
+  "Mark the current TODO as done and add another task after it.
+Creates it at the same level as the previous task."
+  (interactive)
+  (org-agenda-todo "DONE")
+  (org-agenda-switch-to)
+  (org-capture 0 "t"))
+;(bind-key "X" 'jme/org-agenda-done-and-add-followup org-agenda-mode-map)
 #+END_SRC
 
 ** LaTeX
