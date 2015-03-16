@@ -128,10 +128,12 @@ used to be.
 #+RESULTS:
 | _Package Name_                  | _Package Description_                                                              |
 | ace-jump-mode                   | a quick cursor location minor mode for emacs                                       |
+| ace-window                      | Quickly switch windows.                                                            |
 | alert                           | Growl-style notification system for Emacs                                          |
 | annoying-arrows-mode            | Ring the bell if using arrows too much                                             |
 | async                           | Asynchronous processing in Emacs                                                   |
 | auctex                          | Integrated environment for *TeX*                                                   |
+| auto-compile                    | automatically compile Emacs Lisp libraries                                         |
 | auto-complete                   | Auto Completion for GNU Emacs                                                      |
 | bbdb                            | The Insidious Big Brother Database for GNU Emacs                                   |
 | bind-key                        | A simple way to manage personal keybindings                                        |
@@ -186,7 +188,9 @@ used to be.
 | handlebars-mode                 | A major mode for editing Handlebars files.                                         |
 | haskell-mode                    | A Haskell editing mode                                                             |
 | helm                            | Helm is an Emacs incremental and narrowing framework                               |
+| helm-descbinds                  | Yet Another `describe-bindings' with `helm'.                                       |
 | helm-git-files                  | helm for git files                                                                 |
+| helm-projectile                 | Helm integration for Projectile                                                    |
 | helm-swoop                      | Efficiently hopping squeezed lines powered by helm interface                       |
 | hi2                             | indentation module for Haskell Mode                                                |
 | highlight-indentation           | Minor modes for highlighting indentation                                           |
@@ -209,9 +213,10 @@ used to be.
 | nose                            | Easy Python test running in Emacs                                                  |
 | org                             | Outline-based notes management and organizer                                       |
 | org-bullets                     | Show bullets in org-mode as UTF-8 characters                                       |
-| org-gcal                        | Org sync with Google Calendar                                                      |
+| org-mac-iCal                    | Imports events from iCal.app to the Emacs diary                                    |
 | ox-reveal                       | reveal.js Presentation Back-End for Org Export Engine                              |
 | package-build                   | Tools for assembling a package archive                                             |
+| packed                          | package manager agnostic Emacs Lisp package utilities                              |
 | pallet                          | A package management tool for Emacs, using Cask.                                   |
 | paradox                         | A modern Packages Menu. Colored, with package ratings, and customizable.           |
 | pkg-info                        | Information about packages                                                         |
@@ -219,6 +224,7 @@ used to be.
 | popup                           | Visual Popup User Interface                                                        |
 | popwin                          | Popup Window Manager.                                                              |
 | pretty-mode                     | Redisplay parts of the buffer as pretty symbols.                                   |
+| projectile                      | Manage and navigate projects in Emacs easily                                       |
 | pydoc-info                      | Better Python support for info-lookup-symbol.                                      |
 | python-environment              | virtualenv API for Emacs Lisp                                                      |
 | queue                           | Queue data structure                                                               |
@@ -972,7 +978,7 @@ Enable =Undo-tree-mode= globally.
   :config
   (progn
     (global-undo-tree-mode)
-    (setq undo-tree-visualizer-timestanps t
+    (setq undo-tree-visualizer-timestamps t
           undo-tree-visualizer-diff t)))
 #+END_SRC
 
@@ -1063,7 +1069,6 @@ extensions over time. This one works.
 
 #+BEGIN_SRC emacs-lisp
 (use-package company
-   :commands global-company-mode
    :ensure t
    :diminish company-mode
    :config
@@ -1071,9 +1076,7 @@ extensions over time. This one works.
    :init
    (progn
      (setq company-tooltip-limit 20
-           company-idle-delay .3
-           company-echo-delay 0
-           company-begin-commands '(self-insert-comman))))
+           company-idle-delay .3)))
 #+END_SRC
 
 ** YASnippet
@@ -1257,7 +1260,8 @@ Make sure =image-dired= keeps its files in the meta directory.
 ** Erlang
 
 #+BEGIN_SRC emacs-lisp
-(use-package erlang-start)
+(use-package erlang-start
+  :disabled t)
 #+END_SRC
 
 ** Expand Region
@@ -1527,17 +1531,7 @@ Also, query for the name of the master file.
     (setq
       TeX-auto-save t
       TeX-parse-self t)
-    (setq-default TeX-master nil))
-  :config
-  (use-package latex-mode
-    :config
-    (progn
-      (use-package preview)
-      (info-lookup-add-help :mode 'latex-mode
-                              :regexp ".*"
-                              :parse-rule "\\\\?[a-zA-Z]+\\|\\\\[^a-zA-Z]"
-                              :doc-spec '(("(latex2e)Concept Index" )
-                                          ("(latex2e)Command Index"))))))
+    (setq-default TeX-master nil)))
 #+END_SRC
 
 ** Lisp
@@ -1611,7 +1605,8 @@ loads the configuration based on my login name.
 ** Pianobar
 
 #+BEGIN_SRC emacs-lisp
-(use-package pianobar)
+(use-package pianobar
+  :disabled t)
 #+END_SRC
 
 ** Projectile
