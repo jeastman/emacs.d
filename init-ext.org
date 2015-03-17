@@ -1486,7 +1486,7 @@ Helm can do a great job of describing bindings.
 (use-package js2-mode
   :ensure t
   :commands js2-mode
-  :mode ("\\.js\\" . js2-mode)
+  :mode ("\\.js$" . js2-mode)
   :init
   (progn
     (setq-default js2-basic-offset 2)
@@ -2176,7 +2176,7 @@ they relate to, I find it better to have all global keys in one place.
 ;; Don't start the server unless we can verify that it isn't running.
 (use-package server
   :if (and window-system
-           (not interactive))
+           (not noninteractive))
   :config
   (when (and (functionp 'server-running-p) (not (server-running-p)))
      (server-start)))
@@ -2184,7 +2184,7 @@ they relate to, I find it better to have all global keys in one place.
 ;; Support for Chrome 'edit with emacs' extension
 (use-package edit-server
   :if (and window-system
-           (not interactive))
+           (not noninteractive))
   :config
   (edit-server-start t))
 #+END_SRC
