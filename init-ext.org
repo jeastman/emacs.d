@@ -1038,21 +1038,6 @@ have been using =winner= mode.
     (bury-buffer)))
 #+END_SRC
 
-** Mark and Pop
-
-This bit of elisp allows optionally storing the mark before moving. I
-adopted this from a [[https://gist.github.com/magnars/2350388][gist]] by Magnar Sveen.
-
-#+BEGIN_SRC emacs-lisp
-(defvar push-mark-before-goto-char nil)
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-(defadvice goto-char (before push-mark-first activate)
-  (when push-mark-before-goto-char
-    (push mark)))
-#+END_SRC
-
 * Package Specific Settings
 ** Ace-jump-mode
 
