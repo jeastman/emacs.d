@@ -954,6 +954,9 @@ original =show paren= with =smartparens=.
 
 #+BEGIN_SRC emacs-lisp
 (use-package smartparens
+  :commands (smartparens-mode
+             show-smartparens-mode
+             show-smartparens-global-mode)
   :diminish smartparens-mode
   :ensure t
   :config
@@ -1015,6 +1018,8 @@ I also specify the column beyond which the line is highlighted.
 #+BEGIN_SRC emacs-lisp
 (use-package winner
   :ensure t
+  :if (not noninteractive)
+  :demand t
   :config (winner-mode 1))
 #+END_SRC
 
@@ -1044,7 +1049,12 @@ have been using =winner= mode.
 #+BEGIN_SRC emacs-lisp
 (use-package ace-jump-mode
   :ensure t
-  :bind ("C-. C-s" . ace-jump-mode))
+  :bind ("C-. C-s" . ace-jump-mode)
+  :config
+  (setq ace-jump-mode-submode-list
+        '(ace-jump-char-mode
+          ace-jump-word-mode
+          ace-jump-line-mode)))
 #+END_SRC
 
 ** Auto complete (Company)
@@ -1476,9 +1486,9 @@ Helm can do a great job of describing bindings.
 (use-package js2-mode
   :ensure t
   :commands js2-mode
+  :mode ("\\.js\\" . js2-mode)
   :init
   (progn
-    (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
     (setq-default js2-basic-offset 2)
     (add-to-list 'interpreter-mode-alist (cons "node" 'js2-mode)))
   :config
@@ -1603,15 +1613,17 @@ loads the configuration based on my login name.
   :diminish projectile-mode
   :config
   (progn
+    (use-package helm-projectile
+      :ensure t
+      :config
+      (progn
+        (setq projectile-completion-system 'helm
+              projectile-switch-project-action 'helm-projectile)
+        (helm-projectile-on)))
     (setq projectile-keymap-prefix (kbd "C-c p")
-          projectile-completion-system 'helm
-          projectile-switch-project-action 'helm-projectile
           projectile-enable-caching t)
     (projectile-global-mode)))
 
-(use-package helm-projectile
-  :ensure t
-  :config (helm-projectile-on))
 #+END_SRC
 
 ** Python
@@ -2163,14 +2175,16 @@ they relate to, I find it better to have all global keys in one place.
 #+BEGIN_SRC emacs-lisp
 ;; Don't start the server unless we can verify that it isn't running.
 (use-package server
-  :if window-system
+  :if (and window-system
+           (not interactive))
   :config
   (when (and (functionp 'server-running-p) (not (server-running-p)))
      (server-start)))
 
 ;; Support for Chrome 'edit with emacs' extension
 (use-package edit-server
-  :if window-system
+  :if (and window-system
+           (not interactive))
   :config
   (edit-server-start t))
 #+END_SRC
