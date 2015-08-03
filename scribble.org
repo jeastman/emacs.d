@@ -15,7 +15,7 @@ This file contains configuration items specific to Scribble.
 ;;; Commentary:
 ;;;
 ;;; See scribble.org for complete documentation
-;;; 
+;;;
 ;;; Code:
 ;;;
 
@@ -54,7 +54,7 @@ Jar file required for plantuml.
 Also see this [[https://gist.github.com/rpl/547521][gist]].
 
 #+BEGIN_SRC emacs-lisp
-(setq plantuml-jar-path "/usr/local/Cellar/plantuml/8018/plantuml.8018.jar")
+(setq plantuml-jar-path "/usr/local/Cellar/plantuml/8024/plantuml.8024.jar")
 #+END_SRC
 
 *** Org

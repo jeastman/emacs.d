@@ -1556,7 +1556,8 @@ Also, query for the name of the master file.
   :commands magit-status
   :ensure t
   :bind ("C-x d" . magit-status)
-  :diminish magit-auto-revert-mode)
+  :diminish magit-auto-revert-mode
+  :init (setq magit-last-seen-setup-instructions "1.4.0"))
 #+END_SRC
 
 ** Markdown
@@ -2106,6 +2107,29 @@ when appropriate.
     (use-default-theme)))
 
 (use-default-theme)
+#+END_SRC
+
+hide-mode-line provides a way for me to hide the mode line during
+presentations.
+
+#+BEGIN_SRC emacs-lisp
+(use-package hide-mode-line)
+#+END_SRC
+
+For presentations themselves, provide org-present.
+
+#+BEGIN_SRC emacs-lisp
+(use-package org-present
+  :config (add-hook 'org-present-mode-hook
+                    (lambda ()
+                       (org-display-inline-images)
+                       (hide-mode-line)
+                       (use-presentation-theme)))
+          (add-hook 'org-present-mode-quit-hook
+                    (lambda ()
+                       (org-remove-inline-images)
+                       (use-default-theme)
+                       (hide-mode-line))))
 #+END_SRC
 
 ** Monkey Mode Line

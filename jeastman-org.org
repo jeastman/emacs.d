@@ -60,10 +60,11 @@ of modules that I am currently experimenting with.
                                (concat org-directory "/tasks.org")
                                (concat org-directory "/journal.org")
                                (concat org-directory "/notes.org")
+                               (concat org-directory "/calendar.org")
                                (expand-file-name daypage-path)))
   (setq org-default-notes-file (concat org-directory "/notes.org"))
   (setq org-annotate-file-storage-file (concat org-directory "/annotated.org"))
-  (setq org-agenda-include-diary t)
+  (setq org-agenda-include-diary nil)
 #+END_SRC
 
 ** Daypages
@@ -426,7 +427,7 @@ See http://orgmode.org/worg/org-contrib/org-mac-iCal.html
     (unless (string= do-with "")
       (org-entry-put nil "dowith" do-with))))
 
-(bind-key "C-c od" 'org-set-dowith)
+(bind-key "C-c od" 'org-sec-set-dowith)
 
 (defun org-sec-set-doat ()
   "Sets the value of the doat property."
