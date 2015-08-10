@@ -1556,7 +1556,6 @@ Also, query for the name of the master file.
   :commands magit-status
   :ensure t
   :bind ("C-x d" . magit-status)
-  :diminish magit-auto-revert-mode
   :init (setq magit-last-seen-setup-instructions "1.4.0"))
 #+END_SRC
 
