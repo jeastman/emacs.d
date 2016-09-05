@@ -29,12 +29,6 @@ Add some comments to the beginning of the generated elisp file.
   ;;;
   ;;; Code:
   ;;;
-  (add-to-list 'package-pinned-packages '(dash . "marmalade") t)
-
-  ;force proper version of dash
-  (use-package dash
-    :ensure t
-    :pin marmalade)
 
 #+END_SRC
 
