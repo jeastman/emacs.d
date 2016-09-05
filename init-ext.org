@@ -1822,6 +1822,33 @@ for these exceptions.
     uniquify-ignore-buffers-re "^\\*"))
 #+END_SRC
 
+** Web mode
+
+#+BEGIN_SRC emacs-lisp
+  (use-package web-mode
+    :mode
+    (("\\.jsx$" . web-mode)
+     ("\\.html?\\'" . web-mode))
+    :init
+    (progn
+      (setq web-mode-markup-indent-offset 2
+            web-mode-css-indent-offset 2
+            web-mode-code-indent-offset 2
+            web-mode-enable-current-column-highlight t))
+    :config
+    (progn
+      (defadvice web-mode-highlight-part (around tweak-jsx activate)
+        (if (equal web-mode-content-type "jsx")
+            (let ((web-mode-enable-part-face nil))
+              ad-do-it)
+          ad-do-it))
+      (add-hook 'web-mode-hook
+        (lambda ()
+          (when (equal web-mode-content-type "jsx")
+            (flycheck-select-checker 'javascript-eslint)
+            (flycheck-select-checker 'flycheck-tidyrc))))))
+#+END_SRC
+
 ** Diminish
 
 I use diminish to hide most of minor modes from the modeline. Most of the
