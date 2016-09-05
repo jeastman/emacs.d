@@ -1046,6 +1046,17 @@ have been using =winner= mode.
   :bind ("C-. C-s" . avy-goto-word-1))
 #+END_SRC
 
+** Aggressive Indent
+
+   Avoid manual indentation with 'aggressive indent'.
+
+   #+BEGIN_SRC emacs-lisp
+   (use-package aggressive-indent
+      :ensure t
+      :config
+        (add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode))
+   #+END_SRC
+
 ** Auto complete (Company)
 
 I have fiddled around with different auto-completion packages and
