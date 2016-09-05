@@ -6,14 +6,12 @@
 ;;
 ;;; Commentary:
 ;;
-;; Bootstrap initialization file. Just enough configuration
+;; Bootstrap initialization file.  Just enough configuration
 ;; to initialize the packaging system and ensure org is loaded
 ;; so that the rest of the configuration can be loaded.
 ;;
 ;;; Code:
 ;;
-
-(require 'cl)
 
 ;; Use cask for package management
 (require 'cask "~/.cask/cask.el")
