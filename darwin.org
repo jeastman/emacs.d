@@ -79,6 +79,16 @@ Include spotlight data into helm.
 
 * Tweaks
 
+** Super key support
+
+   I utilize the command key as META on Mac, thus need something else to
+   use as SUPER key. This enables the OPTION key as SUPER, while preserving
+   it as ALT in other cases.
+
+   #+BEGIN_SRC emacs-lisp
+   (setq mac-option-modifier '(:ordinary super :function alt :mouse alt))
+   #+END_SRC
+
 Flyspell depends on =mouse-3= which does not work well without a 3rd
 button. Fix that.
 
