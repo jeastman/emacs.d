@@ -1492,16 +1492,18 @@ Helm can do a great job of describing bindings.
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-(use-package helm-swoop
-  :commands (helm-swoop helm-swoop-back-to-last-point)
-  :ensure t
-  :bind (("C-c h s" . helm-swoop)
-         ("M-i" . helm-swoop)
-         ("M-I" . helm-swoop-back-to-last-point))
-  :config
-  (progn
-   (bind-key "M-i" 'helm-swoop-from-isearch isearch-mode-map)
-   (bind-key "M-i" 'helm-multi-swoop-all-from-helm-swoop helm-swoop-map)))
+  (use-package helm-swoop
+    :commands (helm-swoop helm-swoop-back-to-last-point)
+    :ensure t
+    :bind (("C-c h s" . helm-swoop)
+           ("M-i" . helm-swoop)
+           ("M-I" . helm-swoop-back-to-last-point))
+    :config
+    (progn
+      (bind-key "M-i" 'helm-swoop-from-isearch isearch-mode-map)
+      (bind-key "M-i" 'helm-multi-swoop-all-from-helm-swoop helm-swoop-map)
+      (bind-key "C-s" 'helm-next-line helm-swoop-map)
+      (bind-key "C-r" 'helm-previous-line helm-swoop-map)))
 #+END_SRC
 
 ** Javascript
