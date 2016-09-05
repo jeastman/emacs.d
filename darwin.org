@@ -60,8 +60,10 @@ Prevent finder from opening new frames.
 Take advantage of the trash can on the Mac.
 
 #+BEGIN_SRC emacs-lisp
-(setq delete-by-moving-to-trash t
-      trash-directory "~/.Trash/emacs")
+  (if (boundp 'mac-system-move-file-to-trash-use-finder)
+      (setq mac-system-move-file-to-trash-use-finder t)
+    (setq delete-by-moving-to-trash t
+          trash-directory "~/.Trash/emacs"))
 #+END_SRC
 
 Include spotlight data into helm.
