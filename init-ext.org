@@ -1036,17 +1036,14 @@ have been using =winner= mode.
 #+END_SRC
 
 * Package Specific Settings
-** Ace-jump-mode
+** Avy
+
+   Replacement for ace-jump-mode and other things.
 
 #+BEGIN_SRC emacs-lisp
-(use-package ace-jump-mode
+(use-package avy
   :ensure t
-  :bind ("C-. C-s" . ace-jump-mode)
-  :config
-  (setq ace-jump-mode-submode-list
-        '(ace-jump-char-mode
-          ace-jump-word-mode
-          ace-jump-line-mode)))
+  :bind ("C-. C-s" . avy-goto-word-1))
 #+END_SRC
 
 ** Auto complete (Company)
@@ -1065,6 +1062,24 @@ extensions over time. This one works.
      (setq company-tooltip-limit 20
            company-idle-delay .3)))
 #+END_SRC
+
+** Ace-isearch
+
+   Neat little package that provides a minor mode which combines isearch,
+   avy and helm-swoop. See setup for helm-swoop key bindings.
+
+   #+BEGIN_SRC emacs-lisp
+   (use-package ace-isearch
+     :ensure t
+     :diminish ace-isearch-mode
+     :config
+       (custom-set-variables
+         '(ace-isearch-function 'avy-goto-word-1)
+         '(ace-isearch-junp-delay 0.5)
+         '(ace-isearch-input-length 5)))
+
+   (global-ace-isearch-mode +1)
+   #+END_SRC
 
 ** YASnippet
 
