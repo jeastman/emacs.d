@@ -2140,36 +2140,35 @@ Need to make sure to capture the default cursor color so we can switch it
 when appropriate.
 
 #+BEGIN_SRC emacs-lisp
-(use-package color-theme-sanityinc-tomorrow)
+  (use-package material-theme
+    :ensure t)
 
-(defun use-presentation-theme ()
- "Switch to presentation theme."
-  (interactive)
-  (color-theme-sanityinc-tomorrow 'day)
-  (jme/org-src-color-blocks-light)
-  (when (boundp 'jme/presentation-font)
-    (set-frame-font jme/presentation-font :frames nil)
-    (set-face-attribute 'default nil :font jme/presentation-font))
-  (setq default-cursor-color (cdr (assoc 'cursor-color (frame-parameters)))))
+  (defun use-presentation-theme ()
+   "Switch to presentation theme."
+    (interactive)
+    (load-theme 'material-light t)
+    (when (boundp 'jme/presentation-font)
+      (set-frame-font jme/presentation-font :frames nil)
+      (set-face-attribute 'default nil :font jme/presentation-font))
+    (setq default-cursor-color (cdr (assoc 'cursor-color (frame-parameters)))))
 
-(defun use-default-theme ()
- "Switch to the default theme."
-  (interactive)
-  (color-theme-sanityinc-tomorrow 'night)
-  (jme/org-src-color-blocks-dark)
-  (when (boundp 'jme/default-font)
-    (set-frame-font jme/default-font :frames nil)
-    (set-face-attribute 'default nil :font jme/default-font))
-  (setq default-cursor-color (cdr (assoc 'cursor-color (frame-parameters)))))
+  (defun use-default-theme ()
+   "Switch to the default theme."
+    (interactive)
+    (load-theme 'material t)
+    (when (boundp 'jme/default-font)
+      (set-frame-font jme/default-font :frames nil)
+      (set-face-attribute 'default nil :font jme/default-font))
+    (setq default-cursor-color (cdr (assoc 'cursor-color (frame-parameters)))))
 
-(defun toggle-presentation-mode ()
- "Toggle between presentation and default theme."
-  (interactive)
-  (if (string= (frame-parameter nil 'font) jme/default-font)
-      (use-presentation-theme)
-    (use-default-theme)))
+  (defun toggle-presentation-mode ()
+   "Toggle between presentation and default theme."
+    (interactive)
+    (if (string= (frame-parameter nil 'font) jme/default-font)
+        (use-presentation-theme)
+      (use-default-theme)))
 
-(use-default-theme)
+  (use-default-theme)
 #+END_SRC
 
 hide-mode-line provides a way for me to hide the mode line during
