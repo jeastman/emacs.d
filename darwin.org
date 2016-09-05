@@ -89,6 +89,19 @@ Include spotlight data into helm.
    (setq mac-option-modifier '(:ordinary super :function alt :mouse alt))
    #+END_SRC
 
+** Emoji
+
+   Use the Mac emoji font.
+
+   #+BEGIN_SRC emacs-lisp
+   (when (fboundp 'set-fontset-font)
+     (set-fontset-font "fontset-default"
+                       '(#x1F600 . #x1F64F)
+                       (font-spec :name "Apple Color Emoji") nil 'prepend))
+   #+END_SRC
+
+** Flyspell
+
 Flyspell depends on =mouse-3= which does not work well without a 3rd
 button. Fix that.
 
