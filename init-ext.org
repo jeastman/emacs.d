@@ -1507,6 +1507,17 @@ Helm can do a great job of describing bindings.
 #+END_SRC
 
 ** Javascript
+   Make sure to handle json files appropriately.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package json-mode
+    :ensure t
+    :commands json-mode
+    :mode ("\\.json$" . json-mode)
+    :init
+    (setq-default json-reformat::indent-width 2
+                  js-indent-level 2))
+#+END_SRC
 
 #+BEGIN_SRC emacs-lisp
 (use-package js2-mode
