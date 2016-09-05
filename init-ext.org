@@ -1291,13 +1291,19 @@ A fantastically useful package to gradually expand selected region.
 ** Flycheck
 
 #+BEGIN_SRC emacs-lisp
-(use-package flycheck
-  :ensure t
-  :config
-  (progn
-    (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)
-    (flycheck-clojure-setup)
-    (global-flycheck-mode)))
+  (use-package flycheck
+    :ensure t
+    :init
+    (setq-default flycheck-disabled-checkers
+      (append flycheck-disabled-checkers
+        '(javascript-jshint)))
+    :config
+    (progn
+      (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)
+      (flycheck-clojure-setup)
+      (global-flycheck-mode)
+      (flycheck-add-mode 'javascript-eslint 'web-mode)
+      (flycheck-add-mode 'html-tidy 'web-mode)))
 #+END_SRC
 
    #+BEGIN_SRC emacs-lisp
