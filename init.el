@@ -45,6 +45,6 @@
   (warn "Org-Mode is out of date. We expect org 8 or higher, but instead we have %s" (org-version)))
 
 ;; load the literate init file
-(org-babel-load-file (expand-file-name "init-ext.org" "~/.emacs.d"))
+(org-babel-load-file (expand-file-name "init-ext.org" user-emacs-directory))
 (provide 'init)
 ;;; init.el ends here
