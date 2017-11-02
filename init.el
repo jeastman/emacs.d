@@ -16,6 +16,7 @@
 ;; Use cask for package management
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
+(package-initialize)
 
 ;; Utilize pallet to keep cask in sync
 (unless (package-installed-p 'pallet)

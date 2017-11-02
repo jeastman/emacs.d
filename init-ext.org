@@ -612,6 +612,7 @@ Turn on auto fill for text files.
 
 #+BEGIN_SRC emacs-lisp
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
+(diminish 'auto-fill-function)
 #+END_SRC
 
 Allow narrowing.
@@ -715,13 +716,23 @@ The result should look something like:
 
 =⚡︎ 42% 2:30=
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (if (string-equal system-type "darwin")
       (custom-set-variables
         '(battery-mode-line-format "⚡️%b%p%% %t "))
     (custom-set-variables
       '(battery-mode-line-format "⚡︎ %b%p%%%% %t ")))
   (display-battery-mode)
+#+END_SRC
+
+I have opted for a simpler and 'clearer' solution utilizing the
+`fancy-battery` package.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package fancy-battery
+    :ensure t
+    :config
+    (add-hook 'after-init-hook #'fancy-battery-mode))
 #+END_SRC
 
 ***** Time
@@ -735,11 +746,8 @@ configure it here to my liking.
 #+BEGIN_SRC emacs-lisp
   (setq display-time-default-load-average nil)  ; Don't display load
   (setq display-time-day-and-date nil)  ; Don't display date
-  (if (string-equal system-type "darwin")
-      (custom-set-variables
-        '(display-time-format "🕗%l:%M%p"))
-    (custom-set-variables
-      '(display-time-format "%l:%M%p")))
+  (custom-set-variables
+      '(display-time-format "%l:%M%p"))
   (display-time-mode)
 #+END_SRC
 
@@ -833,6 +841,7 @@ Revert buffers when they change on disk.
 
 #+BEGIN_SRC emacs-lisp
 (global-auto-revert-mode 1)
+(diminish 'auto-revert-mode)
 #+END_SRC
 
 Auto-refresh dired buffers.
@@ -1053,6 +1062,7 @@ have been using =winner= mode.
    #+BEGIN_SRC emacs-lisp
    (use-package aggressive-indent
       :ensure t
+      :diminish (aggressive-indent-mode . "➠")
       :config
         (add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode))
    #+END_SRC
@@ -1262,6 +1272,7 @@ Make sure =image-dired= keeps its files in the meta directory.
 #+BEGIN_SRC emacs-lisp
 ;; diredp-toggle-find-file-reuse-dir 1
   (use-package dired+
+    :ensure t
     :config
     (progn
       (setq image-dired-dir (concat metafiles-dir "/image-dired"))
@@ -1288,11 +1299,10 @@ A fantastically useful package to gradually expand selected region.
   :bind ("C-=" . er/expand-region))
 #+END_SRC
 
-** Flycheck
-
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :ensure t
+    :diminish flycheck-mode
     :init
     (setq-default flycheck-disabled-checkers
       (append flycheck-disabled-checkers
@@ -1303,7 +1313,8 @@ A fantastically useful package to gradually expand selected region.
       (flycheck-clojure-setup)
       (global-flycheck-mode)
       (flycheck-add-mode 'javascript-eslint 'web-mode)
-      (flycheck-add-mode 'html-tidy 'web-mode)))
+      (flycheck-add-mode 'html-tidy 'web-mode)
+      (define-key flycheck-mode-map (kbd "C-c ! h") 'helm-flycheck)))
 #+END_SRC
 
    #+BEGIN_SRC emacs-lisp
@@ -1331,6 +1342,7 @@ Nice utility for providing a guide for key bindings.
 #+BEGIN_SRC emacs-lisp
 (use-package guide-key
   :diminish guide-key-mode
+  :ensure t
   :config
   (progn
     (setq guide-key/guide-key-sequence '("C-x" "C-c"))
@@ -1487,6 +1499,7 @@ Helm can do a great job of describing bindings.
 
 #+BEGIN_SRC emacs-lisp
 (use-package helm-descbinds
+  :ensure t
   :commands (helm-descbinds)
   :bind ("C-h b" . helm-descbinds))
 #+END_SRC
@@ -1505,6 +1518,15 @@ Helm can do a great job of describing bindings.
       (bind-key "C-s" 'helm-next-line helm-swoop-map)
       (bind-key "C-r" 'helm-previous-line helm-swoop-map)))
 #+END_SRC
+
+*** Flycheck
+
+    Add helm support for flycheck.
+
+    #+BEGIN_SRC emacs-lisp
+    (use-package helm-flycheck
+      :ensure t)
+    #+END_SRC
 
 ** Javascript
    Make sure to handle json files appropriately.
@@ -1671,24 +1693,45 @@ loads the configuration based on my login name.
 ; Bring back indent after newline
 (add-hook 'python-mode-hook '(lambda ()
              (define-key python-mode-map "\C-m" 'newline-and-indent)))
-(add-hook 'python-mode-hook 'highlight-indentation-mode)
-
-;; use ipython
-(setq python-shell-interpreter "ipython"
-       python-shell-interpreter-args "-i")
 
 #+END_SRC
 
+   Use python3
+
+   #+BEGIN_SRC emacs-lisp
+   (setq python-shell-interpreter "python3"
+         python-shell-interpreter-args "-i")
+   #+END_SRC
+
+ use ipython (no more)
+
+#+BEGIN_SRC emacs-lisp :tangle no
+(setq python-shell-interpreter "ipython"
+       python-shell-interpreter-args "-i -v")
+#+END_SRC
+
+ Jedi for Python
 #+BEGIN_SRC emacs-lisp
-;; Jedi for Python
 (use-package jedi
-  :commands jedi:setup
+ :commands jedi:setup
+  :disabled t
   :init
   (progn
     (setq jedi:setup-keys t)
     (add-hook 'python-mode-hook 'jedi:setup)))
 #+END_SRC
 
+  Highlight indentation
+
+  #+BEGIN_SRC emacs-lisp
+  (use-package highlight-indent-guides
+   :ensure t
+   :commands highlight-indent-guides-mode
+   :init
+   (progn
+    (setq highlight-indent-guides-method 'character)
+    (add-hook 'python-mode-hook 'highlight-indent-guides-mode)))
+  #+END_SRC
 ** Rainbow mode
 
 #+BEGIN_SRC emacs-lisp
@@ -1856,6 +1899,7 @@ diminish functionality has been updated into the =use-package= calls.
 
 #+BEGIN_SRC emacs-lisp
 (eval-after-load "highlight-indentation" '(diminish 'highlight-indentation-mode))
+(diminish 'overwrite-mode "💀")
 #+END_SRC
 
 * Custom Configuration
@@ -2199,8 +2243,16 @@ For presentations themselves, provide org-present.
 My own invention of a mode line layout.
 
 #+BEGIN_SRC emacs-lisp
-(use-package monkey-mode-line
-  :config (monkeyml/monkey-mode-line))
+  ;(use-package monkey-mode-line
+  ;  :config (monkeyml/monkey-mode-line))
+  (use-package spaceline
+    :ensure t
+    :config
+    (use-package spaceline-config
+      :config
+      (use-package monkey-spaceline
+        :load-path "lisp/"
+        :config (spaceline-monkey-theme))))
 #+END_SRC
 
 * Key Bindings

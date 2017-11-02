@@ -111,7 +111,8 @@ Ensure we have support for programming languages used in code blocks.
      (plantuml . t)
      (python . t)
      (js . t)
-     (lisp . t)))
+     (lisp . t)
+     (shell . t)))
 #+END_SRC
 
 ** Look and Feel
@@ -120,9 +121,23 @@ Use utf-8 bullets for nicer look.
 
 #+BEGIN_SRC emacs-lisp
 (use-package org-bullets
+  :after org
   :ensure t
-  :init
+  :demand t
+  :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+#+END_SRC
+
+=org-sticky-header= shows off-screen Org heading at top of window.
+
+#+BEGIN_SRC emacs-lisp
+(use-package org-sticky-header
+  :after org
+  :ensure t
+  :demand t
+  :config
+  (setq org-sticky-header-full-path 'full)
+  (add-hook 'org-mode-hook 'org-sticky-header-mode))
 #+END_SRC
 
 Startup with content folded.
@@ -575,6 +590,13 @@ Add custom document classes.
         ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
 (add-to-list 'org-latex-classes
       '("jmeorgarticle" "\\documentclass[10pt,oneside,article]{jmeorgdoc}"
+        ("\\section{%s}" . "\\section*{%s}")
+        ("\\subsection{%s}" . "\\subsection*{%s}")
+        ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+        ("\\paragraph{%s}" . "\\paragraph*{%s}")
+        ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
+(add-to-list 'org-latex-classes
+       '("synacororgarticle" "\\documentclass[10pt,oneside,article]{synacororgarticle}"
         ("\\section{%s}" . "\\section*{%s}")
         ("\\subsection{%s}" . "\\subsection*{%s}")
         ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
