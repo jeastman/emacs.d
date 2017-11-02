@@ -69,7 +69,7 @@ Org specific directories.
                            (("~/Dropbox/org/task_archive.txt") :maxlevel . 5)
                            (nil :maxlevel . 5)))
 (setq org-archive-location "~/Dropbox/org/task_archive.txt::* %s")
-(setq org-ditaa-jar-path "/usr/local/Cellar/ditaa/0.9/libexec/ditaa0_9.jar")
+(setq org-ditaa-jar-path "/usr/local/Cellar/ditaa/0.10/libexec/ditaa0_10.jar")
 (setq org-plantuml-jar-path plantuml-jar-path)
 #+END_SRC
 
