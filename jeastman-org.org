@@ -5,40 +5,42 @@
 
 * What I Use Org For
 
-Just about everything.
+  Just about everything.
 
-Anything I write these days is written completely, or at least starts, in
-Org.
+  Anything I write these days is written completely, or at least starts, in
+  Org.
 
-I have recently started keeping day specific notes. Each day is represented
-by an individual Org file, referred to as a ~daypage~. The original
-mechanism I use for handling this is inspired by [[http://tomparslow.co.uk][Thomas Parslow's]] article [[http://almostobsolete.net/daypage.html][A
-day page for Org-Mode]].
+  I have recently started keeping day specific notes. Each day is
+  represented by an individual Org file, referred to as a ~daypage~. The
+  original mechanism I use for handling this is inspired by [[http://tomparslow.co.uk][Thomas
+  Parslow's]] article [[http://almostobsolete.net/daypage.html][A day page for Org-Mode]].
 
 * Configuration
-Inspired by the [[https://github.com/eschulte/emacs24-starter-kit][Emacs Starter Kit]], I set up my configuration file
-using Org-babel. My personal move to this literate style of configuration
-programming began with this file. My main configuration file loads this
-automatically by using =(org-babel-load-file "/path/to/file")=.
+
+  Inspired by the [[https://github.com/eschulte/emacs24-starter-kit][Emacs Starter Kit]], I set up my configuration file using
+  Org-babel. My personal move to this literate style of configuration
+  programming began with this file. My main configuration file loads this
+  automatically by using =(org-babel-load-file "/path/to/file")=.
 
 ** General settings
 
 *** Modules
-Org has a number of handy optional modules. The following list are the set
-of modules that I am currently experimenting with.
 
-#+BEGIN_SRC emacs-lisp
-  (setq org-modules '(org-annotate-file
-                      org-bbdb
-                      org-bibtex
-                      org-docview
-                      org-list
-                      org-info
-                      org-jsinfo
-                      org-man
-                      org-panel
-                      org-w3m))
-#+END_SRC
+    Org has a number of handy optional modules. The following list are the
+    set of modules that I am currently experimenting with.
+
+    #+BEGIN_SRC emacs-lisp
+      (setq org-modules '(org-annotate-file
+                          org-bbdb
+                          org-bibtex
+                          org-docview
+                          org-list
+                          org-info
+                          org-jsinfo
+                          org-man
+                          org-panel
+                          org-w3m))
+    #+END_SRC
 
 *** Org Files
 
@@ -52,201 +54,202 @@ of modules that I am currently experimenting with.
     Daypages have their own directory and the files are generated
     on-demand.
 
-#+BEGIN_SRC emacs-lisp
-  (setq daypage-path (concat org-directory "/days/"))
-  (setq diary-file (concat org-directory "/diary"))
-  (setq org-mobile-inbox-for-pull (concat org-directory "/flagged.org"))
-  (setq org-agenda-files (list (concat org-directory "/work.org")
-                               (concat org-directory "/tasks.org")
-                               (concat org-directory "/journal.org")
-                               (concat org-directory "/notes.org")
-                               (concat org-directory "/calendar.org")
-                               (expand-file-name daypage-path)))
-  (setq org-default-notes-file (concat org-directory "/notes.org"))
-  (setq org-annotate-file-storage-file (concat org-directory "/annotated.org"))
-  (setq org-agenda-include-diary nil)
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (setq daypage-path (concat org-directory "/days/"))
+      (setq diary-file (concat org-directory "/diary"))
+      (setq org-mobile-inbox-for-pull (concat org-directory "/flagged.org"))
+      (setq org-agenda-files (list (concat org-directory "/work.org")
+                                   (concat org-directory "/tasks.org")
+                                   (concat org-directory "/journal.org")
+                                   (concat org-directory "/notes.org")
+                                   (concat org-directory "/calendar.org")
+                                   (expand-file-name daypage-path)))
+      (setq org-default-notes-file (concat org-directory "/notes.org"))
+      (setq org-annotate-file-storage-file (concat org-directory "/annotated.org"))
+      (setq org-agenda-include-diary nil)
+    #+END_SRC
 
 ** Daypages
 
- The following functions are used for opening daypage buffers. This can be
- used to create day-specific items.
+   The following functions are used for opening daypage buffers. This can
+   be used to create day-specific items.
 
-#+BEGIN_SRC emacs-lisp
-(defun jme/find-daypage (&optional date)
-  "Go to the page for the specified date. If no date is specified, go to today's page."
-  (interactive (list
-                (org-read-date "" 'totime nil nil (current-time) "")))
-  (setq date (or date (current-time)))
-  (find-file
-   (expand-file-name
-    (concat daypage-path
-            (format-time-string "%Y%m%d" date) ".org")))
-  (when (eq 0 (buffer-size))
-    ; Insert a skeleton into the file
-    (jme/insert-yas-by-name "daily")
-;    (insert (concat "* <"
-;                    (format-time-string "%Y-%m-%d %a" date)
-;                    "> Notes\n\n"))
-    (beginning-of-buffer)
-    (next-line 2)))
+   #+BEGIN_SRC emacs-lisp
+     (defun jme/find-daypage (&optional date)
+       "Go to the page for the specified date. If no date is specified, go to today's page."
+       (interactive (list
+                     (org-read-date "" 'totime nil nil (current-time) "")))
+       (setq date (or date (current-time)))
+       (find-file
+        (expand-file-name
+         (concat daypage-path
+                 (format-time-string "%Y%m%d" date) ".org")))
+       (when (eq 0 (buffer-size))
+         ; Insert a skeleton into the file
+         (jme/insert-yas-by-name "daily")
+     ;    (insert (concat "* <"
+     ;                    (format-time-string "%Y-%m-%d %a" date)
+     ;                    "> Notes\n\n"))
+         (beginning-of-buffer)
+         (next-line 2)))
 
-(defun jme/todays-daypage ()
-  "Go straight to today's day page."
-  (interactive)
-  (jme/find-daypage))
-#+END_SRC
+     (defun jme/todays-daypage ()
+       "Go straight to today's day page."
+       (interactive)
+       (jme/find-daypage))
+   #+END_SRC
 
 ** Babel
 
-Ensure we have support for programming languages used in code blocks.
+   Ensure we have support for programming languages used in code blocks.
 
-#+BEGIN_SRC emacs-lisp
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((emacs-lisp . t)
-     (ditaa . t)
-     (dot . t)
-     (gnuplot . t)
-     (plantuml . t)
-     (python . t)
-     (js . t)
-     (lisp . t)
-     (shell . t)))
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (org-babel-do-load-languages
+      'org-babel-load-languages
+      '((emacs-lisp . t)
+        (ditaa . t)
+        (dot . t)
+        (gnuplot . t)
+        (plantuml . t)
+        (python . t)
+        (js . t)
+        (lisp . t)
+        (shell . t)))
+   #+END_SRC
 
 ** Look and Feel
 
-Use utf-8 bullets for nicer look.
+   Use utf-8 bullets for nicer look.
 
-#+BEGIN_SRC emacs-lisp
-(use-package org-bullets
-  :after org
-  :ensure t
-  :demand t
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (use-package org-bullets
+       :after org
+       :ensure t
+       :demand t
+       :config
+       (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+   #+END_SRC
 
-=org-sticky-header= shows off-screen Org heading at top of window.
+   =org-sticky-header= shows off-screen Org heading at top of window.
 
-#+BEGIN_SRC emacs-lisp
-(use-package org-sticky-header
-  :after org
-  :ensure t
-  :demand t
-  :config
-  (setq org-sticky-header-full-path 'full)
-  (add-hook 'org-mode-hook 'org-sticky-header-mode))
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (use-package org-sticky-header
+       :after org
+       :ensure t
+       :demand t
+       :config
+       (setq org-sticky-header-full-path 'full)
+       (add-hook 'org-mode-hook 'org-sticky-header-mode))
+   #+END_SRC
 
-Startup with content folded.
+   Startup with content folded.
 
-#+BEGIN_SRC emacs-lisp
-(setq org-startup-folded 'content)
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (setq org-startup-folded 'content)
+   #+END_SRC
 
-Use =ido=-style completion.
+   Use =ido=-style completion.
 
-#+BEGIN_SRC emacs-lisp
-(setq org-completion-use-ido t)
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (setq org-completion-use-ido t)
+   #+END_SRC
 
-The following ensures that I do not accidentally make edits to invisible
-areas. A value of ~show~ causes the point to become visible and actually do
-the requested edit.
+   The following ensures that I do not accidentally make edits to invisible
+   areas. A value of ~show~ causes the point to become visible and actually
+   do the requested edit.
 
-#+BEGIN_SRC emacs-lisp
-(setq org-catch-invisible-edits 'show)
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (setq org-catch-invisible-edits 'show)
+   #+END_SRC
 
 *** Code block fontification
 
-The following displays the contents of code blocks using the major-mode of
-the code.  It also changes the behavior of ~TAB~ to work as appropriate for
-the major-mode.  This allows for reading and writing code inside of Org to
-be closer to the experience in the major-mode itself.
+    The following displays the contents of code blocks using the major-mode
+    of the code.  It also changes the behavior of ~TAB~ to work as
+    appropriate for the major-mode.  This allows for reading and writing
+    code inside of Org to be closer to the experience in the major-mode
+    itself.
 
-#+BEGIN_SRC emacs-lisp
-(setq
- org-src-fontify-natively t
- org-src-tab-acts-natively t)
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (setq
+       org-src-fontify-natively t
+       org-src-tab-acts-natively t)
+    #+END_SRC
 
 *** Targets
 
-Targets include this file and any file contributing to the agenda - up to
-5 levels deep.
+    Targets include this file and any file contributing to the agenda - up
+    to 5 levels deep.
 
-#+BEGIN_SRC emacs-lisp
-(setq org-refile-targets '((org-agenda-files . (:maxlevel . 5))))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (setq org-refile-targets '((org-agenda-files . (:maxlevel . 5))))
+    #+END_SRC
 
-Targets start with the file name. This allows creating level 1 tasks.
+    Targets start with the file name. This allows creating level 1 tasks.
 
-#+BEGIN_SRC emacs-lisp
-(setq org-refile-use-outline-path (quote file))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (setq org-refile-use-outline-path (quote file))
+    #+END_SRC
 
-Targets complete in steps so we start with filename, TAB shows the next
-level of targets etc.
+    Targets complete in steps so we start with filename, TAB shows the next
+    level of targets etc.
 
-#+BEGIN_SRC emacs-lisp
-(setq org-outline-path-complete-in-steps t)
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (setq org-outline-path-complete-in-steps t)
+    #+END_SRC
 
-Allow refile to create parent tasks with confirmation.
+    Allow refile to create parent tasks with confirmation.
 
-#+BEGIN_SRC emacs-lisp
-(setq org-refile-allow-creating-parent-nodes (quote confirm))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (setq org-refile-allow-creating-parent-nodes (quote confirm))
+    #+END_SRC
 
 ** Task settings
 
 *** Timestamps
-Add a timestamp to the task when it moves to the DONE state.
 
-#+BEGIN_SRC emacs-lisp
-(setq org-log-done 'time
-      org-log-into-drawer "LOGBOOK")
-#+END_SRC
+    Add a timestamp to the task when it moves to the DONE state.
+
+    #+BEGIN_SRC emacs-lisp
+      (setq org-log-done 'time
+            org-log-into-drawer "LOGBOOK")
+    #+END_SRC
 
 *** Effort
 
-#+BEGIN_SRC emacs-lisp
-(setq org-global-properties
-      '(("Effort_ALL". "0 0:15 0:30 1:00 2:00 3:00 4:00")))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (setq org-global-properties
+            '(("Effort_ALL". "0 0:15 0:30 1:00 2:00 3:00 4:00")))
+    #+END_SRC
 
 *** Workflows
 
     Personal todo items are tracked with TODO, other tracked items are
     labeled with TASK. Inspired by [[http://juanreyero.com/article/emacs/org-teams.html][Org-mode tricks for team management]].
 
-#+BEGIN_SRC emacs-lisp
-(setq org-todo-keywords
-      '((sequence "TODO(t)" "STARTED(s)" "WAITING(w)" "STALLED(x)" "|" "DONE(d)" "CANCELLED(c)")
-        (sequence "TASK(f)" "|" "DONE(d)")
-        (sequence "MAYBE(m)" "|" "DONE(d)" "CANCELLED(c)")
-        (sequence "RISK(r)" "|" "MITIGATED(i)")))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (setq org-todo-keywords
+            '((sequence "TODO(t)" "STARTED(s)" "WAITING(w)" "STALLED(x)" "|" "DONE(d)" "CANCELLED(c)")
+              (sequence "TASK(f)" "|" "DONE(d)")
+              (sequence "MAYBE(m)" "|" "DONE(d)" "CANCELLED(c)")
+              (sequence "RISK(r)" "|" "MITIGATED(i)")))
+    #+END_SRC
 
-    Add some color to the different items to make them easier to
-    visualize.
+    Add some color to the different items to make them easier to visualize.
 
-#+BEGIN_SRC emacs-lisp
-(setq org-todo-keyword-faces
-      '(("TODO" . (:foreground "DarkOrange" :weight bold))
-        ("STARTED" . (:foreground "DarkOrange" :weight bold))
-        ("WAITING" . (:foreground "gold" :weight bold))
-        ("MAYBE" . (:foreground "spring green"))
-        ("DONE" . (:foreground "dark sea green"))
-        ("STALLED" . (:foreground "slate grey"))
-        ("CANCELLED" . (:foreground "slate grey"))
-        ("TASK" . (:foreground "DeepSkyBlue"))
-        ("RISK" . (:foreground "white" :background "orange red"))
-        ("MITIGATED" . (:foreground "white" :background "dark green"))))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (setq org-todo-keyword-faces
+            '(("TODO" . (:foreground "DarkOrange" :weight bold))
+              ("STARTED" . (:foreground "DarkOrange" :weight bold))
+              ("WAITING" . (:foreground "gold" :weight bold))
+              ("MAYBE" . (:foreground "spring green"))
+              ("DONE" . (:foreground "dark sea green"))
+              ("STALLED" . (:foreground "slate grey"))
+              ("CANCELLED" . (:foreground "slate grey"))
+              ("TASK" . (:foreground "DeepSkyBlue"))
+              ("RISK" . (:foreground "white" :background "orange red"))
+              ("MITIGATED" . (:foreground "white" :background "dark green"))))
+    #+END_SRC
 
 **** Projects
 
@@ -255,371 +258,373 @@ Add a timestamp to the task when it moves to the DONE state.
      unless they do. The =prj= tag should not be inheritable, otherwise its
      tasks will also appear as projects.
 
-#+BEGIN_SRC emacs-lisp
-(setq org-tags-exclude-from-inheritance '("prj"))
-#+END_SRC
+     #+BEGIN_SRC emacs-lisp
+       (setq org-tags-exclude-from-inheritance '("prj"))
+     #+END_SRC
 
 *** Templates
-#+BEGIN_SRC emacs-lisp
-  (setq org-capture-templates
-        '(("m" "Zimbra Task" entry (file+headline
-                                    (concat org-directory "/work.org") "General")
-           "* TODO %^{Brief Description} %^g\n  %?\n  Added: %U")
-          ("t" "Todo" entry (file+headline
-                             (concat org-directory "/tasks.org") "Tasks")
-           "* TODO %^{Brief Description} %^g\n  %?\n  Added: %U")
-          ("T" "Quick task" entry (file+headline
-                                   (concat org-directory "/tasks.org") "Tasks")
-           "* TASK %^{Task}"
-           :immediate-finish t)
-          ("j" "Journal entry" plain (file+datetree
-                                      (concat org-directory "/journal.org"))
-           "%K - %a\n%i\n%?\n"
-           :unnarrowed t)
-          ("J" "Journal entry with date" plain (file+datetree+prompt
-                                                (concat org-directory "/journal.org"))
-           "%K - %a\n%i\n%?\n"
-           :unnarrowed t)
-          ("n" "Notes" entry (file+datetree
-                                (concat org-directory "/notes.org") "Inbox")
-           "* %^{Description} %^g\n  %?\n  Added: %U")))
-#+END_SRC
+
+    #+BEGIN_SRC emacs-lisp
+      (setq org-capture-templates
+            '(("m" "Zimbra Task" entry (file+headline
+                                        (concat org-directory "/work.org") "General")
+               "* TODO %^{Brief Description} %^g\n  %?\n  Added: %U")
+              ("t" "Todo" entry (file+headline
+                                 (concat org-directory "/tasks.org") "Tasks")
+               "* TODO %^{Brief Description} %^g\n  %?\n  Added: %U")
+              ("T" "Quick task" entry (file+headline
+                                       (concat org-directory "/tasks.org") "Tasks")
+               "* TASK %^{Task}"
+               :immediate-finish t)
+              ("j" "Journal entry" plain (file+datetree
+                                          (concat org-directory "/journal.org"))
+               "%K - %a\n%i\n%?\n"
+               :unnarrowed t)
+              ("J" "Journal entry with date" plain (file+datetree+prompt
+                                                    (concat org-directory "/journal.org"))
+               "%K - %a\n%i\n%?\n"
+               :unnarrowed t)
+              ("n" "Notes" entry (file+datetree
+                                    (concat org-directory "/notes.org") "Inbox")
+               "* %^{Description} %^g\n  %?\n  Added: %U")))
+    #+END_SRC
 
 *** Archiving
-Archiving of completed tasks. see
-http://article.gmane.org/gmane.emacs.orgmode/3629.
 
-To set an org file up for archiving you need to add the following at the
-top of the file (replace archive.text with the archive file):
+    Archiving of completed tasks. see
+    http://article.gmane.org/gmane.emacs.orgmode/3629.
 
-=-*- mode: org; after-save-hook: (archive-done-tasks) -*-=
-=#+ARCHIVE: archive.txt::* %s archive=
+    To set an org file up for archiving you need to add the following at
+    the top of the file (replace archive.text with the archive file):
 
-#+BEGIN_SRC emacs-lisp
-(defvar jme/org-archive-expiry-days 7
-  "The number of days after which a completed task should be auto-archived.
-This can be 0 for immediate, or a floating point value.")
+    =-*- mode: org; after-save-hook: (archive-done-tasks) -*-=
+    =#+ARCHIVE: archive.txt::* %s archive=
 
-(defun jme/org-archive-done-tasks ()
-  (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    (let ((done-regexp
-           (concat "\\* \\(" (regexp-opt org-done-keywords) "\\) "))
-          (state-regexp
-           (concat "- State \"\\(" (regexp-opt org-done-keywords)
-                   "\\)\"\\s-*\\[\\([^]\n]+\\)\\]")))
-      (while (re-search-forward done-regexp nil t)
-        (let ((end (save-excursion
-                     (outline-next-heading)
-                     (point)))
-              begin)
-          (goto-char (line-beginning-position))
-          (setq begin (point))
-          (if (re-search-forward state-regexp end t)
-              (let* ((time-string (match-string 2))
-                     (when-closed (org-parse-time-string time-string)))
-                (if (>= (time-to-number-of-days
-                         (time-subtract (current-time)
-                                        (apply #'encode-time when-closed)))
-                        jme/org-archive-expiry-days)
-                    (org-archive-subtree)))
-            (goto-char end)))))
-    (save-buffer)))
+    #+BEGIN_SRC emacs-lisp
+      (defvar jme/org-archive-expiry-days 7
+        "The number of days after which a completed task should be auto-archived.
+      This can be 0 for immediate, or a floating point value.")
 
-(setq safe-local-variable-values (quote ((after-save-hook archive-done-tasks))))
-(defalias 'archive-done-tasks 'jme/org-archive-done-tasks)
-#+END_SRC
+      (defun jme/org-archive-done-tasks ()
+        (interactive)
+        (save-excursion
+          (goto-char (point-min))
+          (let ((done-regexp
+                 (concat "\\* \\(" (regexp-opt org-done-keywords) "\\) "))
+                (state-regexp
+                 (concat "- State \"\\(" (regexp-opt org-done-keywords)
+                         "\\)\"\\s-*\\[\\([^]\n]+\\)\\]")))
+            (while (re-search-forward done-regexp nil t)
+              (let ((end (save-excursion
+                           (outline-next-heading)
+                           (point)))
+                    begin)
+                (goto-char (line-beginning-position))
+                (setq begin (point))
+                (if (re-search-forward state-regexp end t)
+                    (let* ((time-string (match-string 2))
+                           (when-closed (org-parse-time-string time-string)))
+                      (if (>= (time-to-number-of-days
+                               (time-subtract (current-time)
+                                              (apply #'encode-time when-closed)))
+                              jme/org-archive-expiry-days)
+                          (org-archive-subtree)))
+                  (goto-char end)))))
+          (save-buffer)))
+
+      (setq safe-local-variable-values (quote ((after-save-hook archive-done-tasks))))
+      (defalias 'archive-done-tasks 'jme/org-archive-done-tasks)
+    #+END_SRC
 
 ** Agenda Settings
 
-Look ahead two days of my agenda at a time.
+   Look ahead two days of my agenda at a time.
 
-#+BEGIN_SRC emacs-lisp
-(setq org-agenda-span 2)
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (setq org-agenda-span 2)
+   #+END_SRC
 
-Set a relevant set of columns which includes effort.
+   Set a relevant set of columns which includes effort.
 
-#+BEGIN_SRC emacs-lisp
-(setq org-columns-default-format "%50ITEM %12SCHEDULED %TODO %3PRIORITY %Effort{:} %TAGS")
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (setq org-columns-default-format "%50ITEM %12SCHEDULED %TODO %3PRIORITY %Effort{:} %TAGS")
+   #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  (setq org-agenda-custom-commands
-        '(
-          ("h" "Work todos" tags-todo
-           "-personal-doat={.+}-dowith={.+}/!-TASK"
-           ((org-agenda-todo-ignore-scheduled t)))
-          ("H" "All work todos" tags-todo "-personal/!-TASK-MAYBE"
-           ((org-agenda-todo-ignore-scheduled nil)))
-          ("A" "Work todos with doat or dowith" tags-todo
-           "-personal+doat={.+}|dowith={.+}/!-TASK"
-           ((org-agenda-todo-ignore-scheduled nil)))
-          ("j" "TODO dowith and TASK with"
-           ((org-sec-with-view "TODO dowith")
-            (org-sec-where-view "TODO doat")
-            (org-sec-assigned-with-view "TASK with")
-            (org-sec-stuck-with-view "STUCK with")))
-          ("J" "Interactive TODO dowith and TASK with"
-           ((org-sec-who-view "TODO dowith")))
-          ("P" "Projects"
-           ((tags "prj")))
-          ("D" "Daily Action List"
-           (
-            (agenda "" ((org-agenda-ndays 1)
-                        (org-agenda-sorting-strategy
-                         (quote ((agenda time-up priority-down tag-up) )))
-                        (org-deadline-warning-days 0)
-                        ))
-            ))
-          ))
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (setq org-agenda-custom-commands
+           '(
+             ("h" "Work todos" tags-todo
+              "-personal-doat={.+}-dowith={.+}/!-TASK"
+              ((org-agenda-todo-ignore-scheduled t)))
+             ("H" "All work todos" tags-todo "-personal/!-TASK-MAYBE"
+              ((org-agenda-todo-ignore-scheduled nil)))
+             ("A" "Work todos with doat or dowith" tags-todo
+              "-personal+doat={.+}|dowith={.+}/!-TASK"
+              ((org-agenda-todo-ignore-scheduled nil)))
+             ("j" "TODO dowith and TASK with"
+              ((org-sec-with-view "TODO dowith")
+               (org-sec-where-view "TODO doat")
+               (org-sec-assigned-with-view "TASK with")
+               (org-sec-stuck-with-view "STUCK with")))
+             ("J" "Interactive TODO dowith and TASK with"
+              ((org-sec-who-view "TODO dowith")))
+             ("P" "Projects"
+              ((tags "prj")))
+             ("D" "Daily Action List"
+              (
+               (agenda "" ((org-agenda-ndays 1)
+                           (org-agenda-sorting-strategy
+                            (quote ((agenda time-up priority-down tag-up) )))
+                           (org-deadline-warning-days 0)
+                           ))
+               ))
+             ))
+   #+END_SRC
 
-A common problem with all-day and multi-day events in org agenda view is
-that they become separated from timed events and are placed below all =TODO=
-items. Likewise, additional fields such as =Location:= are orphaned from
-their parent events. The following hook will ensure that all events are
-correctly placed in the agenda:
+   A common problem with all-day and multi-day events in org agenda view is
+   that they become separated from timed events and are placed below all
+   =TODO= items. Likewise, additional fields such as =Location:= are
+   orphaned from their parent events. The following hook will ensure that
+   all events are correctly placed in the agenda:
 
-See http://orgmode.org/worg/org-contrib/org-mac-iCal.html
+   See http://orgmode.org/worg/org-contrib/org-mac-iCal.html
 
-#+BEGIN_SRC emacs-lisp
-(add-hook 'org-agenda-cleanup-fancy-diary-hook
-          (lambda ()
-            (goto-char (point-min))
-            (save-excursion
-              (while (re-search-forward "^[a-z]" nil t)
-                (goto-char (match-beginning 0))
-                (insert "0:00-24:00")))
-            (while (re-search-forward "^ [a-z]" nil t)
-              (goto-char (match-beginning 0))
-              (save-excursion
-                (re-search-backward "^[0-9]+:[0-9]+-[0-9]+:[0-9]+ " nil t))
-              (insert (match-string 0)))))
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (add-hook 'org-agenda-cleanup-fancy-diary-hook
+               (lambda ()
+                 (goto-char (point-min))
+                 (save-excursion
+                   (while (re-search-forward "^[a-z]" nil t)
+                     (goto-char (match-beginning 0))
+                     (insert "0:00-24:00")))
+                 (while (re-search-forward "^ [a-z]" nil t)
+                   (goto-char (match-beginning 0))
+                   (save-excursion
+                     (re-search-backward "^[0-9]+:[0-9]+-[0-9]+:[0-9]+ " nil t))
+                   (insert (match-string 0)))))
+   #+END_SRC
 
 *** Special Agenda Views
 
-#+BEGIN_SRC emacs-lisp
-(defvar org-sec-with "nobody"
-  "Value of the :with: peoperty when doing an org-sec-tag-entry.
-   Change it with org-sec-set-with, set to C-c ow")
+    #+BEGIN_SRC emacs-lisp
+      (defvar org-sec-with "nobody"
+        "Value of the :with: peoperty when doing an org-sec-tag-entry.
+         Change it with org-sec-set-with, set to C-c ow")
 
-(defvar org-sec-where ""
-  "Value of the :at: property when doing an
-   org-sec-tag-entry. Change it with org-sec-set-with,
-   set to C-c oW")
+      (defvar org-sec-where ""
+        "Value of the :at: property when doing an
+         org-sec-tag-entry. Change it with org-sec-set-with,
+         set to C-c oW")
 
-(defvar org-sec-with-history '()
-  "History list of :where: properties")
+      (defvar org-sec-with-history '()
+        "History list of :where: properties")
 
-(defun org-sec-set-with ()
- "Changes the value of the org-sec-with variable for use
-  in the next call of org-sec-tag-entry."
- (interactive)
- (setq org-sec-with (read-string "With: " nil
-                                 'org-sec-with-history "")))
+      (defun org-sec-set-with ()
+       "Changes the value of the org-sec-with variable for use
+        in the next call of org-sec-tag-entry."
+       (interactive)
+       (setq org-sec-with (read-string "With: " nil
+                                       'org-sec-with-history "")))
 
-(bind-key "C-c ow" 'org-sec-set-with)
+      (bind-key "C-c ow" 'org-sec-set-with)
 
-(defun org-sec-set-where ()
-  "Changes the value of the org-sec-where variable for use
-   in the next call of org-sec-tag-entry."
-  (interactive)
-  (setq org-sec-where
-        (read-string "Where: " nil
-                     'org-sec-where-history "")))
+      (defun org-sec-set-where ()
+        "Changes the value of the org-sec-where variable for use
+         in the next call of org-sec-tag-entry."
+        (interactive)
+        (setq org-sec-where
+              (read-string "Where: " nil
+                           'org-sec-where-history "")))
 
-(bind-key "C-c oW" 'org-sec-set-where)
+      (bind-key "C-c oW" 'org-sec-set-where)
 
-(defun org-sec-set-dowith ()
-  "Sets the value of the dowith property."
-  (interactive)
-  (let ((do-with
-         (read-string "Do with: "
-                      nil 'org-sec-dowith-history "")))
-    (unless (string= do-with "")
-      (org-entry-put nil "dowith" do-with))))
+      (defun org-sec-set-dowith ()
+        "Sets the value of the dowith property."
+        (interactive)
+        (let ((do-with
+               (read-string "Do with: "
+                            nil 'org-sec-dowith-history "")))
+          (unless (string= do-with "")
+            (org-entry-put nil "dowith" do-with))))
 
-(bind-key "C-c od" 'org-sec-set-dowith)
+      (bind-key "C-c od" 'org-sec-set-dowith)
 
-(defun org-sec-set-doat ()
-  "Sets the value of the doat property."
-  (interactive)
-  (let ((do-at (read-string "Do at: "
-                            nil 'org-sec-doat-history "")))
-    (unless (string= do-at "")
-      (org-entry-put nul "doat" do-at))))
+      (defun org-sec-set-doat ()
+        "Sets the value of the doat property."
+        (interactive)
+        (let ((do-at (read-string "Do at: "
+                                  nil 'org-sec-doat-history "")))
+          (unless (string= do-at "")
+            (org-entry-put nul "doat" do-at))))
 
-(bind-key "C-c oD" 'org-sec-set-doat)
+      (bind-key "C-c oD" 'org-sec-set-doat)
 
-(defun org-sec-tag-entry ()
-  "Adds a :with: property with the value of org-sec-with if
-   defined, an :at: property with the value of org-sec-where
-   if defined, and an :on: property with the current time."
-   (interactive)
-   (save-excursion
-     (org-entry-put nil "on" (format-time-string
-                              (org-time-stamp-format 'long)
-                              (current-time)))
-     (unless (string= org-sec-where "")
-       (org-entry-put nil "at" org-sec-where))
-     (unless (string= org-sec-with "nobody")
-       (org-entry-put nil "with" org-sec-with))))
+      (defun org-sec-tag-entry ()
+        "Adds a :with: property with the value of org-sec-with if
+         defined, an :at: property with the value of org-sec-where
+         if defined, and an :on: property with the current time."
+         (interactive)
+         (save-excursion
+           (org-entry-put nil "on" (format-time-string
+                                    (org-time-stamp-format 'long)
+                                    (current-time)))
+           (unless (string= org-sec-where "")
+             (org-entry-put nil "at" org-sec-where))
+           (unless (string= org-sec-with "nobody")
+             (org-entry-put nil "with" org-sec-with))))
 
-(bind-key "C-c oj" 'org-sec-tag-entry)
+      (bind-key "C-c oj" 'org-sec-tag-entry)
 
-(defun join (lst sep &optional pre post)
-  (mapconcat (function (lambda (x)
-                         (concat pre x post)))
-             lst sep))
+      (defun join (lst sep &optional pre post)
+        (mapconcat (function (lambda (x)
+                               (concat pre x post)))
+                   lst sep))
 
-(defun org-sec-with-view (par &optional who)
-  "Select tasks marked as dowith=who, where who
-   defaults to the value of org-sec-with."
-  (org-tags-view '(4) (join (split-string (if who
-                                              who
-                                            org-sec-with))
-                            "|" "dowith=\"" "\"")))
+      (defun org-sec-with-view (par &optional who)
+        "Select tasks marked as dowith=who, where who
+         defaults to the value of org-sec-with."
+        (org-tags-view '(4) (join (split-string (if who
+                                                    who
+                                                  org-sec-with))
+                                  "|" "dowith=\"" "\"")))
 
-(defun org-sec-where-view (par)
-  "Select tasks marked as doat=org-sec-where."
-  (org-tags-view '(4) (concat "doat={" org-sec-where "}")))
+      (defun org-sec-where-view (par)
+        "Select tasks marked as doat=org-sec-where."
+        (org-tags-view '(4) (concat "doat={" org-sec-where "}")))
 
-(defun org-sec-assigned-with-view (par &optional who)
-  "Select tasks assigned to who, by default org-sec-with."
-  (org-tags-view '(4)
-                 (concat (join (split-string (if who
-                                                 who
-                                               org-sec-with))
-                               "|")
-                         "/TASK")))
+      (defun org-sec-assigned-with-view (par &optional who)
+        "Select tasks assigned to who, by default org-sec-with."
+        (org-tags-view '(4)
+                       (concat (join (split-string (if who
+                                                       who
+                                                     org-sec-with))
+                                     "|")
+                               "/TASK")))
 
-(defun org-sec-stuck-with-view (par &optional who)
-  "Select stuck projects assigned to who, by default
-   org-sec-with."
-  (let ((org-stuck-projects
-         `(,(concat "+prj+"
-                    (join (split-string (if who
-                                            who
-                                          org-sec-with)) "|")
-                    "/-MAYBE-DONE")
-           ("TODO" "TASK") ())))
-    (org-agenda-list-stuck-projects)))
+      (defun org-sec-stuck-with-view (par &optional who)
+        "Select stuck projects assigned to who, by default
+         org-sec-with."
+        (let ((org-stuck-projects
+               `(,(concat "+prj+"
+                          (join (split-string (if who
+                                                  who
+                                                org-sec-with)) "|")
+                          "/-MAYBE-DONE")
+                 ("TODO" "TASK") ())))
+          (org-agenda-list-stuck-projects)))
 
-(defun org-sec-who-view (par)
-  "Builds agenda for a given user.  Queried. "
-  (let ((who (read-string "Build todo for user/tag: "
-                          "" "" "")))
-    (org-sec-with-view "TODO dowith" who)
-    (org-sec-assigned-with-view "TASK with" who)
-    (org-sec-stuck-with-view "STUCK with" who)))
-#+END_SRC
+      (defun org-sec-who-view (par)
+        "Builds agenda for a given user.  Queried. "
+        (let ((who (read-string "Build todo for user/tag: "
+                                "" "" "")))
+          (org-sec-with-view "TODO dowith" who)
+          (org-sec-assigned-with-view "TASK with" who)
+          (org-sec-stuck-with-view "STUCK with" who)))
+    #+END_SRC
 
 *** Allow quickly marking items as done in the agenda view. (From [[http://pages.sachachua.com/.emacs.d/Sacha.html#unnumbered-82][here]]).
 
-#+BEGIN_SRC emacs-lisp
-(defun jme/org-agenda-done (&optional arg)
-  "Mark current TODO as done.
-This changes the line at point, all other lines in the agenda referring to
-the same tree node, and the headline of the tree node in the org file."
-  (interactive "P")
-  (org-agenda-todo "DONE"))
-;(bind-key "x" 'jme/org-agenda-done org-agenda-mode-map)
+    #+BEGIN_SRC emacs-lisp
+      (defun jme/org-agenda-done (&optional arg)
+        "Mark current TODO as done.
+      This changes the line at point, all other lines in the agenda referring to
+      the same tree node, and the headline of the tree node in the org file."
+        (interactive "P")
+        (org-agenda-todo "DONE"))
+      ;(bind-key "x" 'jme/org-agenda-done org-agenda-mode-map)
 
-(defun jme/org-agenda-done-and-add-followup ()
-  "Mark the current TODO as done and add another task after it.
-Creates it at the same level as the previous task."
-  (interactive)
-  (org-agenda-todo "DONE")
-  (org-agenda-switch-to)
-  (org-capture 0 "t"))
-;(bind-key "X" 'jme/org-agenda-done-and-add-followup org-agenda-mode-map)
-#+END_SRC
+      (defun jme/org-agenda-done-and-add-followup ()
+        "Mark the current TODO as done and add another task after it.
+      Creates it at the same level as the previous task."
+        (interactive)
+        (org-agenda-todo "DONE")
+        (org-agenda-switch-to)
+        (org-capture 0 "t"))
+      ;(bind-key "X" 'jme/org-agenda-done-and-add-followup org-agenda-mode-map)
+    #+END_SRC
 
 ** LaTeX
 
-Use smart quotes when exporting.
+   Use smart quotes when exporting.
 
-#+BEGIN_SRC emacs-lisp
-(setq org-export-with-smart-quotes t)
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (setq org-export-with-smart-quotes t)
+   #+END_SRC
 
 *** Source code listings
 
-Use the ~minted~ package for source code fontification and coloring.
+    Use the ~minted~ package for source code fontification and coloring.
 
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'org-latex-packages-alist '("" "minted"))
-(setq org-latex-listings 'minted)
-(setq org-latex-minted-options
-   '(("frame" "lines")
-     ("fontsize" "\\scriptsize")))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (add-to-list 'org-latex-packages-alist '("" "minted"))
+      (setq org-latex-listings 'minted)
+      (setq org-latex-minted-options
+         '(("frame" "lines")
+           ("fontsize" "\\scriptsize")))
+    #+END_SRC
 
-We need to also ensure that the PDF conversion process adds the
-=-shell-escape= option to pdflatex.
+    We need to also ensure that the PDF conversion process adds the
+    =-shell-escape= option to pdflatex.
 
-#+BEGIN_SRC emacs-lisp
-(setq org-latex-pdf-process
-   '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-     "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-     "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (setq org-latex-pdf-process
+         '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+           "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+           "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+    #+END_SRC
 
-Add custom document classes.
+    Add custom document classes.
 
-#+BEGIN_SRC emacs-lisp
-(require 'ox-latex)
-(add-to-list 'org-latex-classes
-      '("mezeoorgdoc" "\\documentclass[10pt,oneside]{mezeoorgdoc}"
-        ("\\chapter{%s}" . "\\chapter*{%s}")
-        ("\\section{%s}" . "\\section*{%s}")
-        ("\\subsection{%s}" . "\\subsection*{%s}")
-        ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-        ("\\paragraph{%s}" . "\\paragraph*{%s}")
-        ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
-(add-to-list 'org-latex-classes
-      '("jmeorgdoc" "\\documentclass[10pt,oneside]{jmeorgdoc}"
-        ("\\chapter{%s}" . "\\chapter*{%s}")
-        ("\\section{%s}" . "\\section*{%s}")
-        ("\\subsection{%s}" . "\\subsection*{%s}")
-        ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-        ("\\paragraph{%s}" . "\\paragraph*{%s}")
-        ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
-(add-to-list 'org-latex-classes
-      '("jmeorgarticle" "\\documentclass[10pt,oneside,article]{jmeorgdoc}"
-        ("\\section{%s}" . "\\section*{%s}")
-        ("\\subsection{%s}" . "\\subsection*{%s}")
-        ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-        ("\\paragraph{%s}" . "\\paragraph*{%s}")
-        ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
-(add-to-list 'org-latex-classes
-       '("synacororgarticle" "\\documentclass[10pt,oneside,article]{synacororgarticle}"
-        ("\\section{%s}" . "\\section*{%s}")
-        ("\\subsection{%s}" . "\\subsection*{%s}")
-        ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-        ("\\paragraph{%s}" . "\\paragraph*{%s}")
-        ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (require 'ox-latex)
+      (add-to-list 'org-latex-classes
+            '("mezeoorgdoc" "\\documentclass[10pt,oneside]{mezeoorgdoc}"
+              ("\\chapter{%s}" . "\\chapter*{%s}")
+              ("\\section{%s}" . "\\section*{%s}")
+              ("\\subsection{%s}" . "\\subsection*{%s}")
+              ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+              ("\\paragraph{%s}" . "\\paragraph*{%s}")
+              ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
+      (add-to-list 'org-latex-classes
+            '("jmeorgdoc" "\\documentclass[10pt,oneside]{jmeorgdoc}"
+              ("\\chapter{%s}" . "\\chapter*{%s}")
+              ("\\section{%s}" . "\\section*{%s}")
+              ("\\subsection{%s}" . "\\subsection*{%s}")
+              ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+              ("\\paragraph{%s}" . "\\paragraph*{%s}")
+              ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
+      (add-to-list 'org-latex-classes
+            '("jmeorgarticle" "\\documentclass[10pt,oneside,article]{jmeorgdoc}"
+              ("\\section{%s}" . "\\section*{%s}")
+              ("\\subsection{%s}" . "\\subsection*{%s}")
+              ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+              ("\\paragraph{%s}" . "\\paragraph*{%s}")
+              ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
+      (add-to-list 'org-latex-classes
+             '("synacororgarticle" "\\documentclass[10pt,oneside,article]{synacororgarticle}"
+              ("\\section{%s}" . "\\section*{%s}")
+              ("\\subsection{%s}" . "\\subsection*{%s}")
+              ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+              ("\\paragraph{%s}" . "\\paragraph*{%s}")
+              ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
+    #+END_SRC
 
 ** Key bindings
 
-Guide setup
+   Guide setup
 
-#+BEGIN_SRC emacs-lisp
-  (defun guide-key/jme-hook-function-for-org-mode ()
-    (guide-key/add-local-guide-key-sequence "C-c")
-    (guide-key/add-local-guide-key-sequence "C-c C-x")
-    (guide-key/add-local-highlight-command-regexp "org-"))
-  (add-hook 'org-mode-hook 'guide-key/jme-hook-function-for-org-mode)
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (defun guide-key/jme-hook-function-for-org-mode ()
+       (guide-key/add-local-guide-key-sequence "C-c")
+       (guide-key/add-local-guide-key-sequence "C-c C-x")
+       (guide-key/add-local-highlight-command-regexp "org-"))
+     (add-hook 'org-mode-hook 'guide-key/jme-hook-function-for-org-mode)
+   #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  (bind-key "C-c l" 'org-store-link)
-  (bind-key "C-c L" 'org-insert-link-global)
-  (bind-key "C-c a" 'org-agenda)
-  (bind-key "C-c c" 'org-capture)
-  (bind-key "C-c b" 'org-iswitchb)
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (bind-key "C-c l" 'org-store-link)
+     (bind-key "C-c L" 'org-insert-link-global)
+     (bind-key "C-c a" 'org-agenda)
+     (bind-key "C-c c" 'org-capture)
+     (bind-key "C-c b" 'org-iswitchb)
+   #+END_SRC
