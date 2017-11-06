@@ -24,35 +24,13 @@
 
 ** Applications
 
-*** CoffeeScript
-
-    Set the coffeescript path.
-
-    #+BEGIN_SRC emacs-lisp
-      (setq coffee-command "/usr/local/share/npm/bin/coffee")
-    #+END_SRC
-
-*** Erlang
-
-    Set up Erlang paths.
-
-    #+BEGIN_SRC emacs-lisp
-      (add-to-list 'load-path "/usr/local/Cellar/erlang/R16B/lib/erlang/lib/tools-2.6.10/emacs")
-      (setq erlang-root-dir "/usr/local/Cellar/erlang/R16B")
-      (setq erlang-man-dirs
-        '(("Man - Commands" "share/man/man1" t)
-          ("Man - Modules" "share/man/man3" t)
-          ("Man - Files" "share/man/man4" t)
-          ("Man - Applications" "share/man/man6" t)))
-    #+END_SRC
-
 *** Plantuml
 
     Jar file required for plantuml.
     Also see this [[https://gist.github.com/rpl/547521][gist]].
 
     #+BEGIN_SRC emacs-lisp
-      (setq plantuml-jar-path "/usr/local/Cellar/plantuml/8024/plantuml.8024.jar")
+      (setq plantuml-jar-path "/usr/local/Cellar/plantuml/1.2017.18/libexec/plantuml.jar")
     #+END_SRC
 
 *** Org
@@ -60,15 +38,14 @@
     Org specific directories.
 
     #+BEGIN_SRC emacs-lisp
-      (setq org-directory "~/Dropbox/org")
-      (setq org-mobile-directory "~/Dropbox/Apps/MobileOrg")
-      (setq my-notes "~/Dropbox/org/notes")
-      (setq org-refile-targets '((org-agenda-files :maxlevel . 5)
-                                 (("~/Dropbox/org/task_archive.txt") :maxlevel . 5)
-                                 (nil :maxlevel . 5)))
-      (setq org-archive-location "~/Dropbox/org/task_archive.txt::* %s")
-      (setq org-ditaa-jar-path "/usr/local/Cellar/ditaa/0.10/libexec/ditaa0_10.jar")
-      (setq org-plantuml-jar-path plantuml-jar-path)
+      (setq my-notes "~/Documents/org/notes")
+      (custom-set-variables '(org-directory "~/Documents/org")
+                            '(org-refile-targets '((org-agenda-files :maxlevel . 5)
+                                                   (("~/Documents/org/task_archive.txt") :maxlevel . 5)
+                                                   (nil :maxlevel . 5)))
+                            '(org-archive-location "~/Documents/org/task_archive.txt::* %s")
+                            '(org-ditaa-jar-path "/usr/local/Cellar/ditaa/0.10/libexec/ditaa0_10.jar")
+                            '(org-plantuml-jar-path plantuml-jar-path))
     #+END_SRC
 
 * Machine Specific

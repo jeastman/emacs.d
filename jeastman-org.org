@@ -26,16 +26,41 @@
 
 *** Modules
 
-    Org has a number of handy optional modules. The following list are the
-    set of modules that I am currently experimenting with.
+    Org has a number of handy optional modules. The following table lists
+    the org modules which I have looked into at some point in time. This
+    table serves as a reference for their functionality.
+
+    | Name              | Description                                                        |
+    |-------------------+--------------------------------------------------------------------|
+    | org-annotate-file | Provides a means to annotate arbitraty files in a central location |
+    | org-bbdb          | Allows linking to BBDB entries from within org                     |
+    | org-bibtex        | Allows links to database entries in BibTeX files                   |
+    | org-eshell        | Allows linking to an eshell and executing a command                |
+    | org-eww           | Allows creating a link to URL of an eww buffer                     |
+    | org-feed          | Allows entries to be created and changed by items in an RSS feed   |
+    | org-git-link      | Allows linking to files in git repository                          |
+    | org-panel         | A kind of control panel for org - facilitates quick navigation     |
+
+    The default set of modules (as of 24.4) are:
+
+    - org-w3m
+    - org-bbdb
+    - org-bibtex
+    - org-docview
+    - org-gnus
+    - org-info
+    - org-irc
+    - org-mhe
+    - org-rmail
+
+    The following list are the set of modules that I am currently
+    experimenting with.
 
     #+BEGIN_SRC emacs-lisp
       (setq org-modules '(org-annotate-file
-                          org-bbdb
                           org-bibtex
                           org-docview
                           org-list
-                          org-info
                           org-jsinfo
                           org-man
                           org-panel

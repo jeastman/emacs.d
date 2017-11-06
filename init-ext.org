@@ -34,14 +34,55 @@
     ;;;
   #+END_SRC
 
+* Early loading
+
+  These items need to be setup early in the Emacs loading process.
+
+** Prefer newer
+
+   In an effort to reduce the risk of loading outdated byte code files, set
+   =load-prefer-newer= to =t=. Starting with Emacs version 24.5,
+   =load-prefer-newer= can prevent outdated byte code files from being
+   loaded. However, there is still a possibility that a source file would
+   not be re-compiled. =auto-compile= works to fill this gap.
+
+   #+BEGIN_SRC emacs-lisp
+     (setq load-prefer-newer t)
+   #+END_SRC
+
+** Auto compilation
+
+   Ensure we are always using the latest code. =auto-compile= ensures that
+   source files are recompiled if newer than their compiled form.
+
+  #+BEGIN_SRC emacs-lisp
+    (use-package auto-compile
+      :demand t
+      :ensure t
+      :config
+      (progn
+        (auto-compile-on-load-mode)
+        (auto-compile-on-save-mode)))
+  #+END_SRC
+
 * General Configuration
 ** Exec path
 
-   Ensure that =/usr/local/bin= is in the exec path.
+   Pull the exec path from our shell, this ensures all of the binaries we
+   expect are available to us.
 
    #+BEGIN_SRC emacs-lisp
-     (when (not (member "/usr/local/bin" exec-path))
-       (add-to-list 'exec-path "/usr/local/bin"))
+     (use-package exec-path-from-shell
+       :if (memq window-system '(mac ns))
+       :ensure t
+       :config
+       (progn
+         (when (string-match-p "/zsh$" (getenv "SHELL"))
+           ;; use an non-interactive login shell to ensure
+           ;; zsh path is loaded properly from .zprofile
+           ;; which only loads with login shell.
+           (setq exec-path-from-shell-arguments '("-l")))
+         (exec-path-from-shell-initialize)))
    #+END_SRC
 
 ** Library Paths
@@ -110,6 +151,8 @@
 
     | Variable         | Purpose                                                                                                   |
     |------------------+-----------------------------------------------------------------------------------------------------------|
+    | =meta-config=    | Location of no-littering's etc directory                                                                  |
+    | =meta-data=      | Location of no-littering's var directory                                                                  |
     | =meta-saveplace= | Name of the file that records the =save-place-alist=, which stores the location of point in visited files |
     | =meta-backup=    | Location for backup files                                                                                 |
     | =meta-bookmarks= | Bookmarks file.                                                                                           |
@@ -120,7 +163,11 @@
     | =meta-tramp=     | File used for =tramp= persistence                                                                         |
 
     #+BEGIN_SRC emacs-lisp
-      (defvar meta-saveplace (concat metafiles-dir "/saveplace")
+      (defvar meta-config (concat metafiles-dir "/etc/")
+        "Location of etc directory for no-littering.")
+      (defvar meta-data (concat metafiles-dir "/var/")
+        "Location of var directory for no-littering.")
+      (defvar meta-saveplace (concat metafiles-dir "/places")
         "Name of the file that records save-place-alist.")
       (defvar meta-bookmarks (concat metafiles-dir "/bookmarks")
         "Location for bookmarks file.")
@@ -138,42 +185,16 @@
         "Directory for url files.")
     #+END_SRC
 
-*** Non-packaged packages
-
-    I used to use several packages that did not exist in package
-    archives. In order to handle loading these, I added the 3rd party
-    libraries in the =vendor= directory. I no longer do this, but have kept
-    the logic for reference, though it is no longer tangled to the
-    generated file.
-
-    #+BEGIN_SRC emacs-lisp :tangle no
-      (defvar vendor-dir (concat user-emacs-directory "vendor")
-        "3rd party library directory for items not managed by Cask.")
-      (unless (file-exists-p vendor-dir)
-        (make-directory vendor-dir))
-      (add-to-list 'load-path vendor-dir)
-      (let ((default-directory vendor-dir))
-           (normal-top-level-add-subdirs-to-load-path))
-   #+END_SRC
-
-    Make sure we are not using stale files. The =auto-compile= package
-    helps ensure the latest version of source files are compiled.
-
-    #+BEGIN_SRC emacs-lisp :tangle no
-      (use-package auto-compile
-        :ensure t
-        :config (auto-compile-on-load-mode))
-      (setq load-prefer-newer t)
-    #+END_SRC
-
-    I leverage the =bind-key= package to do all of my key-binding. I need
-    to =require= it in early to handle all of my mode-specific key
-    bindings. Not sure this is technically required to be loaded anymore
-    since it is a dependancy of =use-package=, but it doesn't hurt.
+    Having set all of the known paths, we use the =no-littering= package to
+    attempt to catch the rest.
 
     #+BEGIN_SRC emacs-lisp
-      (use-package bind-key
-        :ensure t)
+      (use-package no-littering
+        :ensure t
+        :demand t
+        :init
+        (setq no-littering-etc-directory meta-config
+              no-littering-var-directory meta-data))
     #+END_SRC
 
 *** System and user specific configuration
@@ -196,13 +217,13 @@
      populated from configuration.
 
      #+BEGIN_SRC emacs-lisp
-       (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+       (custom-set-variables '(custom-file (expand-file-name "custom.el" user-emacs-directory)))
      #+END_SRC
 
 **** Basic loading function
 
      #+BEGIN_SRC emacs-lisp
-       (defun jme/load (directory base)
+       (defun jme:load (directory base)
          "Look for files located in DIRECTORY whose base name is BASE.
 
        Check the base name against several extensions.  If a file with
@@ -224,7 +245,7 @@
      file.
 
      #+BEGIN_SRC emacs-lisp
-       (jme/load user-emacs-directory ".private")
+       (jme:load user-emacs-directory ".private")
      #+END_SRC
 
 **** OS-specific settings
@@ -232,9 +253,9 @@
      Settings specific to machine type are kept in their own settings file.
 
      #+BEGIN_SRC emacs-lisp
-       (let* ((system-name (symbol-name system-type))
-              (base-name (replace-regexp-in-string "/" "-" system-name)))
-         (jme/load user-emacs-directory base-name))
+       (let* ((system-type-name (symbol-name system-type))
+              (base-name (replace-regexp-in-string "/" "-" system-type-name)))
+         (jme:load user-emacs-directory base-name))
      #+END_SRC
 
 **** Hostname-specific settings
@@ -244,13 +265,13 @@
 
      #+BEGIN_SRC emacs-lisp
        (let ((host-name-base (car (split-string (system-name) "\\."))))
-         (jme/load user-emacs-directory host-name-base))
+         (jme:load user-emacs-directory host-name-base))
      #+END_SRC
 
 **** User-specific settings
 
      #+BEGIN_SRC emacs-lisp
-       (jme/load user-emacs-directory user-login-name)
+       (jme:load user-emacs-directory user-login-name)
      #+END_SRC
 
 **** Custom configuration
@@ -294,7 +315,7 @@
     This function resets the window to its minimal position.
 
     #+BEGIN_SRC emacs-lisp
-      (defun jme/emacs-min ()
+      (defun jme:emacs-min ()
       "Reset frame size to minumum."
         (interactive)
         (set-frame-parameter (selected-frame) 'fullscreen nil)
@@ -310,7 +331,7 @@
     maximum position.
 
     #+BEGIN_SRC emacs-lisp
-      (defun jme/emacs-max ()
+      (defun jme:emacs-max ()
       "Reset frame size to maximum."
         (interactive)
         (if t
@@ -336,12 +357,12 @@
     One last function to give me the ability to toggle between the two.
 
     #+BEGIN_SRC emacs-lisp
-      (defun jme/emacs-toggle-size ()
+      (defun jme:emacs-toggle-size ()
       "Toggle between minimum and maximum size of frame."
         (interactive)
         (if (> (cdr (assq 'width (frame-parameters))) 100)
-            (jme/emacs-min)
-          (jme/emacs-max)))
+            (jme:emacs-min)
+          (jme:emacs-max)))
     #+END_SRC
 
     I start off with Emacs in its minimal state when starting up. Since
@@ -351,7 +372,7 @@
 
     #+BEGIN_SRC emacs-lisp
       (if window-system
-          (add-hook 'after-init-hook 'jme/emacs-min))
+          (add-hook 'after-init-hook 'jme:emacs-min))
     #+END_SRC
 
 *** Coding system
@@ -369,7 +390,7 @@
       (set-keyboard-coding-system 'utf-8)
       (prefer-coding-system 'utf-8)
       (when (display-graphic-p)
-        (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
+        (custom-set-variables '(x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))))
     #+END_SRC
 
 *** Interface settings
@@ -378,7 +399,7 @@
     instead of beeps. Who likes beeps anyway?
 
     #+BEGIN_SRC emacs-lisp
-      (setq visible-bell t)
+      (custom-set-variables '(visible-bell t))
     #+END_SRC
 
     Make sure I can see what it is that I am typing. This setting is the
@@ -386,20 +407,20 @@
     find the default of 1 second a bit slow.
 
     #+BEGIN_SRC emacs-lisp
-      (setq echo-keystrokes 0.1)
+      (custom-set-variables '(echo-keystrokes 0.1))
     #+END_SRC
 
     I am not a big fan of overloading the arrow keys. Plus they are just too
     far away from my fingers to be useful. Don't use the shift+arrows for mark.
 
     #+BEGIN_SRC emacs-lisp
-      (setq shift-select-mode nil)
+      (custom-set-variables '(shift-select-mode nil))
     #+END_SRC
 
     Use point instead of click with mouse yank.
 
     #+BEGIN_SRC emacs-lisp
-      (setq mouse-yank-at-point t)
+      (custom-set-variables '(mouse-yank-at-point t))
     #+END_SRC
 
     While I no longer have a machine with a mouse connected (only trackpads
@@ -409,29 +430,32 @@
     acceleration and scroll the window under the mouse.
 
     #+BEGIN_SRC emacs-lisp
-      (setq scroll-step 1)
-      (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ; one line at a time
-      (setq mouse-wheel-progressive-speed nil) ; don't accelerate scrolling
-      (setq mouse-wheel-follow-mouse 't) ; scroll window under mouse
+      (custom-set-variables '(scroll-step 1)
+                            '(mouse-wheel-scroll-amount '(1 ((shift) . 1))) ; one line at a time
+                            '(mouse-wheel-progressive-speed nil)            ; don't accelerate scrolling
+                            '(mouse-wheel-follow-mouse 't))                 ; scroll window under mouse
     #+END_SRC
 
-    Truncate lines in windows narrower than the frame.
+    Truncate lines in windows narrower than the frame. Providing an integer
+    here specifies to truncate lines in each window narrower thant the full
+    frame width, provided the total window width in column units is less
+    than that integer; otherwise respect the value of =truncate-lines=.
 
     #+BEGIN_SRC emacs-lisp
-      (setq truncate-partial-width-windows t)
+      (custom-set-variables '(truncate-partial-width-windows 50))
     #+END_SRC
 
     Set the default tab stop.
 
     #+BEGIN_SRC emacs-lisp
-      (setq-default tab-width 4)
+      (custom-set-variables '(tab-width 4))
     #+END_SRC
 
     Never put tabs in files, use spaces instead. If, for some reason, a real
     tab is needed, use =C-q C-i= to insert one.
 
     #+BEGIN_SRC emacs-lisp
-      (setq-default indent-tabs-mode nil)
+      (custom-set-variables '(indent-tabs-mode nil))
     #+END_SRC
 
     I want to always go to the next indent level when hitting return.
@@ -443,20 +467,19 @@
     Add newlines to the end of the file if I naviagate past it.
 
     #+BEGIN_SRC emacs-lisp
-      (setq next-line-add-newlines t)
+      (custom-set-variables '(next-line-add-newlines t))
     #+END_SRC
 
     Set the column that triggers fill
 
     #+BEGIN_SRC emacs-lisp
-      (setq-default fill-column 75)
+      (custom-set-variables '(fill-column 75))
     #+END_SRC
 
     Turn on auto fill for text files.
 
     #+BEGIN_SRC emacs-lisp
       (add-hook 'text-mode-hook 'turn-on-auto-fill)
-      (diminish 'auto-fill-function)
     #+END_SRC
 
     Allow narrowing.
@@ -498,25 +521,23 @@
     Don't show the startup message.
 
     #+BEGIN_SRC emacs-lisp
-      (setq inhibit-startup-message t
-            inhibit-startup-echo-area-message t)
+      (custom-set-variables '(inhibit-startup-message t)
+                            '(inhibit-startup-echo-area-message (user-login-name)))
     #+END_SRC
 
     Visually indicate empty lines after the buffer end. This is shown as a
     fringe bitmap in the left edge.
 
     #+BEGIN_SRC emacs-lisp
-      (set-default 'indicate-empty-lines t)
+      (custom-set-variables '(indicate-empty-lines t))
     #+END_SRC
 
-    Cause Emacs to fully redraw the display before it processes queued
-    input events. Apparently this provides a slight performance tweak for
-    newer machines. My machines seem to be able to handle it. Picked up
-    from [[http://www.masteringemacs.org/articles/2011/10/02/improving-performance-emacs-display-engine/][here]].
+**** Icon support
 
-    #+BEGIN_SRC emacs-lisp
-      (setq redisplay-dont-pause t)
-    #+END_SRC
+     #+BEGIN_SRC emacs-lisp
+       (use-package all-the-icons
+        :ensure t)
+     #+END_SRC
 
 **** Modeline
 
@@ -538,40 +559,8 @@
 
 ***** Battery information
 
-      Battery information display in the modeline is controlled by
-      =battery-mode-line-format= and =battery-status-function=. I enable
-      this whenever I am on a mac, +as I only have mac laptops+ (now
-      running on a chromebook also).
-
-      =battery-mode-line-format= is a customizable variable, I am setting
-      it here to reflect the following format:
-
-      - "⚡︎ "
-      - status
-        - =empty= - high
-        - =-= - low
-        - =!= - critical
-        - =+= - charging
-      - load percentage
-      - =%=
-      - " " - a space
-      - time remaining
-
-      The result should look something like:
-
-      =⚡︎ 42% 2:30=
-
-      #+BEGIN_SRC emacs-lisp :tangle no
-        (if (string-equal system-type "darwin")
-            (custom-set-variables
-              '(battery-mode-line-format "⚡️%b%p%% %t "))
-          (custom-set-variables
-            '(battery-mode-line-format "⚡︎ %b%p%%%% %t ")))
-        (display-battery-mode)
-      #+END_SRC
-
-      I have opted for a simpler and 'clearer' solution utilizing the
-      `fancy-battery` package.
+      I have opted for a simpler and 'clearer' solution to displaying
+      battery information utilizing the `fancy-battery` package.
 
       #+BEGIN_SRC emacs-lisp
         (use-package fancy-battery
@@ -589,11 +578,10 @@
       than just the time. I configure it here to my liking.
 
       #+BEGIN_SRC emacs-lisp
-        (setq display-time-default-load-average nil)  ; Don't display load
-        (setq display-time-day-and-date nil)  ; Don't display date
-        (custom-set-variables
-            '(display-time-format "%l:%M%p"))
-        (display-time-mode)
+        (custom-set-variables '(display-time-default-load-average nil)  ; Don't display load
+                              '(display-time-day-and-date nil)          ; Don't display date
+                              '(display-time-format "%l:%M%p"))
+        (add-hook 'after-init-hook #'display-time-mode)
       #+END_SRC
 
 *** Miscellaneous
@@ -601,25 +589,19 @@
     Add newline to end of file on save.
 
     #+BEGIN_SRC emacs-lisp
-      (setq require-final-newline t)
+      (custom-set-variables '(require-final-newline t))
     #+END_SRC
 
     Make Emacs use the clipboard
 
     #+BEGIN_SRC emacs-lisp
-      (setq x-select-enable-clipboard t)
-    #+END_SRC
-
-    Seed the random-number generator
-
-    #+BEGIN_SRC emacs-lisp
-      (random t)
+      (custom-set-variables '(select-enable-clipboard t))
     #+END_SRC
 
     Prefix used for generating the auto save file names.
 
     #+BEGIN_SRC emacs-lisp
-      (setq auto-save-list-file-prefix meta-saves)
+      (custom-set-variables '(auto-save-list-file-prefix meta-saves))
     #+END_SRC
 
     Use "y" in place of "yes", who wants to type all of those extra characters?
@@ -643,7 +625,7 @@
      Configure where the backups should go.
 
      #+BEGIN_SRC emacs-lisp
-       (setq backup-directory-alist (quote ((".*" . "~/.emacs-meta/backups/"))))
+       (custom-set-variables '(backup-directory-alist (quote ((".*" . "~/.emacs-meta/backups/")))))
      #+END_SRC
 
      I like to use version numbers for the backup files. Set the number of
@@ -661,12 +643,12 @@
      | =backup-by-copying-when-linked= | =t=   | Use copying to create backups for files with multiple names          |
 
      #+BEGIN_SRC emacs-lisp
-       (setq
-         version-control t
-         kept-new-versions 2
-         kept-old-versions 2
-         delete-old-versions t
-         backup-by-copying-when-linked t)
+       (custom-set-variables
+         '(version-control t)
+         '(kept-new-versions 2)
+         '(kept-old-versions 2)
+         '(delete-old-versions t)
+         '(backup-by-copying-when-linked t))
      #+END_SRC
 
 **** URL Related
@@ -674,8 +656,8 @@
      Make sure to store URL related stuff in the right place.
 
      #+BEGIN_SRC emacs-lisp
-       (setq url-cookie-file (concat meta-url "/cookies"))
-       (setq url-cache-directory (concat temporary-file-directory "url/cache"))
+       (custom-set-variables '(url-cookie-file (concat meta-url "/cookies"))
+                             '(url-cache-directory (concat temporary-file-directory "url/cache")))
      #+END_SRC
 
 *** Global mode settings
@@ -686,7 +668,6 @@
 
      #+BEGIN_SRC emacs-lisp
        (global-auto-revert-mode 1)
-       (diminish 'auto-revert-mode)
      #+END_SRC
 
      Auto-refresh dired buffers.
@@ -713,7 +694,7 @@
          :diminish git-gutter-mode
          :config
          (progn
-           (setq git-gutter:lighter " GG")
+           (custom-set-variables '(git-gutter:lighter " GG"))
            (global-git-gutter-mode)))
      #+END_SRC
 
@@ -721,8 +702,8 @@
 
      #+BEGIN_SRC emacs-lisp
        (use-package git-messenger
-         :commands git-messenger:popup-message
          :ensure t
+         :commands git-messenger:popup-message
          :bind ("C-x v p" . git-messenger:popup-message))
      #+END_SRC
 
@@ -747,10 +728,10 @@
        (use-package recentf
          :config
          (progn
-           (setq
-             recentf-save-file meta-recent
-             recentf-max-saved-items 100
-             recentf-max-menu-items 15)
+           (custom-set-variables
+             '(recentf-save-file meta-recent)
+             '(recentf-max-saved-items 100)
+             '(recentf-max-menu-items 15))
            (recentf-mode t)))
      #+END_SRC
 
@@ -771,11 +752,11 @@
        (use-package savehist
          :config
          (progn
-           (setq savehist-additional-variables
-             '(kill-ring search-ring regexp-search-ring)
-             savehist-autosave-interval 300
-             savehist-file meta-savehist
-             history-delete-duplicates t)
+           (custom-set-variables '(savehist-additional-variables
+                                   '(kill-ring search-ring regexp-search-ring))
+                                 '(savehist-autosave-interval 300)
+                                 '(savehist-file meta-savehist)
+                                 '(history-delete-duplicates t))
            (savehist-mode t)))
      #+END_SRC
 
@@ -790,37 +771,42 @@
        (use-package saveplace
          :init
          (progn
-           (setq save-place-file meta-saveplace)
-           (setq-default save-place t)))
+           (custom-set-variables '(save-place-file meta-saveplace))
+           (save-place-mode t)))
      #+END_SRC
 
-**** Show Paren mode
+**** Smartparens
 
-     I like to visually see the matching parens. =Show Paren= mode is a
-     global minor mode that highlights matching parens. I have now replaced
-     the original =show paren= with =smartparens=.
+     I like to visually see the matching parens. =smartparens-mode= is a
+     global minor mode that highlights matching parens.
+
+     If there are specific modes in which =smartparens-mode= should not be
+     enabled, they can be added to the =sp-ignore-modes-list=.
 
      #+BEGIN_SRC emacs-lisp
        (use-package smartparens
+         :ensure t
          :commands (smartparens-mode
                     show-smartparens-mode
                     show-smartparens-global-mode)
+         :demand t
          :diminish smartparens-mode
-         :ensure t
          :config
          (progn
-                (use-package smartparens-config)
-                ;(smartparens-global-mode) ;; commented out until bug? fixed
-                (show-smartparens-global-mode)))
+           (require 'smartparens-config)
+           (smartparens-global-mode)))
      #+END_SRC
 
 **** Undo-tree-mode
 
-     =Undo-tree-mode= replaces Emacs' standard undo feature with a more
+     =undo-tree-mode= replaces Emacs' standard undo feature with a more
      powerful, yet easier to user version, that treats the undo history as
      what it is: a tree.
 
-     Enable =Undo-tree-mode= globally.
+     If a specific mode is not compatible with =undo-tree-mode=, it can be
+     added to the list =undo-tree-incompatible-major-modes=.
+
+     Enable =undo-tree-mode= globally.
 
      #+BEGIN_SRC emacs-lisp
        (use-package undo-tree
@@ -828,9 +814,9 @@
          :diminish undo-tree-mode
          :config
          (progn
-           (global-undo-tree-mode)
-           (setq undo-tree-visualizer-timestamps t
-                 undo-tree-visualizer-diff t)))
+           (custom-set-variables '(undo-tree-visualizer-timestamps t)
+                                 '(undo-tree-visualizer-diff t))
+           (global-undo-tree-mode)))
      #+END_SRC
 
 **** Whitespace
@@ -854,13 +840,17 @@
          :diminish global-whitespace-mode
          :config
          (progn
-           (setq whitespace-style '(face trailing space-before-tab
-                              indentation space-after-tab)
-                 whitespace-line-column 80)
+           (custom-set-variables '(whitespace-style '(face trailing space-before-tab
+                                                      indentation space-after-tab))
+                                 '(whitespace-line-column 80))
            (global-whitespace-mode 1)))
      #+END_SRC
 
 **** Winner
+
+     Winner mode is a minor mode which keeps a history of changes to window
+     configurations. This allows you to easily undo (=winner-undo=) and
+     redo (=winner-redo=) window configurations.
 
      #+BEGIN_SRC emacs-lisp
        (use-package winner
@@ -898,12 +888,19 @@
    #+BEGIN_SRC emacs-lisp
      (use-package avy
        :ensure t
+       :commands avy-goto-word-1
        :bind ("C-. C-s" . avy-goto-word-1))
    #+END_SRC
 
 ** Aggressive Indent
 
-   Avoid manual indentation with 'aggressive indent'.
+   Avoid manual indentation with 'aggressive indent'. I am not sure I am
+   comfortable with this mode anywhere but in lisp code just yet.
+
+   It can be turned on globally with =(global-aggressive-indent-mode 1)=.
+
+   If used globally, specific modes can be excluded with the list
+   =aggressive-indent-excluded-modes=.
 
    #+BEGIN_SRC emacs-lisp
      (use-package aggressive-indent
@@ -920,32 +917,24 @@
 
    #+BEGIN_SRC emacs-lisp
      (use-package company
-        :ensure t
-        :diminish company-mode
-        :config
-          (global-company-mode)
-        :init
-        (progn
-          (setq company-tooltip-limit 20
-                company-idle-delay .3)))
+       :ensure t
+       :diminish company-mode
+       :config
+       (global-company-mode)
+       :init
+       (progn
+         (custom-set-variables '(company-tooltip-limit 20)
+                               '(company-idle-delay .3))))
    #+END_SRC
 
-** Ace-isearch
-
-   Neat little package that provides a minor mode which combines isearch,
-   avy and helm-swoop. See setup for helm-swoop key bindings.
+   Also enable fuzzy matching.
 
    #+BEGIN_SRC emacs-lisp
-     (use-package ace-isearch
+     (use-package company-flx
        :ensure t
-       :diminish ace-isearch-mode
+       :after company
        :config
-         (custom-set-variables
-           '(ace-isearch-function 'avy-goto-word-1)
-           '(ace-isearch-junp-delay 0.5)
-           '(ace-isearch-input-length 5)))
-
-     (global-ace-isearch-mode +1)
+       (company-flx-mode +1))
    #+END_SRC
 
 ** YASnippet
@@ -962,15 +951,26 @@
        :diminish yas-minor-mode
        :config (yas-global-mode 1))
 
-     (defun jme/insert-yas-by-name (name)
+     (defun jme:insert-yas-by-name (name)
+       "Insert YASnippet by NAME."
        (cl-flet ((dummy-prompt
                   (prompt choices &optional display-fn)
                   (declare (ignore prompt))
                   (or (find name choices :key display-fn :test #'string=)
                       (throw 'notfound nil))))
-         (let ((yas/prompt-functions '(dummy-prompt)))
+         (let ((yas-prompt-functions '(dummy-prompt)))
            (catch 'notfound
-             (yas/insert-snippet t)))))
+             (yas-insert-snippet t)))))
+   #+END_SRC
+
+   Add =helm= support for yas.
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package helm-c-yasnippet
+       :ensure t
+       :after helm
+       :bind ("C-c y" . helm-yas-complete)
+       :config (custom-set-variables '(helm-yas-space-match-any-greedy t)))
    #+END_SRC
 
    Here we provide an indication that there is a yasnippet available to be
@@ -982,8 +982,8 @@
      (defvar yasnippet-can-fire-cursor-color "purple"
        "Color to change cursor when yasnippet is available.")
 
-     (defun jme/yasnippet-can-fire-p (&optional field)
-       "Test if yasnippet can expand."
+     (defun jme:yasnippet-can-fire-p (&optional field)
+       "Test if yasnippet can expand based on FIELD."
        (interactive)
        (setq yas--condition-cache-timestamp (current-time))
        (let (templates-and-pos)
@@ -997,18 +997,19 @@
                                      (yas--templates-for-key-at-point))))
          (and templates-and-pos (first templates-and-pos))))
 
-     (defun jme/change-cursor-color-when-can-expand (&optional field)
+     (defun jme:change-cursor-color-when-can-expand (&optional field)
+       "Update the cursor color if a snippet is available, based on FIELD."
        (interactive)
        (when (eq last-command 'self-insert-command)
-         (set-cursor-color (if (jme/can-expand)
+         (set-cursor-color (if (jme:can-expand)
                                yasnippet-can-fire-cursor-color
                              default-cursor-color))))
 
-     (defun jme/can-expand ()
+     (defun jme:can-expand ()
        "Return true if right after an expandable thing."
-       (or (abbrev--before-point) (jme/yasnippet-can-fire-p)))
+       (or (abbrev--before-point) (jme:yasnippet-can-fire-p)))
 
-     (add-hook 'post-command-hook 'jme/change-cursor-color-when-can-expand)
+     (add-hook 'post-command-hook 'jme:change-cursor-color-when-can-expand)
    #+END_SRC
 
 ** Clojure
@@ -1064,44 +1065,17 @@
     #+END_SRC
 
 *** Slamhound
-    #+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp :tangle no
       (use-package slamhound
-        :ensure t)
+        :disabled t)
     #+END_SRC
-** CoffeeScript
 
-   Support for CoffeeScript.
+** CSS
 
-   #+BEGIN_SRC emacs-lisp
-     (use-package coffee-mode
-       :commands coffee-mode
-       :mode ("\\.coffee\\'" . coffee-custom)
-       :init
-       (setq
-         coffee-js-mode 'js2-mode
-         coffee-tab-width 2
-         coffee-args-compile '("-c" "--bare") ;; If you don't want your compiled files to be wrapped
-         coffee-debug-mode t)
-       :config
-       (bind-key "M-r" 'coffee-compile-buffer coffee-mode-map))
-   #+END_SRC
-
-** Deft
-
-   I find Deft to be a great note-taking utility.
+   Mode for handling CSS.
 
    #+BEGIN_SRC emacs-lisp
-     (use-package deft
-       :commands deft
-       :ensure t
-       :init
-       (progn
-         (setq
-           deft-extension "org"
-           deft-text-mode 'org-mode)
-         (when (boundp 'my-notes)
-           (setq deft-directory my-notes)))
-       :bind ("<f9>" . deft))
+     (use-package css-mode)
    #+END_SRC
 
 ** Dired
@@ -1116,21 +1090,13 @@
    Make sure =image-dired= keeps its files in the meta directory.
 
    #+BEGIN_SRC emacs-lisp
-     ;; diredp-toggle-find-file-reuse-dir 1
-       (use-package dired+
-         :ensure t
-         :config
-         (progn
-           (setq image-dired-dir (concat metafiles-dir "/image-dired"))
-           (put 'dired-find-alternate-file 'disabled nil)  ;enable `a' command
-           (diredp-toggle-find-file-reuse-dir 1)))
-   #+END_SRC
-
-** Erlang
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package erlang-start
-       :disabled t)
+     (use-package dired+
+       :ensure t
+       :config
+       (progn
+         (custom-set-variables '(image-dired-dir (concat metafiles-dir "/image-dired")))
+         (put 'dired-find-alternate-file 'disabled nil)  ;enable `a' command
+         (diredp-toggle-find-file-reuse-dir 1)))
    #+END_SRC
 
 ** Expand Region
@@ -1146,17 +1112,19 @@
 
 ** Flycheck
 
+   Removed snippet:
+
+   (custom-set-variables '(flycheck-disabled-checkers
+                               (append flycheck-disabled-checkers
+                                       '(javascript-jshint))))
+
    #+BEGIN_SRC emacs-lisp
      (use-package flycheck
        :ensure t
        :diminish flycheck-mode
-       :init
-       (setq-default flycheck-disabled-checkers
-         (append flycheck-disabled-checkers
-           '(javascript-jshint)))
        :config
        (progn
-         (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)
+         (custom-set-variables '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
          (flycheck-clojure-setup)
          (global-flycheck-mode)
          (flycheck-add-mode 'javascript-eslint 'web-mode)
@@ -1165,8 +1133,8 @@
    #+END_SRC
 
    #+BEGIN_SRC emacs-lisp
-   (use-package flycheck-pos-tip
-     :ensure t)
+     (use-package flycheck-pos-tip
+       :ensure t)
    #+END_SRC
 
 ** Flyspell
@@ -1192,108 +1160,12 @@
        :ensure t
        :config
        (progn
-         (setq guide-key/guide-key-sequence '("C-x" "C-c"))
-         (guide-key-mode 1)
-         (setq guide-key/recursive-key-sequence-flag t)
-         (setq guide-key/popup-window-position 'bottom)))
+         (custom-set-variables
+         '(guide-key/guide-key-sequence '("C-x" "C-c"))
+         '(guide-key/recursive-key-sequence-flag t)
+         '(guide-key/popup-window-position 'bottom))
+         (guide-key-mode 1)))
    #+END_SRC
-
-** Haskell
-
-   Make sure to ignore compiled Haskell files in filename completions.
-   Since I like automatic indentation, it needs to be turned on for
-   Haskell.  Also, make sure to show documentation.
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package haskell-mode
-       :commands haskell-mode
-       :mode ("\\.l?hs\\'" . haskell-mode)
-       :init
-         (add-to-list 'completion-ignored-extensions ".hi")
-       :config
-       (progn
-         (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
-         (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)))
-   #+END_SRC
-
-** Ido
-
-   Provide an easy way to load a recent file utilizing ido.
-
-   #+BEGIN_SRC emacs-lisp
-     (defun recentf-ido-find-file ()
-       "Find a recent file using ido."
-       (interactive)
-       (let ((file (ido-completing-read "Choose recent file: " recentf-list nil t)))
-         (when file
-           (find-file file))))
-   #+END_SRC
-
-   Configure ido to use vertical mode. Much easier to see matches.
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package ido-vertical-mode
-       :ensure t
-       :config (ido-vertical-mode))
-   #+END_SRC
-
-   Use ido everywhere.
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package ido-ubiquitous
-       :disabled t
-       :ensure t
-       :init
-       (eval-after-load "ido" (ido-ubiquitous-mode 1)))
-   #+END_SRC
-
-*** Configuration
-
-    These settings control the behavior of ido.
-
-    | Setting                              | Value      | Description                                              |
-    |--------------------------------------+------------+----------------------------------------------------------|
-    | =ido-case-fold=                      | =t=        | Ignore case when searching                               |
-    | =ido-confirm-unique-completion=      | =t=        | wait for RET, even with unique completion                |
-    | =ido-create-new-buffer=              | =always=   | Always create new buffers unconditionally                |
-    | =ido-enable-flex-matching=           | =t=        | Use flexible string matching                             |
-    | =ido-enable-last-directory-history=  | =t=        | Remember latest selected directory name                  |
-    | =ido-max-prospects=                  | =10=       | Limit prospect list to 10 values                         |
-    | =ido-max-work-directory-list=        | =30=       | Maximum number of working directories to record          |
-    | =ido-max-work-file-list=             | =50=       | Maximum number of names of recently opened files         |
-    | =ido-save-directory-list-file=       | =meta-ido= | File used to store ido state                             |
-    | =ido-use-filename-at-point=          | =nil=      | Don't attempt to use filename at point as starting point |
-    | =ido-use-url-at-point=               | =nil=      | Don't attempt to use URL at point                        |
-    | =confirm-nonexistent-file-or-buffer= | =nil=      | Don't confirm before visiting a non-existent file        |
-
-    #+BEGIN_SRC emacs-lisp
-      (use-package flx-ido
-        :ensure t
-        :config
-        (progn
-          (ido-mode t)
-          (setq
-           ido-case-fold  t                 ; be case-insensitive
-           ido-confirm-unique-completion t  ; wait for RET, even with unique completion
-           ido-create-new-buffer 'always
-      ;     ido-enable-flex-matching t
-           ido-enable-last-directory-history t ; remember last used dirs
-           ido-max-prospects 10
-           ido-max-work-directory-list 30   ; should be enough
-           ido-max-work-file-list      50   ; remember many
-           ido-save-directory-list-file meta-ido
-           ido-use-filename-at-point nil
-           ido-use-url-at-point nil
-           ido-everywhere 1
-           flx-ido-mode 1)
-      ;; increase minibuffer size when ido completion is active
-          (add-hook 'ido-minibuffer-setup-hook
-            (function
-              (lambda ()
-                (set (make-local-variable 'resize-minibuffer-window-max-height) 1))))))
-
-      (setq confirm-nonexistent-file-or-buffer nil)
-    #+END_SRC
 
 ** Helm
 
@@ -1301,35 +1173,24 @@
    work with than other modules.
 
    #+BEGIN_SRC emacs-lisp
-     (defvar jme/helm-sources '(helm-source-buffers-list
+     (defvar jme:helm-sources '(helm-source-buffers-list
                                 helm-source-recentf
                                 helm-source-bookmarks
                                 helm-source-file-cache
                                 helm-source-files-in-current-dir))
      (use-package helm
-       :commands (helm-M-x
-                  helm-apropos
-                  helm-do-grep
-                  helm-occur
-                  helm-find-files
-                  helm-for-files
-                  helm-all-mark-rings
-                  helm-man-woman
-                  helm-mini
-                  helm-register
-                  helm-semantic-or-imenu
-                  helm-show-kill-ring)
        :ensure t
        :diminish helm-mode
        :config
        (progn
          (require 'helm-config)
-         (setq helm-for-files-preferred-list jme/helm-sources
-               helm-split-window-in-side-p t
-               helm-scoll-amount 8)
+         (custom-set-variables '(helm-for-files-preferred-list jme:helm-sources)
+                               '(helm-split-window-in-side-p t)
+                               '(helm-scoll-amount 8))
          (helm-mode 1)
          (helm-autoresize-mode 1))
        :bind (("C-x b" . helm-mini)
+              ("C-x C-b" . helm-buffers-list)
               ("C-x C-f" . helm-find-files)
               ("M-x" . helm-M-x)
               ("M-y" . helm-show-kill-ring)
@@ -1357,13 +1218,13 @@
        :ensure t
        :bind (("C-c h s" . helm-swoop)
               ("M-i" . helm-swoop)
-              ("M-I" . helm-swoop-back-to-last-point))
-       :config
-       (progn
-         (bind-key "M-i" 'helm-swoop-from-isearch isearch-mode-map)
-         (bind-key "M-i" 'helm-multi-swoop-all-from-helm-swoop helm-swoop-map)
-         (bind-key "C-s" 'helm-next-line helm-swoop-map)
-         (bind-key "C-r" 'helm-previous-line helm-swoop-map)))
+              ("M-I" . helm-swoop-back-to-last-point)
+              :map isearch-mode-map
+              ("M-i" . helm-swoop-from-isearch)
+              :map helm-swoop-map
+              ("M-i" . helm-multi-swoop-all-from-helm-swoop)
+              ("C-s" . helm-next-line)
+              ("C-r" . helm-previous-line)))
    #+END_SRC
 
 *** Flycheck
@@ -1383,10 +1244,7 @@
      (use-package json-mode
        :ensure t
        :commands json-mode
-       :mode ("\\.json$" . json-mode)
-       :init
-       (setq-default json-reformat::indent-width 2
-                     js-indent-level 2))
+       :mode ("\\.json$" . json-mode))
    #+END_SRC
 
    #+BEGIN_SRC emacs-lisp
@@ -1394,18 +1252,14 @@
        :ensure t
        :commands js2-mode
        :mode ("\\.js$" . js2-mode)
+       :bind (:map js2-mode-map
+                   ("C-x C-e" . js-send-last-sexp)
+                   ("C-M-x" . js-send-last-sexp-and-go)
+                   ("C-c b" . js-send-buffer)
+                   ("C-c l" . js-load-file-and-go))
        :init
        (progn
-         (setq-default js2-basic-offset 2)
-         (add-to-list 'interpreter-mode-alist (cons "node" 'js2-mode)))
-       :config
-       (progn
-         (bind-key "C-x C-e" 'js-send-last-sexp js2-mode-map)
-         (bind-key "C-M-x" 'js-send-last-sexp-and-go js2-mode-map)
-         (bind-key "C-c b" 'js-send-buffer js2-mode-map)
-         (bind-key "C-c C-b" 'js-send-buffer-and-go js2-mode-map)
-         (bind-key "C-c w" 'my/copy-javascript-region-or-buffer js2-mode-map)
-         (bind-key "C-c l" 'js-load-file-and-go js2-mode-map)))
+         (add-to-list 'interpreter-mode-alist (cons "node" 'js2-mode))))
    #+END_SRC
 
    If we have the ability to use javascript in an inferior process, use
@@ -1418,24 +1272,6 @@
        (custom-set-variables '(inferior-js-program-command "node")))
    #+END_SRC
 
-** LaTeX
-
-   Configure AUCTeX to automatically save style information when saving the
-   buffer and to parse the file after loading to get style information.
-
-   Also, query for the name of the master file.
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package tex-site
-       :mode ("\\.tex\\'" . TeX-latex-mode)
-       :init
-       (progn
-         (setq
-           TeX-auto-save t
-           TeX-parse-self t)
-         (setq-default TeX-master nil)))
-   #+END_SRC
-
 ** Lisp
 
    Eldoc provides minibuffer hints when working with Emacs lisp.
@@ -1444,14 +1280,14 @@
      (use-package eldoc
        :diminish eldoc-mode
        :commands eldoc-mode
+       :bind (:map emacs-lisp-mode-map
+              ("C-c ." . find-function-at-point)
+              ("C-c f" . find-function)
+              ("M-:" . pp-eval-expression))
        :init
        (progn
          (add-hook 'lisp-interaction-mode-hook 'eldoc-mode)
          (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)))
-
-     (bind-key "C-c ." 'find-function-at-point emacs-lisp-mode-map)
-     (bind-key "C-c f" 'find-function emacs-lisp-mode-map)
-     (bind-key "M-:" 'pp-eval-expression)
 
      (add-hook 'lisp-mode-hook (lambda () (local-set-key (kbd "RET") 'newline-and-indent)))
      (add-hook 'emacs-lisp-mode-hook (lambda () (local-set-key (kbd "RET") 'newline-and-indent)))
@@ -1463,37 +1299,17 @@
      (use-package magit
        :commands magit-status
        :ensure t
-       :bind ("C-x d" . magit-status)
-       :init (setq magit-last-seen-setup-instructions "1.4.0"))
+       :bind ("C-x d" . magit-status))
    #+END_SRC
 
 ** Markdown
 
    #+BEGIN_SRC emacs-lisp
      (use-package markdown-mode
+       :commands markdown-mode
        :mode
        (("\\.markdown$" . markdown-mode)
         ("\\.md$" . markdown-mode)))
-   #+END_SRC
-
-** Newsticker
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package newsticker
-       :commands (newsticker-show-news newsticker-start)
-       :init
-       (progn
-         (setq
-           newsticker-cache-filename (concat metafiles-dir "/.newsticker-cache")
-           newsticker-dir (concat metafiles-dir "/newsticker/")))
-       :config
-       (setq-default
-        newsticker-automatically-mark-items-as-old nil
-        newsticker-automatically-mark-visited-items-as-old t
-        newsticker-obsolete-item-max-age (* 30 (* 24 3600))
-        newsticker-hide-immortal-items-in-echo-area t
-        newsticker-hide-obsolete-items-in-echo-area t
-        newsticker-date-format "(%A, %B %d %I:%M%p)"))
    #+END_SRC
 
 ** Org
@@ -1502,14 +1318,17 @@
    loads the configuration based on my login name.
 
    #+BEGIN_SRC emacs-lisp
-     (jme/load user-emacs-directory (concat user-login-name "-org"))
+     (jme:load user-emacs-directory (concat user-login-name "-org"))
    #+END_SRC
 
-** Pianobar
+** Paradox
+
+   Better package management.
 
    #+BEGIN_SRC emacs-lisp
-     (use-package pianobar
-       :disabled t)
+     (use-package paradox
+       :ensure t
+       :commands paradox-list-packages)
    #+END_SRC
 
 ** Projectile
@@ -1522,23 +1341,48 @@
        :diminish projectile-mode
        :config
        (progn
-         (use-package helm-projectile
-           :ensure t
-           :config
-           (progn
-             (setq projectile-completion-system 'helm
-                   projectile-switch-project-action 'helm-projectile)
-             (helm-projectile-on)))
-         (setq projectile-keymap-prefix (kbd "C-c p")
-               projectile-enable-caching t)
-         (projectile-global-mode)))
+         (custom-set-variables '(projectile-cache-file (concat metafiles-dir "/projectile.cache"))
+                               '(projectile-known-projects-file (concat metafiles-dir "/projectile-bookmarks.eld"))
+                               '(projectile-keymap-prefix (kbd "C-c p"))
+                               '(projectile-enable-caching t))
+         (projectile-mode)))
+   #+END_SRC
+
+   Support for org tasks associated with projectile projects.
+
+   #+BEGIN_SRC emacs-lisp
+;     (use-package org-projectile
+;       :ensure t
+;       :bind (("C-c n p" . org-projectile-project-todo-completing-read)
+;              ("C-c c" . org-capture))
+;       :config
+;       (progn
+;         (setq org-projectile-projects-file
+;               (concat metafiles-dir "projects.org"))
+;         (setq org-agenda-files (append org-agenda-files (org-projectile-todo-files)))
+;         (push (org-projectile-project-todo-entry) org-capture-templates)))
+   #+END_SRC
+
+   Projectile Helm support.
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package helm-projectile
+       :ensure t
+       :after projectile
+       :config
+       (progn
+         (custom-set-variables '(projectile-completion-system 'helm)
+                               '(projectile-switch-project-action 'helm-projectile))
+         (helm-projectile-on)))
+
+;     (use-package org-projectile-helm
+;       :after org-projectile
+;       :bind (("C-c n p" . org-projectile-helm-template-or-project)))
    #+END_SRC
 
 ** Python
 
    #+BEGIN_SRC emacs-lisp
-     (setq python-remove-cwd-from-path nil)
-
      ; Bring back indent after newline
      (add-hook 'python-mode-hook '(lambda ()
                   (define-key python-mode-map "\C-m" 'newline-and-indent)))
@@ -1559,16 +1403,18 @@
             python-shell-interpreter-args "-i -v")
    #+END_SRC
 
-   Jedi for Python
+   Jedi for Python. To use auto-complete with Jedi, we require only
+   company-jedi and not make reference to jedi-core package.
 
    #+BEGIN_SRC emacs-lisp
-     (use-package jedi
-      :commands jedi:setup
-       :disabled t
-       :init
-       (progn
-         (setq jedi:setup-keys t)
-         (add-hook 'python-mode-hook 'jedi:setup)))
+     (use-package company-jedi
+       :ensure t
+       :commands (jedi:goto-definition jedi-mode company-jedi)
+       :bind (:map python-mode-map
+                   ("M-." . jedi:goto-definition)
+                   ("M-," . jedi:goto-definition-pop-marker))
+       :config
+       (setq jedi:complete-on-dot t))
    #+END_SRC
 
    Highlight indentation
@@ -1579,15 +1425,46 @@
       :commands highlight-indent-guides-mode
       :init
       (progn
-       (setq highlight-indent-guides-method 'character)
+       (custom-set-variables '(highlight-indent-guides-method 'character))
        (add-hook 'python-mode-hook 'highlight-indent-guides-mode)))
    #+END_SRC
+
+** Java
+
+*** Eclim
+
+    Eclipse front-end for Java development.
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package eclim
+        :commands eclim-mode
+        :config
+        (progn
+          (use-package company-emacs-eclim
+            :after company
+            :config
+            (company-emacs-eclim-setup))
+          (setq eclimd-autostart t)
+          (add-hook 'java-mode-hook (lambda () (eclim-mode 1)))))
+    #+END_SRC
+
+*** Java utilities
+
+    Auto byte-code disassembly.
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package autodisass-java-bytecode
+        :ensure t
+        :defer t)
+    #+END_SRC
 
 ** Rainbow mode
 
    #+BEGIN_SRC emacs-lisp
      (use-package rainbow-mode
        :commands rainbow-mode
+       :ensure t
+       :after css-mode
        :init
        (add-hook 'css-mode-hook 'rainbow-mode))
    #+END_SRC
@@ -1598,77 +1475,116 @@
    that I have not yet been able to do this completely, though the desire
    is there.
 
-   #+BEGIN_SRC emacs-lisp
-     (use-package comint
-       :init
-       (progn
-         (bind-key "M-p" 'comint-previous-matching-input-from-input comint-mode-map)
-         (bind-key "M-n" 'comint-next-matching-input-from-input comint-mode-map)
-         (bind-key "C-M-n" 'comint-next-input comint-mode-map)
-         (bind-key "C-M-p" 'comint-previous-input comint-mode-map)
-         (setq comint-prompt-read-only t)
-         (add-hook 'term-exec-hook
-               (function
-                (lambda ()
-                  (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))))))
-   #+END_SRC
+*** eshell
 
-   Autoload =multi-term= and =multi-term-next= so they can be used in key
-   bindings.
+    Additional references:
 
-   #+BEGIN_SRC emacs-lisp
-     (use-package multi-term
-       :commands (multi-term multi-term-next)
-       :bind (("C-c t" . multi-term-next)
-              ("C-c T" . multi-term)))
-   #+END_SRC
+    - [[https://www.masteringemacs.org/article/complete-guide-mastering-eshell][Mikey Petersen's Mastering Eshell]]
+    - [[http://www.modernemacs.com/post/custom-eshell/][Modern Emacs: Making eshell your own]]
+    - [[https://www.emacswiki.org/emacs/EshellPrompt][EmacsWiki: EshellPrompt]]
+    - [[http://blog.liangzan.net/blog/2012/12/12/customizing-your-emacs-eshell-prompt/][Liang Zan: Customozing Your Emacs Eshell Propmpt]]
 
-   Tramp is a fantastic package that allows for remote file editing. Make
-   sure tramp uses ssh by default. Also make sure that files are stored in
-   the meta information directory.
+    Packages:
 
-   #+BEGIN_SRC emacs-lisp
-     (use-package tramp
-       :init
-       (setq
-         tramp-default-method "ssh"
-         tramp-persistency-file-name meta-tramp))
-   #+END_SRC
+    - [[https://github.com/xuchunyang/eshell-git-prompt][eshell-git-prompt]]
+    - [[https://github.com/kaihaosw/eshell-prompt-extras][eshell-prompt-extras]]
 
-   I provide a regexp to match my prompts.
+**** Prompt
 
-   #+BEGIN_SRC emacs-lisp
-     (setq shell-prompt-pattern "^[^a-zA-Z].*[#$%>☞] *")
-   #+END_SRC
+     #+BEGIN_SRC emacs-lisp
+       (use-package eshell-git-prompt
+         :ensure t
+         :config
+         (eshell-git-prompt-use-theme 'powerline))
+     #+END_SRC
 
-** Smex
 
-   #+BEGIN_SRC emacs-lisp
-     (use-package smex
-       :commands (smex smex-major-mode-commands execute-extended-command)
-       :init
-       (setq smex-save-file (concat metafiles-dir "/.smex-items"))
-       :config
-       (smex-initialize)
-       :bind (("M-X" . smex-major-mode-commands)
-              ("C-c C-c M-x" . execute-extended-command)))
-   #+END_SRC
+**** Configuration
 
-** Swank-js
+***** Control files
 
-   #+BEGIN_SRC emacs-lisp
-     (use-package slime-js
-       :commands (slime-js-minor-mode slime-js-refresh-css slime-js-embed-css)
-       :init
-       (progn
-         (add-hook 'js2-mode-hook
-                   (lambda ()
-                     (slime-js-minor-mode 1)))
-         (add-hook 'css-mode-hook
-                   (lambda ()
-                     (bind-key "M-C-x" 'slime-js-refresh-css css-mode-map)
-                     (bind-key "C-c C-r" 'slime-js-embed-css css-mode-map)))))
-   #+END_SRC
+      #+BEGIN_SRC emacs-lisp
+        (custom-set-variables '(eshell-directory-name (concat metafiles-dir "/eshell/")))
+      #+END_SRC
+
+***** Visual Commands
+
+      Eshell has support for special handling of commands which present their
+      output in a visual fashion (see help for =eshell-visual-commands=).
+
+      Typically, these are commands which require a proper terminal
+      environment to run in. =eshell= will run them in a term buffer when
+      they are invoked.
+
+      The emacs defaults are:
+
+      - vi
+      - screen
+      - top
+      - less
+      - more
+      - lynx
+      - ncftp
+      - pine
+      - tin
+      - trn
+      - elm
+
+      I don't use a lot of these commands and there are others I do use.
+
+     #+BEGIN_SRC emacs-lisp
+       (setq eshell-visual-commands
+             '("less" "tmux" "top" "bash" "zsh"))
+     #+END_SRC
+
+      The =eshell-visual-subcommands= specifies an alist of subcommands which
+      present their output visually, in much the same way as specified
+      above. In this case, however, you can specify specific arguments which
+      trigger the behavior.
+
+      I find this to be especially useful for =git= commands which display
+      tree information (like log). I have a number of aliases set up with git
+      which I want to ensure are covered.
+
+     #+BEGIN_SRC emacs-lisp
+       (setq eshell-visual-subcommands
+             '(("git"
+                "diff" "df" "dc"
+                "show"
+                "log" "lg" "tree" "lol" "lola" "lala" "ltla" "ldla")))
+     #+END_SRC
+
+*** comint
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package comint
+        :bind (:map comint-mode-map
+                    ("M-p" . comint-previous-matching-input-from-input)
+                    ("M-n" . comint-next-matching-input-from-input)
+                    ("C-M-n" . comint-next-input)
+                    ("C-M-p" . comint-previous-input))
+        :init
+        (progn
+          (custom-set-variables '(comint-prompt-read-only t))
+          (add-hook 'term-exec-hook
+                    (function
+                     (lambda ()
+                       (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))))))
+    #+END_SRC
+
+*** Tramp
+
+    Tramp is a fantastic package that allows for remote file editing. Make
+    sure tramp uses ssh by default. Also make sure that files are stored in
+    the meta information directory.
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package tramp
+        :init
+        (custom-set-variables
+          '(tramp-default-method "ssh")
+          '(tramp-persistency-file-name meta-tramp)))
+    #+END_SRC
 
 ** Uniquify
 
@@ -1695,38 +1611,37 @@
    #+BEGIN_SRC emacs-lisp
      (use-package uniquify
        :init
-       (setq
-         uniquify-buffer-name-style 'post-forward
-         uniquify-separator ":"
-         uniquify-after-kill-buffer-p t
-         uniquify-ignore-buffers-re "^\\*"))
+       (custom-set-variables
+         '(uniquify-buffer-name-style 'post-forward)
+         '(uniquify-separator ":")
+         '(uniquify-after-kill-buffer-p t)
+         '(uniquify-ignore-buffers-re "^\\*")))
    #+END_SRC
 
 ** Web mode
 
    #+BEGIN_SRC emacs-lisp
      (use-package web-mode
+       :ensure t
        :mode
        (("\\.jsx$" . web-mode)
         ("\\.html?\\'" . web-mode))
-       :init
-       (progn
-         (setq web-mode-markup-indent-offset 2
-               web-mode-css-indent-offset 2
-               web-mode-code-indent-offset 2
-               web-mode-enable-current-column-highlight t))
        :config
        (progn
+         (custom-set-variables '(web-mode-markup-indent-offset 2)
+                               '(web-mode-css-indent-offset 2)
+                               '(web-mode-code-indent-offset 2)
+                               '(web-mode-enable-current-column-highlight t))
          (defadvice web-mode-highlight-part (around tweak-jsx activate)
            (if (equal web-mode-content-type "jsx")
                (let ((web-mode-enable-part-face nil))
                  ad-do-it)
              ad-do-it))
          (add-hook 'web-mode-hook
-           (lambda ()
-             (when (equal web-mode-content-type "jsx")
-               (flycheck-select-checker 'javascript-eslint)
-               (flycheck-select-checker 'flycheck-tidyrc))))))
+                   (lambda ()
+                     (when (equal web-mode-content-type "jsx")
+                       (flycheck-select-checker 'javascript-eslint)
+                       (flycheck-select-checker 'flycheck-tidyrc))))))
    #+END_SRC
 
 ** Diminish
@@ -1736,8 +1651,14 @@
    calls.
 
    #+BEGIN_SRC emacs-lisp
-     (eval-after-load "highlight-indentation" '(diminish 'highlight-indentation-mode))
-     (diminish 'overwrite-mode "💀")
+     (use-package diminish
+       :ensure t
+       :config
+       (progn
+         (eval-after-load "highlight-indentation" '(diminish 'highlight-indentation-mode))
+         (diminish 'auto-revert-mode)
+         (diminish 'auto-fill-function)
+         (diminish 'overwrite-mode "💀")))
    #+END_SRC
 
 * Custom Configuration
@@ -1752,7 +1673,7 @@
     windows (you can find it [[http://whattheemacsd.com/buffer-defuns.el-02.html][here]].)
 
     #+BEGIN_SRC emacs-lisp
-      (defun jme/rotate-windows ()
+      (defun jme:rotate-windows ()
         "Rotate your windows."
         (interactive)
         (cond ((not (> (count-windows)1))
@@ -1782,7 +1703,7 @@
     windows. (Picked up from [[http://whattheemacsd.com/buffer-defuns.el-03.html][here]].)
 
     #+BEGIN_SRC emacs-lisp
-      (defun jme/toggle-window-split ()
+      (defun jme:toggle-window-split ()
        "Toggle between horizontal and vertical layout of windows."
         (interactive)
         (if (= (count-windows) 2)
@@ -1817,14 +1738,14 @@
     buffer.
 
     #+BEGIN_SRC emacs-lisp
-      (defun jme/vsplit-last-buffer (prefix)
+      (defun jme:vsplit-last-buffer (prefix)
         "Split the window vertically and display the previous buffer."
         (interactive "p")
         (split-window-vertically)
         (other-window 1 nil)
         (if (= prefix 1)
           (switch-to-next-buffer)))
-      (defun jme/hsplit-last-buffer (prefix)
+      (defun jme:hsplit-last-buffer (prefix)
         "Split the window horizontally and display the previous buffer."
         (interactive "p")
         (split-window-horizontally)
@@ -1837,8 +1758,9 @@
     #+BEGIN_SRC emacs-lisp
       (use-package ace-window
         :ensure t
-        :init (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
-        :bind ("C-x o" . ace-window))
+        :commands ace-window
+        :bind ("C-x o" . ace-window)
+        :config (custom-set-variables '(aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))))
     #+END_SRC
 
 ** Cleanup
@@ -1848,7 +1770,7 @@
    to, allowing it to be safe for a =before-save-hook=. (see [[http://whattheemacsd.com/buffer-defuns.el-01.html][this article]].)
 
    #+BEGIN_SRC emacs-lisp
-     (defun jme/cleanup-buffer-safe ()
+     (defun jme:cleanup-buffer-safe ()
        "Perform a bunch of safe operations on the whitespace content of a buffer.
      Does not indent buffer, because it is used for a `before-save-hook', and that
      might be bad."
@@ -1861,18 +1783,18 @@
    If we want to be less careful when cleaning up, we can do that too.
 
    #+BEGIN_SRC emacs-lisp
-     (defun jme/cleanup-buffer ()
+     (defun jme:cleanup-buffer ()
        "Perform a bunch of operations on the whitespace content of a buffer.
      Including indent-buffer, which should not be called automatically on save."
        (interactive)
-       (jme/cleanup-buffer-safe)
+       (jme:cleanup-buffer-safe)
        (indent-region (point-min) (point-max)))
    #+END_SRC
 
    Make sure we hook this into our save process.
 
    #+BEGIN_SRC emacs-lisp
-     (add-hook 'before-save-hook 'jme/cleanup-buffer-safe)
+     (add-hook 'before-save-hook 'jme:cleanup-buffer-safe)
    #+END_SRC
 
 ** Movement
@@ -1884,7 +1806,7 @@
     smart way. (See [[http://emacsredux.com/blog/2013/05/22/smarter-navigation-to-the-beginning-of-a-line/][this article]].)
 
     #+BEGIN_SRC emacs-lisp
-      (defun jme/smarter-move-beginning-of-line (arg)
+      (defun jme:smarter-move-beginning-of-line (arg)
         "Move point back to indentation of beginning of line.
 
       Move point to the first non-whitespace character on this line.
@@ -1909,7 +1831,7 @@
 
       ;; remap C-a to `smarter-move-beginning-of-line'
       (global-set-key [remap move-beginning-of-line]
-                      'jme/smarter-move-beginning-of-line)
+                      'jme:smarter-move-beginning-of-line)
     #+END_SRC
 
 ** Mark
@@ -1919,7 +1841,7 @@
    good [[http://www.masteringemacs.org/articles/2010/12/22/fixing-mark-commands-transient-mark-mode/][article]] on the subject.
 
    #+BEGIN_SRC emacs-lisp
-     (defun jme/push-mark-no-activate ()
+     (defun jme:push-mark-no-activate ()
        "Pushes `point' to `mark-ring' and does not activate the region.
      Equivalent to \\[set-mark-command] when \\[transient-mark-mode] is disabled"
        (interactive)
@@ -1928,7 +1850,7 @@
    #+END_SRC
 
    #+BEGIN_SRC emacs-lisp
-     (defun jme/jump-to-mark ()
+     (defun jme:jump-to-mark ()
        "Jumps to the local mark, respecting the `mark-ring' order.
      This is the same as using \\[set-mark-command] with the prefix argument."
        (interactive)
@@ -1936,12 +1858,12 @@
    #+END_SRC
 
    #+BEGIN_SRC emacs-lisp
-     (defun jme/exchange-point-and-mark-no-activate ()
+     (defun jme:exchange-point-and-mark-no-activate ()
        "Identical to \\[exchange-point-and-mark] but will not activate the region."
        (interactive)
        (exchange-point-and-mark)
        (deactivate-mark nil))
-     (define-key global-map [remap exchange-point-and-mark] 'jme/exchange-point-and-mark-no-activate)
+     (define-key global-map [remap exchange-point-and-mark] 'jme:exchange-point-and-mark-no-activate)
    #+END_SRC
 
 * Theme Configuration
@@ -1956,6 +1878,14 @@
      (setq custom-theme-directory (concat user-emacs-directory "themes"))
    #+END_SRC
 
+   Support easy switching of themes via helm.
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package helm-themes
+       :ensure t
+       :after helm)
+   #+END_SRC
+
 ** Fonts
 
    I have moved to using the =Adobe Source Code Pro= font. More information
@@ -1965,9 +1895,9 @@
    use in presentation mode. Define some variables to hold them.
 
    #+BEGIN_SRC emacs-lisp
-     (defvar jme/default-font ""
+     (defvar jme:default-font ""
        "Default font to use.")
-     (defvar jme/presentation-font ""
+     (defvar jme:presentation-font ""
        "Font to use for presentations.")
    #+END_SRC
 
@@ -1975,11 +1905,11 @@
 
    #+BEGIN_SRC emacs-lisp
      (when window-system
-       (setq jme/default-font "-*-Source Code Pro-normal-normal-normal-*-14-*-*-*-m-0-iso10646-1")
+       (setq jme:default-font "-*-Source Code Pro-normal-normal-normal-*-14-*-*-*-m-0-iso10646-1")
        (if (string-equal system-type "darwin")
-           (setq jme/presentation-font "-*-Source Code Pro-normal-normal-normal-*-18-*-*-*-m-0-iso10646-1")
-           (setq jme/presentation-font "-bitstream-bitstream vera sans mono-medium-r-*-*-*-120-*-*-*-*-*-*"))
-         (set-face-attribute 'default nil :font jme/default-font))
+           (setq jme:presentation-font "-*-Source Code Pro-normal-normal-normal-*-18-*-*-*-m-0-iso10646-1")
+           (setq jme:presentation-font "-bitstream-bitstream vera sans mono-medium-r-*-*-*-120-*-*-*-*-*-*"))
+         (set-face-attribute 'default nil :font jme:default-font))
    #+END_SRC
 
 ** Load custom theme
@@ -1991,7 +1921,7 @@
     See [[http://www.howardism.org/Technical/LP/dot-emacs.html][Howard Abrams Emacs Config]].
 
     #+BEGIN_SRC emacs-lisp
-      (defun jme/org-src-color-blocks-light ()
+      (defun jme:org-src-color-blocks-light ()
         "Colors the block headers and footers to make them stand out more for lighter themes."
         (interactive)
         (custom-set-faces
@@ -2002,7 +1932,7 @@
          '(org-block-end-line
            ((t (:overline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF"))))))
 
-      (defun jme/org-src-color-blocks-dark ()
+      (defun jme:org-src-color-blocks-dark ()
         "Colors the block headers and footers to make them stand out more for dark themes."
         (interactive)
         (custom-set-faces
@@ -2035,24 +1965,24 @@
        "Switch to presentation theme."
         (interactive)
         (load-theme 'material-light t)
-        (when (boundp 'jme/presentation-font)
-          (set-frame-font jme/presentation-font :frames nil)
-          (set-face-attribute 'default nil :font jme/presentation-font))
+        (when (boundp 'jme:presentation-font)
+          (set-frame-font jme:presentation-font :frames nil)
+          (set-face-attribute 'default nil :font jme:presentation-font))
         (setq default-cursor-color (cdr (assoc 'cursor-color (frame-parameters)))))
 
       (defun use-default-theme ()
        "Switch to the default theme."
         (interactive)
         (load-theme 'material t)
-        (when (boundp 'jme/default-font)
-          (set-frame-font jme/default-font :frames nil)
-          (set-face-attribute 'default nil :font jme/default-font))
+        (when (boundp 'jme:default-font)
+          (set-frame-font jme:default-font :frames nil)
+          (set-face-attribute 'default nil :font jme:default-font))
         (setq default-cursor-color (cdr (assoc 'cursor-color (frame-parameters)))))
 
       (defun toggle-presentation-mode ()
        "Toggle between presentation and default theme."
         (interactive)
-        (if (string= (frame-parameter nil 'font) jme/default-font)
+        (if (string= (frame-parameter nil 'font) jme:default-font)
             (use-presentation-theme)
           (use-default-theme)))
 
@@ -2079,13 +2009,11 @@
                        (hide-mode-line))))
     #+END_SRC
 
-** Monkey Mode Line
+** Spaceline
 
-   My own invention of a mode line layout.
+   Configure spaceline for mode-line theme.
 
    #+BEGIN_SRC emacs-lisp
-     ;(use-package monkey-mode-line
-     ;  :config (monkeyml/monkey-mode-line))
      (use-package spaceline
        :ensure t
        :config
@@ -2105,17 +2033,17 @@
   | Key        | Action                      | Comments                            |
   |------------+-----------------------------+-------------------------------------|
   | =C-z=      | hide-or-expand              | Thought of as analog to shell sleep |
-  | =M-`=      | jme/push-mark-no-activate   |                                     |
+  | =M-`=      | jme:push-mark-no-activate   |                                     |
   | =C-`=      | pop-to-mark-command         |                                     |
   | =C-==      | expand-region               |                                     |
   | =C-c h=    | helm-mini                   |                                     |
-  | =C-c n=    | jme/cleanup-buffer          | Destructive cleanup of buffer       |
-  | =C-c on=   | jme/todays-daypage          | Open daypage for current day        |
-  | =C-c oN=   | jme/jme/find-daypage        | Open a specific day page            |
+  | =C-c n=    | jme:cleanup-buffer          | Destructive cleanup of buffer       |
+  | =C-c on=   | jme:todays-daypage          | Open daypage for current day        |
+  | =C-c oN=   | jme:find-daypage            | Open a specific day page            |
   | =C-c t=    | multi-term-next             | Reuse terminal                      |
   | =C-c T=    | multi-term                  | Create a new terminal               |
   | =C-c v p=  | git-messenger:popup-message | Popup the last git commit message   |
-  | =C-x <up>= | jme/rotate-windows          | Rotates windows                     |
+  | =C-x <up>= | jme:rotate-windows          | Rotates windows                     |
   | =C-. C-s=  | ace-jump-mode               |                                     |
   | =C-<f9>=   | toggle-presentation-mode    | switch in/out presentation theme    |
 
@@ -2124,22 +2052,22 @@
    #+BEGIN_SRC emacs-lisp
      (bind-key "C-z" 'hide-or-expand)
 
-     (bind-key "M-`" 'jme/push-mark-no-activate)
+     (bind-key "M-`" 'jme:push-mark-no-activate)
      (bind-key "C-`" 'pop-to-mark-command)
    #+END_SRC
 
 ** =C-c= mappings
 
    #+BEGIN_SRC emacs-lisp
-     (bind-key "C-c n" 'jme/cleanup-buffer)
-     (bind-key "C-c on" 'jme/todays-daypage)
-     (bind-key "C-c oN" 'jme/find-daypage)
+     (bind-key "C-c n" 'jme:cleanup-buffer)
+     (bind-key "C-c on" 'jme:todays-daypage)
+     (bind-key "C-c oN" 'jme:find-daypage)
    #+END_SRC
 
 ** =C-x= mappings
 
    #+BEGIN_SRC emacs-lisp
-     (bind-key "C-x <up>" 'jme/rotate-windows)
+     (bind-key "C-x <up>" 'jme:rotate-windows)
    #+END_SRC
 
 ** Function Key mappings
@@ -2161,10 +2089,11 @@
 
      ;; Support for Chrome 'edit with emacs' extension
      (use-package edit-server
+       :ensure t
        :if (and window-system
                 (not noninteractive))
-       :config
-       (edit-server-start t))
+       :init
+       (add-hook 'after-init-hook 'edit-server-start t))
    #+END_SRC
 
 * Footer
