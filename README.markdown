@@ -9,17 +9,8 @@ I have recently converted my configuration to literate style using
 `org-mode` and `org-babel`. Please have a look at the individual org files
 for more information.
 
-I have now moved to using [Cask](https://github.com/cask/cask) and
-[Pallet](https://github.com/rdallasgray/pallet) for package management.
-
-To make use of this configuration, you will need to take several
-installation steps:
-
-  * Install GNU Emacs 24 or higher
-  * Install Cask from https://github.com/cask/cask
-  * Clone the [repository](https://github.com/jeastman/emacs.d) as `$HOME/emacs.d`
-  * Run `cask install` in `$HOME/emacs.d`
-  * Start Emacs
+Simply running Emacs with the setup should correctly setup all files and
+packages.
 
 Additional Directories
 ---------------------
@@ -123,5 +114,3 @@ Full path to `pycheckers.sh` file for flymake is specified.
 
 Paths to where org files are located as well as files published for mobile
 org.
-
-
