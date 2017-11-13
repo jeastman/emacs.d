@@ -66,10 +66,10 @@
 ** Lisp Hyperspec
 
    #+BEGIN_SRC emacs-lisp
-     (defvar jme/common-lisp-hyperspec-root
+     (defvar jme:common-lisp-hyperspec-root
        "file:/Users/jeastman/Projects/l/lisp_docs/"
        "Local installation of Common Lisp Hyperspec")
 
-     (when (boundp 'jme/common-lisp-hyperspec-root)
-       (setq common-lisp-hyperspec-root jme/common-lisp-hyperspec-root))
+     (when (boundp 'jme:common-lisp-hyperspec-root)
+       (setq common-lisp-hyperspec-root jme:common-lisp-hyperspec-root))
    #+END_SRC
