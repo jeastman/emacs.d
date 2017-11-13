@@ -1522,6 +1522,62 @@
        (add-hook 'python-mode-hook 'highlight-indent-guides-mode)))
    #+END_SRC
 
+*** Anaconda
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package anaconda-mode
+        :ensure t
+        :commands anaconda-mode
+        :init (add-hook 'python-mode-hook 'anaconda-mode))
+    #+END_SRC
+
+*** Company Anaconda
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package company-anaconda
+        :ensure t
+        :after company
+        :config
+        (add-to-list 'company-backends '(company-anaconda :with company-capf)))
+    #+END_SRC
+
+*** Helm Pydoc
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package helm-pydoc
+        :ensure t
+        :after helm
+        :commands helm-pydoc
+        :bind (:map python-mode-map ("C-c C-d" . helm-pydoc)))
+    #+END_SRC
+
+*** Nose
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package nose
+        :ensure t
+        :after python
+        :commands (nosetests-one
+                   nosetests-pdb-one
+                   nosetests-all
+                   nosetests-pdb-all
+                   nosetests-module
+                   nosetests-pdb-module
+                   nosetests-suite
+                   nosetests-pdb-suite)
+        :config
+        (add-hook 'python-mode-hook (lambda () (nose-mode t))))
+    #+END_SRC
+
+*** Pythonic
+
+    #+BEGIN_SRC emacs-lisp
+    (use-package pythonic
+      :ensure t
+      :commands pythonic-activate)
+    #+END_SRC
+
+
 ** Java
 
 *** Eclim
