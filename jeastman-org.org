@@ -229,6 +229,16 @@
       (setq org-refile-allow-creating-parent-nodes (quote confirm))
     #+END_SRC
 
+*** Org-Bullets
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package org-bullets
+        :ensure t
+        :init
+        (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+    #+END_SRC
+
+
 ** Task settings
 
 *** Timestamps
