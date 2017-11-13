@@ -65,6 +65,14 @@
          (custom-set-variables '(helm-for-files-preferred-list jme:helm-sources))))
   #+END_SRC
 
+* Homebrew
+  Support for packages installed with homebrew
+
+  #+BEGIN_SRC emacs-lisp
+    (let ((default-directory "/usr/local/share/emacs/site-lisp/"))
+      (normal-top-level-add-subdirs-to-load-path))
+  #+END_SRC
+
 * Tweaks
 
 ** Super key support
