@@ -29,12 +29,6 @@
      (setq-default ispell-program-name "/usr/local/bin/aspell")
    #+END_SRC
 
-** Calendar
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package org-mac-iCal)
-   #+END_SRC
-
 ** markown
 
    Use =mmd= (MultiMarkdown) instead of =md= (Markdown).
@@ -53,12 +47,6 @@
 
 * Special Configuration
 
-  Prevent finder from opening new frames.
-
-  #+BEGIN_SRC emacs-lisp
-    (setq ns-pop-up-frames 'nil)
-  #+END_SRC
-
   Take advantage of the trash can on the Mac.
 
   #+BEGIN_SRC emacs-lisp
@@ -71,12 +59,10 @@
   Include spotlight data into helm.
 
   #+BEGIN_SRC emacs-lisp
-    (setq jme/helm-sources '(helm-source-buffers-list
-                             helm-source-recentf
-                             helm-source-bookmarks
-                             helm-source-file-cache
-                             helm-source-files-in-current-dir
-                             helm-source-mac-spotlight))
+    (eval-after-load "helm"
+      '(progn
+         (add-to-list 'jme:helm-sources 'helm-source-mac-spotlight)
+         (custom-set-variables '(helm-for-files-preferred-list jme:helm-sources))))
   #+END_SRC
 
 * Tweaks
@@ -88,7 +74,7 @@
    it as ALT in other cases.
 
    #+BEGIN_SRC emacs-lisp
-   (setq mac-option-modifier '(:ordinary super :function alt :mouse alt))
+   (custom-set-variables '(mac-option-modifier '(:ordinary super :function alt :mouse alt)))
    #+END_SRC
 
 ** Emoji
@@ -111,7 +97,7 @@
      (eval-after-load "flyspell"
        '(progn
           (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
-          (define-key flyspell-mouse-map [moude-3] #'undefined)))
+          (define-key flyspell-mouse-map [mouse-3] #'undefined)))
    #+END_SRC
 
 * Notification Messages
@@ -120,7 +106,7 @@
   Mac specific way to display desktop notifications via simple AppleScript.
 
   #+BEGIN_SRC emacs-lisp
-    (cl-defun jme/message-notify (title text &key speak-it (max-text-len 64))
+    (cl-defun jme:message-notify (title text &key speak-it (max-text-len 64))
       "Post a message with the given TITLE and TEXT to the notifications center.
       If SPEAK-IT is not NIL, will also say the message. Any text over MAX-TEXT-LEN
       will be truncated.
