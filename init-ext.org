@@ -1099,6 +1099,79 @@
          (diredp-toggle-find-file-reuse-dir 1)))
    #+END_SRC
 
+   All-the-icons support in dired buffers. Becasue, who doesn't like icons?
+
+   #+BEGIN_SRC emacs-lisp
+   (use-package all-the-icons-dired
+    :ensure t
+    :after all-the-icons
+    :commands all-the-icons-dired-mode
+    :config
+    (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+   #+END_SRC
+
+   Subtree support.
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package dired-subtree
+       :ensure t
+       :commands (dired-subtree-insert dired-subtree remove)
+       :after dired
+       :bind (:map dired-mode-map
+                   ("i" . dired-subtree-insert)
+                   (";" . dired-subtree-remove)))
+   #+END_SRC
+
+   Filter support.
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package dired-filter
+       :ensure t
+       :after dired
+       :config
+       (custom-set-variables '(dired-filter-group-saved-groups '(("default"
+                                                                  ("Archives"
+                                                                   (extension "zip" "rar" "gz" "bz2" "tar"))
+                                                                  ("Data"
+                                                                   (extension "json" "xml" "dat" "csv"))
+                                                                  ("Documents"
+                                                                   (extension "org" "markdown" "md" "adoc" "txt"))
+                                                                  ("Binary"
+                                                                   (extension "elc" "pyc"))
+                                                                  ("Backup"
+                                                                   (extension "el~" "backup"))
+                                                                  ("Language"
+                                                                   (extension "el" "py" "java" "sh" "awk" "rb"))
+                                                                  ("LaTeX"
+                                                                   (extension "tex" "bib"))
+                                                                  ("Mac"
+                                                                   (extension . "DS_Store"))
+                                                                  ("PDF"
+                                                                   (extension . "pdf"))
+                                                                  ("Version Control"
+                                                                   (extension "git" "gitignore" "gitconfig" "gitmodules"))
+                                                                  )))))
+   #+END_SRC
+
+** Elfeed
+
+   A utility mode for reading RSS.
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package elfeed
+       :ensure t)
+   #+END_SRC
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package elfeed-org
+       :ensure t
+       :after elfeed
+       :config
+       (progn
+         (custom-set-variables '(rmh-elfeed-org-files (list "~/.elfeed/elfeed.org")))
+         (elfeed-org)))
+   #+END_SRC
+
 ** Expand Region
 
    A fantastically useful package to gradually expand selected region.
@@ -1329,6 +1402,26 @@
      (use-package paradox
        :ensure t
        :commands paradox-list-packages)
+   #+END_SRC
+
+** PDF-tools
+
+   Package has been pinned to =manual=, since it requires an extra install
+   step.
+
+   After updating, the package needs to be activated with =(pdf-tools-install)=.
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package pdf-tools
+       :pin manual
+       :bind (:map pdf-view-mode-map
+              ("h" . pdf-annot-add-highlight-markup-annotation)
+              ("t" . pdf-annot-add-text-annotation)
+              ("D" . pdf-annot-delete))
+       :config
+       (progn
+         (setq-default pdf-view-display-size 'fit-page)
+         (setq pdf-annot-activate-created-annotations t)))
    #+END_SRC
 
 ** Projectile
@@ -1895,9 +1988,9 @@
    use in presentation mode. Define some variables to hold them.
 
    #+BEGIN_SRC emacs-lisp
-     (defvar jme:default-font ""
+     (defvar jme:default-font (face-font 'default)
        "Default font to use.")
-     (defvar jme:presentation-font ""
+     (defvar jme:presentation-font (face-font 'default)
        "Font to use for presentations.")
    #+END_SRC
 
@@ -1907,9 +2000,9 @@
      (when window-system
        (setq jme:default-font "-*-Source Code Pro-normal-normal-normal-*-14-*-*-*-m-0-iso10646-1")
        (if (string-equal system-type "darwin")
-           (setq jme:presentation-font "-*-Source Code Pro-normal-normal-normal-*-18-*-*-*-m-0-iso10646-1")
-           (setq jme:presentation-font "-bitstream-bitstream vera sans mono-medium-r-*-*-*-120-*-*-*-*-*-*"))
-         (set-face-attribute 'default nil :font jme:default-font))
+         (setq jme:presentation-font "-*-Source Code Pro-normal-normal-normal-*-18-*-*-*-m-0-iso10646-1")
+         (setq jme:presentation-font "-bitstream-bitstream vera sans mono-medium-r-*-*-*-120-*-*-*-*-*-*"))
+       (set-face-attribute 'default nil :font jme:default-font))
    #+END_SRC
 
 ** Load custom theme
@@ -2017,11 +2110,66 @@
      (use-package spaceline
        :ensure t
        :config
-       (use-package spaceline-config
+       (use-package spaceline-all-the-icons
+         :ensure t
          :config
-         (use-package monkey-spaceline
-           :load-path "lisp/"
-           :config (spaceline-monkey-theme))))
+         (progn
+           (dolist (s '((jme:spaceline-read-only "#4271AE" "Read only buffer face.")
+                        (jme:spaceline-modified "#F36C60" "Modified buffer face.")
+                        (jme:spaceline-unmodified "#78909C" "Unmodified buffer face.")))
+             (eval `(defface ,(nth 0 s)
+                      `((t (:background ,(nth 1 s)
+                                        :foreground "#3E3D31"
+                                        :inherit 'mode-line)))
+                      ,(nth 2 s)
+                      :group 'spaceline)))
+
+           (defun jme:spaceline-highlight-face-modified ()
+             "Set the highlight face depending on the buffer modified status.
+              Set `spaceline-highlight-face-func' to
+              `spaceline-highlight-face-modified' to use this."
+             (cond
+              (buffer-read-only 'jme:spaceline-read-only)
+              ((buffer-modified-p) 'jme:spaceline-modified)
+              (t 'jme:spaceline-unmodified)))
+
+           (setq-default spaceline-highlight-face-func 'jme:spaceline-highlight-face-modified)
+           (setq-default spaceline-all-the-icons-separator-type 'wave)
+           (spaceline-toggle-all-the-icons-modified-on)
+           (spaceline-toggle-all-the-icons-bookmark-off)
+           (spaceline-toggle-all-the-icons-dedicated-off)
+           (spaceline-toggle-all-the-icons-window-number-off)
+           (spaceline-toggle-all-the-icons-eyebrowse-workspace-off)
+           (spaceline-toggle-all-the-icons-buffer-size-on)
+           (spaceline-toggle-all-the-icons-projectile-on)
+           (spaceline-toggle-all-the-icons-mode-icon-on)
+           (spaceline-toggle-all-the-icons-buffer-id-on)
+           (spaceline-toggle-all-the-icons-buffer-path-off)
+           (spaceline-toggle-all-the-icons-process-off)
+           (spaceline-toggle-all-the-icons-position-on)
+           (spaceline-toggle-all-the-icons-region-info-on)
+           (spaceline-toggle-all-the-icons-fullscreen-off)
+           (spaceline-toggle-all-the-icons-text-scale-on)
+           (spaceline-toggle-all-the-icons-multiple-cursors-off)
+           (spaceline-toggle-all-the-icons-narrowed-on)
+           (spaceline-toggle-all-the-icons-vc-icon-off)
+           (spaceline-toggle-all-the-icons-vc-status-on)
+           (spaceline-toggle-all-the-icons-git-status-off)
+           (spaceline-toggle-all-the-icons-git-ahead-off)
+           (spaceline-toggle-all-the-icons-flycheck-status-on)
+           (spaceline-toggle-all-the-icons-flycheck-status-info-off)
+           (spaceline-toggle-all-the-icons-package-updates-off)
+           (spaceline-toggle-all-the-icons-org-clock-current-task-off)
+           (spaceline-toggle-all-the-icons-hud-off)
+           (spaceline-toggle-all-the-icons-buffer-position-off)
+           (spaceline-toggle-all-the-icons-battery-status-on)
+           (spaceline-toggle-all-the-icons-time-on)
+           (spaceline-toggle-all-the-icons-which-function-on)
+           (spaceline-toggle-all-the-icons-temperature-off)
+           (spaceline-toggle-all-the-icons-weather-off)
+           (spaceline-toggle-all-the-icons-minor-modes-off)
+           (spaceline-toggle-all-the-icons-nyan-cat-off)
+           (spaceline-all-the-icons-theme))))
    #+END_SRC
 
 * Key Bindings
