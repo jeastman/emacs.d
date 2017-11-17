@@ -51,10 +51,9 @@
    '(use-package-verbose t))
 
   ;; load org and make sure we have the right version
-  (use-package org
+  (use-package org-plus-contrib
     :ensure t
-    :pin org
-    :ensure org-plus-contrib)
+    :pin org)
 
   ;; load the literate init file
   (org-babel-load-file (expand-file-name "init-ext.org" user-emacs-directory))
