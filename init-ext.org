@@ -961,18 +961,14 @@
      (use-package yasnippet
        :ensure t
        :diminish yas-minor-mode
-       :config (yas-global-mode 1))
+       :config
+       (progn
+         (add-to-list 'yas-snippet-dirs (concat user-emacs-directory "snippets"))
+         (yas-global-mode 1)))
 
      (defun jme:insert-yas-by-name (name)
        "Insert YASnippet by NAME."
-       (cl-flet ((dummy-prompt
-                  (prompt choices &optional display-fn)
-                  (declare (ignore prompt))
-                  (or (find name choices :key display-fn :test #'string=)
-                      (throw 'notfound nil))))
-         (let ((yas-prompt-functions '(dummy-prompt)))
-           (catch 'notfound
-             (yas-insert-snippet t)))))
+       (yas-expand-snippet (yas-lookup-snippet name)))
    #+END_SRC
 
    Add =helm= support for yas.
