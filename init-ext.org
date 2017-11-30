@@ -1231,6 +1231,16 @@
          (flyspell-buffer)))
    #+END_SRC
 
+** Graphviz
+
+   Support for Graphviz dot language.
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package graphviz-dot-mode
+       :ensure t
+       :mode ("\\.dot\\'" . graphviz-dot-mode))
+   #+END_SRC
+
 ** Guide Key
 
    Nice utility for providing a guide for key bindings.
@@ -2159,6 +2169,47 @@
                        (org-remove-inline-images)
                        (use-default-theme)
                        (hide-mode-line))))
+    #+END_SRC
+
+** Demo-It
+
+   As an alternative means of managing presentations, I have been getting
+   comfortable with the [[https://github.com/howardabrams/demo-it][demo-it]] package by Howard Abrams.
+
+   The demo-it package suggests a couple of other packages which are
+   helpful in presentations. Load those here also.
+
+*** org-tree-slide
+
+    Handle each tree in an org buffer as a slide.
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package org-tree-slide
+        :ensure t
+        :commands org-tree-slide-mode
+        :config
+        (setq org-tree-slide-skip-outline-level 4)
+        (org-tree-slide-simple-profile))
+    #+END_SRC
+
+*** fancy-narrow
+
+    [[https://github.com/Malabarba/fancy-narrow][fancy-narrow]] allows for visually highlighting a section of a buffer. This can be
+    done without narrowing 'out' a specific region, but by 'dimming' the
+    surrounding content.
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package fancy-narrow
+        :ensure t)
+    #+END_SRC
+
+*** demo-it
+
+    The actual demo-it package.
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package demo-it
+        :ensure t)
     #+END_SRC
 
 ** Spaceline
