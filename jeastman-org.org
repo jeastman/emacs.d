@@ -235,10 +235,10 @@
 
     #+BEGIN_SRC emacs-lisp
       (setq org-todo-keywords
-            '((sequence "TODO(t)" "STARTED(s)" "WAITING(w)" "STALLED(x)" "|" "DONE(d)" "CANCELLED(c)")
-              (sequence "TASK(f)" "|" "DONE(d)")
-              (sequence "MAYBE(m)" "|" "DONE(d)" "CANCELLED(c)")
-              (sequence "RISK(r)" "|" "MITIGATED(i)")))
+            '((sequence "TODO(t)" "STARTED(s!)" "WAITING(w@/!)" "STALLED(x@/!)" "|" "DONE(d!)" "CANCELLED(c@)")
+              (sequence "TASK(f)" "|" "DONE(d!)")
+              (sequence "MAYBE(m)" "|" "DONE(d!)" "CANCELLED(c@)")
+              (sequence "RISK(r)" "|" "MITIGATED(i@)")))
     #+END_SRC
 
     Add some color to the different items to make them easier to visualize.
