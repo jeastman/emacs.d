@@ -6,6 +6,6 @@
 #+DATE: `(format-time-string "%B %d, %Y" (current-time))`
 #+AUTHOR: John Eastman
 
-* <`(format-time-string "%Y-%m-%d" (current-time))`> Notes
+* <`(format-time-string "%Y-%m-%d" (current-time))`> Daily Notes
 
 * Email
