@@ -469,16 +469,6 @@
 
 ** Key bindings
 
-   Guide setup
-
-   #+BEGIN_SRC emacs-lisp
-     (defun guide-key/jme-hook-function-for-org-mode ()
-       (guide-key/add-local-guide-key-sequence "C-c")
-       (guide-key/add-local-guide-key-sequence "C-c C-x")
-       (guide-key/add-local-highlight-command-regexp "org-"))
-     (add-hook 'org-mode-hook 'guide-key/jme-hook-function-for-org-mode)
-   #+END_SRC
-
    #+BEGIN_SRC emacs-lisp
      (bind-key "C-c l" 'org-store-link)
      (bind-key "C-c L" 'org-insert-link-global)

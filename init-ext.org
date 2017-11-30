@@ -1241,21 +1241,23 @@
        :mode ("\\.dot\\'" . graphviz-dot-mode))
    #+END_SRC
 
-** Guide Key
+** Which Key
 
-   Nice utility for providing a guide for key bindings.
+   I used to use [[https://github.com/kai2nenobu/guide-key][guide-key]] for remembering key combinations, but have now
+   switched to [[https://github.com/justbur/emacs-which-key][which-key]] which appears to be nicer.
 
    #+BEGIN_SRC emacs-lisp
-     (use-package guide-key
-       :diminish guide-key-mode
+     (use-package which-key
        :ensure t
+       :defer 10
+       :diminish which-key-mode
        :config
-       (progn
-         (custom-set-variables
-         '(guide-key/guide-key-sequence '("C-x" "C-c"))
-         '(guide-key/recursive-key-sequence-flag t)
-         '(guide-key/popup-window-position 'bottom))
-         (guide-key-mode 1)))
+       (setq which-key-key-replacement-alist
+             '(("left" . "◀")
+               ("right" . "▶")
+               ("up" . "▲")
+               ("down" . "▼")))
+       (which-key-mode 1))
    #+END_SRC
 
 ** Helm
