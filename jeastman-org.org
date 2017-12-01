@@ -273,7 +273,7 @@
     #+BEGIN_SRC emacs-lisp
       (setq org-capture-templates
             '(("t" "Todo" entry (file+headline "tasks.org" "Tasks")
-               "* TODO %^{Brief Description} %^g\n  %?\n  Added: %U")
+               "* TODO %^{Brief Description} %^g\n Added: %U\n\n  %?\n")
               ("T" "Quick task" entry (file+headline "tasks.org" "Tasks")
                "* TASK %^{Task}"
                :immediate-finish t)
@@ -284,7 +284,7 @@
                "%K - %a\n%i\n%?\n"
                :unnarrowed t)
               ("n" "Notes" entry (file+datetree "notes.org" "Inbox")
-               "* %^{Description} %^g\n  %?\n  Added: %U")))
+               "* %^{Description} %^g\n  Added: %U\n\n  %?\n")))
     #+END_SRC
 
 *** Archiving
