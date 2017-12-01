@@ -469,6 +469,31 @@
 
 ** Key bindings
 
+*** Org specific keybindings
+
+    Bind keys specific to org-mode. I try to train myself in using the
+    default keybindings. This helps to ensure that I handle things more
+    easily as they naturally evolve with the org package. However, there
+    are some functions I use regularly which have no keybindings. These
+    bindings need to be watched with a careful eye as they may end up
+    overriding something in the future.
+
+    I use timestamps quite frequently in my logging/journaling and many
+    times I want an /inactive/ timestamp (=org-time-stamp-inactive=)
+    instead of an /active/ (=org-time-stamp=) one. It is easy enough to
+    toggle them with =org-toggle-timestamp-type=, but that has no
+    keybinding either. I bound =org-time-stamp-inactive= to =C-c t= since
+    it was unbound and =t= is a good representation for /time/.
+
+    #+BEGIN_SRC emacs-lisp
+      (bind-key "C-c t" 'org-time-stamp-inactive org-mode-map)
+    #+END_SRC
+
+*** Org global keybindings
+
+    Bind keys which should be available in the global keymap which support
+    org-mode functions.
+
    #+BEGIN_SRC emacs-lisp
      (bind-key "C-c l" 'org-store-link)
      (bind-key "C-c L" 'org-insert-link-global)
