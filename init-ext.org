@@ -2246,7 +2246,7 @@
               (t 'jme:spaceline-unmodified)))
 
            (setq-default spaceline-highlight-face-func 'jme:spaceline-highlight-face-modified)
-           (setq-default spaceline-all-the-icons-separator-type 'wave)
+           (setq-default spaceline-all-the-icons-separator-type 'cup)
            (spaceline-toggle-all-the-icons-modified-on)
            (spaceline-toggle-all-the-icons-bookmark-off)
            (spaceline-toggle-all-the-icons-dedicated-off)
@@ -2281,7 +2281,8 @@
            (spaceline-toggle-all-the-icons-weather-off)
            (spaceline-toggle-all-the-icons-minor-modes-off)
            (spaceline-toggle-all-the-icons-nyan-cat-off)
-           (spaceline-all-the-icons-theme))))
+           (spaceline-all-the-icons-theme)
+           (spaceline-all-the-icons--setup-paradox))))
    #+END_SRC
 
 * Key Bindings
