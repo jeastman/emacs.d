@@ -426,6 +426,41 @@
       ;(bind-key "X" 'jme:org-agenda-done-and-add-followup org-agenda-mode-map)
     #+END_SRC
 
+
+** Clocking
+
+   I have recently been trying to train myself to use org clocking as a
+   means of improving my task efficiency. My configuration here is probably
+   pretty light and not comprehensive. I expect, like everything else, it
+   will evolve over time.
+
+*** Configuration
+
+    Make sure clock history, as well as any running clocks, are preserved
+    across emacs sessions. Perserving the clock is a necessity for me as I
+    often have time when I need to restart Emacs while working on some
+    task.
+
+    =org-clock-in-resume= ensures that when clocking into a task with an
+    open clock, the clock is resumed.
+
+    Make sure =org-clock-persist-query-resume= is nil, so that there is no
+    prompt when attempting to resume a clock. Just resume it.
+
+    #+BEGIN_SRC emacs-lisp
+      (org-clock-persistence-insinuate)
+      (setq org-clock-persist t)
+      (setq org-clock-in-resume t)
+      (setq org-clock-perist-query-resume nil)
+    #+END_SRC
+
+    When clocking into a task, go ahead and change the task to =STARTED=
+    state.
+
+    #+BEGIN_SRC emacs-lisp
+    (setq org-clock-in-switch-to-state "STARTED")
+    #+END_SRC
+
 ** LaTeX
 
    Use smart quotes when exporting.

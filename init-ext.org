@@ -2216,7 +2216,10 @@
 
 ** Spaceline
 
-   Configure spaceline for mode-line theme.
+   Configure spaceline for mode-line theme. I am overly specific in
+   toggling the segments. As I work to improve the way my mode line works
+   (which is a continuous effort), I find it best to be very specific about
+   which features to turn on/off.
 
    #+BEGIN_SRC emacs-lisp
      (use-package spaceline
@@ -2271,7 +2274,7 @@
            (spaceline-toggle-all-the-icons-flycheck-status-on)
            (spaceline-toggle-all-the-icons-flycheck-status-info-off)
            (spaceline-toggle-all-the-icons-package-updates-off)
-           (spaceline-toggle-all-the-icons-org-clock-current-task-off)
+           (spaceline-toggle-all-the-icons-org-clock-current-task-on)
            (spaceline-toggle-all-the-icons-hud-off)
            (spaceline-toggle-all-the-icons-buffer-position-off)
            (spaceline-toggle-all-the-icons-battery-status-on)
