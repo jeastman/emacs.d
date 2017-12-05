@@ -67,10 +67,13 @@
 
     I use a number of files to break up tasks into resonably grouped files.
 
-    =work.org= - Work-specific items.
-    =tasks.org= - General tasks.
-    =home.org= - Home-specific items.
-    =notes.org= - General notes file.
+    - =work.org= - Work-specific items, general projects (ones that do not
+      have their own project structure).
+    - =tasks.org= - General tasks, potentially re-filed.
+    - =notes.org= - General notes file, doubles as journal if needed.
+    - =calendar.org= - specific calendar items I want to show in my
+      agenda. This does not contain my full calendar as I do not want my
+      agenda views clouded by all the meetings I need to go to.
 
     Daypages have their own directory and the files are generated
     on-demand.
@@ -78,13 +81,10 @@
     #+BEGIN_SRC emacs-lisp
       (setq daypage-path (concat org-directory "/days/"))
       (setq diary-file (concat org-directory "/diary"))
-      (setq org-mobile-inbox-for-pull (concat org-directory "/flagged.org"))
       (setq org-agenda-files (list (concat org-directory "/work.org")
                                    (concat org-directory "/tasks.org")
-                                   (concat org-directory "/journal.org")
                                    (concat org-directory "/notes.org")
-                                   (concat org-directory "/calendar.org")
-                                   (expand-file-name daypage-path)))
+                                   (concat org-directory "/calendar.org")))
       (setq org-default-notes-file (concat org-directory "/notes.org"))
       (setq org-annotate-file-storage-file (concat org-directory "/annotated.org"))
       (setq org-agenda-include-diary nil)
@@ -93,7 +93,31 @@
 ** Daypages
 
    The following functions are used for opening daypage buffers. This can
-   be used to create day-specific items.
+   be used to create day-specific items. When opening a /day page/, it is
+   added to the current set of agenda files. Previously, I included the
+   directory of pages in the agenda. This had the negative side-effect of
+   loading ALL of the pages for previous days, which was annoying. This
+   solution ensures that things logged on a particular day will show up in
+   the agenda, but not items from previous days (unless the /day page/ is
+   actually visited). My personal workflow is such that I schedule and
+   track items on a daily basis in the /day page/ and anything which might
+   span days is handled in other agenda files.
+
+   Note that my general calendar is kept separately and not as part of my
+   normal agenda files. Since I tend to have a lot of meetings, I don't
+   really need them clouding up my org agenda, which is more
+   task-focused. I /may/ enter upcoming meetings for a particular day, if I
+   think it will effect the planning of my day for some particular
+   reason. In general my /day pages/ are used for daily planning, review,
+   and note taking for historical reference, not so much for time tracking
+   or other purpose.
+
+   Basic workflow is as follows:
+
+   1. Open day page for the current day
+   2. Enter in any upcoming meetings
+   3. Throughout the day, take generic notes and log communications
+   4. Once a day is complete, I close the file
 
    #+BEGIN_SRC emacs-lisp
      (defun jme:find-daypage (&optional date)
@@ -106,10 +130,11 @@
          (concat daypage-path
                  (format-time-string "%Y%m%d" date) ".org")))
        (when (eq 0 (buffer-size))
-         ; Insert a skeleton into the file
+         ;; Insert a skeleton into the file
          (jme:insert-yas-by-name "daily")
          (beginning-of-buffer)
-         (next-line 2)))
+         (next-line 2)
+         (org-agenda-file-to-front)))
 
      (defun jme:todays-daypage ()
        "Go straight to today's day page."
@@ -277,10 +302,10 @@
               ("T" "Quick task" entry (file+headline "tasks.org" "Tasks")
                "* TASK %^{Task}"
                :immediate-finish t)
-              ("j" "Journal entry" plain (file+datetree "journal.org")
+              ("j" "Journal entry" plain (file+datetree "notes.org")
                "%K - %a\n%i\n%?\n"
                :unnarrowed t)
-              ("J" "Journal entry with date" plain (file+datetree+prompt "journal.org")
+              ("J" "Journal entry with date" plain (file+datetree+prompt "notes.org")
                "%K - %a\n%i\n%?\n"
                :unnarrowed t)
               ("n" "Notes" entry (file+datetree "notes.org" "Inbox")
