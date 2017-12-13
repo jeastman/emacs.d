@@ -46,7 +46,13 @@
     (package-refresh-contents)
     (package-install 'use-package))
 
-  (require 'use-package)
+  (eval-when-compile
+    (require 'use-package))
+  (unless (package-installed-p 'diminish)
+    (package-refresh-contents)
+    (package-install 'diminish)
+    (require 'dimish))
+  (require 'bind-key)
   (custom-set-variables
    '(use-package-verbose t))
 
