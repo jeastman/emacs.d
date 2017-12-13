@@ -466,7 +466,7 @@
     default format to include effort and clock summary.
 
     #+BEGIN_SRC emacs-lisp
-      (setq org-columns-default-forma %50ITEM(Task) %TODO %2PRIORITY %10Effort(Effort){:} %10CLOCKSUM %TAGS)
+      (setq org-columns-default-format "%50ITEM(Task) %TODO %2PRIORITY %10Effort(Effort){:} %10CLOCKSUM %TAGS")
     #+END_SRC
 
 ** LaTeX
