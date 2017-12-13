@@ -51,8 +51,8 @@
    '(use-package-verbose t))
 
   ;; load org and make sure we have the right version
-  (use-package org-plus-contrib
-    :ensure t
+  (use-package org
+    :ensure org-plus-contrib
     :pin org)
 
   ;; load the literate init file
