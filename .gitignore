@@ -1,7 +1,4 @@
-.cask
 elpa
-vendor/flymake-jslint.el
-vendor/edit-server.el
 .DS_Store
 url
 eshell

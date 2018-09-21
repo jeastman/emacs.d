@@ -1,47 +1,44 @@
 ;;; init.el --- Emacs configuration file
 ;;
-;; Converted to literate format
 ;; Author: John Eastman
 ;; Date: 2013-10-24
+;; Converted to literate format
+;; Date: 2018-04-10
+;; Streamlined for minimal config
 ;;
 ;;; Commentary:
 ;;
-;; Bootstrap initialization file.  Just enough configuration
-;; to initialize the packaging system and ensure org is loaded
-;; so that the rest of the configuration can be loaded.
+;; Just enough configuration to initialize the packaging system and
+;; ensure org is loaded.
 ;;
 ;;; Code:
-;;
 
-;; Bling on Software tip about Garbage Collection
-;; http://bling.github.io/blog/2016/01/18/why-are-you-changing-gc-cons-threshold/
-;; Original source appears to be:
-;; https://www.reddit.com/r/emacs/comments/3kqt6e/2_easy_little_known_steps_to_speed_up_emacs_start/
 (let ((gc-cons-threshold most-positive-fixnum))
 
-  ;; Warn about using older versions of Emacs
-  ;; Nothing specific here, but this configuration is developed and maintained on
-  ;; version specified here.
   (when (version< emacs-version "25")
-    (warn "This configuration expects Emacs version 25 or greater - you are running %s!"
-          emacs-version))
+    (warn "This configuration expects Emacs version 25 or greater -- You are running %s!"
+      emacs-version))
 
   ;; require the package manager
   (require 'package)
 
-  ;; Set some startup configuration values
+  ;; In an effort to reduce the risk of loading outdated byte code files,
+  ;; set load-prefer-newer to t. Starting with Emacs version 24.5,
+  ;; load-prefer-newer can prevent outdated byte code files from being
+  ;; loaded. However, there is still a possibility that a source file would
+  ;; not be re-compiled. auto-compile works to fill this gap. (loaded later)
   (setq-default
    load-prefer-newer t            ; load prefers the newest version of a file
    package-enable-at-startup nil) ; Prevent packages from being activated after reading init
 
-  ;; initialize the ELPA repositories where packages are fetched
-  (setq package-archives '(("org"   . "http://orgmode.org/elpa/")
-                           ("melpa" . "https://melpa.org/packages/")
-                           ("gnu"   . "https://elpa.gnu.org/packages/")))
+  ;; initialize the package repositories
+  (setq package-archives '(("org"   . "https://orgmode.org/elpa/")
+               ("melpa" . "https://melpa.org/packages/")
+               ("gnu"   . "https://elpa.gnu.org/packages/")))
 
   (package-initialize)
 
-  ;; Utilize use-package
+  ;; Install use-package
   (unless (package-installed-p 'use-package)
     (package-refresh-contents)
     (package-install 'use-package))
@@ -51,20 +48,17 @@
   (unless (package-installed-p 'diminish)
     (package-refresh-contents)
     (package-install 'diminish)
-    (require 'dimish))
+    (require 'diminish))
   (require 'bind-key)
   (custom-set-variables
    '(use-package-verbose t))
 
-  ;; load org and make sure we have the right version
   (use-package org
-    :ensure org-plus-contrib
     :pin org)
 
-  ;; load the literate init file
   (org-babel-load-file (expand-file-name "init-ext.org" user-emacs-directory))
 
-  ;; trigger garbage collection to clean up our deferred mess
   (garbage-collect))
+
 (provide 'init)
 ;;; init.el ends here

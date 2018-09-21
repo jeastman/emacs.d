@@ -1,75 +1,65 @@
 #+TITLE: Emacs Configuration
 #+OPTIONS: toc:4 h:4
 #+STARTUP: showeverything
-#+LATEX_CLASS: jmeorgdoc
 
 * Reworking Configuration
 
-  I originally read a [[http://www.lunaryorn.com/2015/01/06/my-emacs-configuration-with-use-package.html][post]] by Sebastian Wiesner regarding the use of
-  =use-package= that got me curious enough to attempt to rework my Emacs
-  configuration. I now attempt to utilize =use-package= for all of the
-  packages I use. Check John Wiegley's [[https://github.com/jwiegley/use-package/][Github Page]] for more details.
-
-  I previously used =Cask= and =Pallet= to manage all of my packages, which
-  worked quite well, but did not address the configuration side of
-  things.
-
-  I have now moved away from these tools in favor of using =use-package= to
-  manage all package installation and configuration.
+  Emacs configuration is an endless effort for me. Several years ago,
+  I converted my configuration over to an org-based literate style. It
+  was a major undertaking, but I believe it has paid of. While my
+  configuration continued to change and grow, it did so in an orderly
+  and well documented manner. Yet, here I am again, nearly re-writing
+  my entire configuration. Even the best maintained systems deserve a
+  refresh every now and then. While not everything is new, experience
+  has convinced me that there are some better ways to do things.
 
 * File Header
 
   Add some comments to the beginning of the generated elisp file.
 
   #+BEGIN_SRC emacs-lisp :padline no
-    ;;; init-ext.el -- Automatically generated initialization file
-    ;;;
-    ;;; This file is generated based on the init-ext.org file.
-    ;;; Please see that file for complete documentation.
-    ;;;
-    ;;; Commentary:
-    ;;; See init-ext.org
-    ;;;
-    ;;; Code:
-    ;;;
+  ;;; init-ext.el -- Automatically generated initialization file
+  ;;;
+  ;;; This file is generated based on the init-ext.org file.
+  ;;; Please refer to that file for complete documentation.
+  ;;;
+  ;;; Commentary:
+  ;;; See init-ext.org
+  ;;;
+  ;;; Code:
+  ;;;
   #+END_SRC
 
 * Early loading
 
-  These items need to be setup early in the Emacs loading process.
-
-** Prefer newer
-
-   In an effort to reduce the risk of loading outdated byte code files, set
-   =load-prefer-newer= to =t=. Starting with Emacs version 24.5,
-   =load-prefer-newer= can prevent outdated byte code files from being
-   loaded. However, there is still a possibility that a source file would
-   not be re-compiled. =auto-compile= works to fill this gap.
-
-   #+BEGIN_SRC emacs-lisp
-     (setq load-prefer-newer t)
-   #+END_SRC
+  These items need to be setup as early as possible in the Emacs loading process.
 
 ** Auto compilation
 
-   Ensure we are always using the latest code. =auto-compile= ensures that
-   source files are recompiled if newer than their compiled form.
+   While using =load-prefer-newer= will prevent outdated byte code
+   file from being loaded, there is still a possibility that a source
+   file would not be recomipled. =auto-compile= works to fill this
+   gap.
 
-  #+BEGIN_SRC emacs-lisp
-    (use-package auto-compile
-      :demand t
-      :ensure t
-      :config
-      (progn
-        (auto-compile-on-load-mode)
-        (auto-compile-on-save-mode)))
-  #+END_SRC
+   Ensure we are always using the latest code. =auto-compile= ensures
+   that source files are recompiled if newer than their compiled form.
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package auto-compile
+       :demand t
+       :ensure t
+       :config
+       (progn
+         (auto-compile-on-load-mode)
+         (auto-compile-on-save-mode)))
+   #+END_SRC
 
 ** Variable definitions
 
-   Some variables require being defined early on due to use in other modules.
+   Some variables require being defined early on due to their use in
+   other modules.
 
-   #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp :tangle no
      (defvar jme:helm-sources '(helm-source-buffers-list
                                 helm-source-recentf
                                 helm-source-bookmarks
@@ -77,11 +67,12 @@
                                 helm-source-files-in-current-dir))
    #+END_SRC
 
-* General Configuration
+
+* General configuration
 ** Exec path
 
-   Pull the exec path from our shell, this ensures all of the binaries we
-   expect are available to us.
+   Pull the exec path from our shell, this ensures all of the binaries
+   we expect are available to us.
 
    #+BEGIN_SRC emacs-lisp
      (use-package exec-path-from-shell
@@ -90,36 +81,36 @@
        :config
        (progn
          (when (string-match-p "/zsh$" (getenv "SHELL"))
-           ;; use an non-interactive login shell to ensure
+           ;; Use a non-interactive login shell to ensure
            ;; zsh path is loaded properly from .zprofile
-           ;; which only loads with login shell.
+           ;; which only loads with a login shell.
            (setq exec-path-from-shell-arguments '("-l")))
          (exec-path-from-shell-initialize)))
    #+END_SRC
 
-** Library Paths
+** Library paths
 
-   Everything is situated underneath =user-emacs-directory (~/.emacs.d)=
+   Everything is situated underneath =user-emacs-directory (~/.emacs.d)=.
 
-   This makes everything self-contained and easy to migrate to other
+   This make everything self-contained and easy to migrate to other
    environments.
 
-   This section contains all of the path configurations that are not
-   machine specific. A seperate directory =(~/.emacs-meta)= is configured
-   for =Meta= information files (backups, temporary files, etc.)
+   This section contains all of the path configuration that are not
+   machine specific. A seperate directory =(~/.emacs-meta)= is
+   configured for =Meta= information (backups, temp files, etc.)
 
 *** Metafiles
 
-    First, we need to define the  =metafiles-dir= values.
+    First, we need to define the =metafiles-dir= values.
 
     #+BEGIN_SRC emacs-lisp
       (defvar metafiles-dir
         "~/.emacs-meta" "Custom location for metadata.")
     #+END_SRC
 
-    As this may be the first time I am running in this environment, the
-    =metafiles-dir= directory may not actually exist. We go ahead and
-    create it if it doesn't.
+    As this may be the first time Emacs is running in this
+    environment, the =metafiles-dir= directory may not actually
+    exist. Go ahead and create it, if it does not.
 
     #+BEGIN_SRC emacs-lisp
       (unless (file-exists-p metafiles-dir)
@@ -128,8 +119,7 @@
 
 *** Temporary directory
 
-    I can now set the Emacs temporary directory to be within the
-    =metafiles-dir=, again creating it if necessary.
+    Set the temporary directory to be inside the =metafiles-dir=.
 
     #+BEGIN_SRC emacs-lisp
       (setq temporary-file-directory (concat metafiles-dir "/tmp/"))
@@ -137,29 +127,22 @@
         (make-directory temporary-file-directory))
     #+END_SRC
 
+** Additional paths
 
-** Additional Paths
-
-   I add the =user-emacs-directory= to the load path here to ensure we can
+   Add the =user-emacs-directory= to the load path to ensure we can
    pick up the additional configuration files.
 
    #+BEGIN_SRC emacs-lisp
-     (add-to-list 'load-path (concat user-emacs-directory "/lisp"))
-   #+END_SRC
-
-   I also add all top-level subdirectories of =user-emacs-directory=.
-
-   #+BEGIN_SRC emacs-lisp
-     (let ((default-directory user-emacs-directory))
-           (normal-top-level-add-subdirs-to-load-path))
+        (add-to-list 'load-path (concat user-emacs-directory "/lisp"))
    #+END_SRC
 
 *** Paths for meta-information
 
-    I set up variables for all paths needed for storing things in the
-    =meta-information= directory. By consolidating them all in one place
-    (and using the variables later), I have an easier time keeping track of
-    them and maintaining them.
+    Variables for all paths needed for storing things in the
+    =metafiles-dir= directory. By consolidating them all in one place
+    (and using the variables later), keeping track of them and
+    maintaining them becomes easier. Later, =no-littering= will be
+    used to catch all of the items we miss.
 
     | Variable         | Purpose                                                                                                   |
     |------------------+-----------------------------------------------------------------------------------------------------------|
@@ -174,7 +157,7 @@
     | =meta-ido=       | File in which the =ido= state is saved between invocations                                                |
     | =meta-tramp=     | File used for =tramp= persistence                                                                         |
 
-    #+BEGIN_SRC emacs-lisp
+     #+BEGIN_SRC emacs-lisp
       (defvar meta-config (concat metafiles-dir "/etc/")
         "Location of etc directory for no-littering.")
       (defvar meta-data (concat metafiles-dir "/var/")
@@ -197,8 +180,7 @@
         "Directory for url files.")
     #+END_SRC
 
-    Having set all of the known paths, we use the =no-littering= package to
-    attempt to catch the rest.
+    Use =no-littering= package to keep things clean.
 
     #+BEGIN_SRC emacs-lisp
       (use-package no-littering
@@ -209,98 +191,19 @@
               no-littering-var-directory meta-data))
     #+END_SRC
 
-*** System and user specific configuration
+*** Custom settings
 
-    I run the same configuration on several machines. Different machines
-    have different capabilities as well as different file system
-    layouts. To handle this situation, I load system specific files based
-    on the name of the machine. I also load in a file based on user name,
-    to handle additional environments.
+    Keep emacs custom settings in a separate file. This helps to keep
+    things clean in the configuration files. Most of the variable
+    assignments in this configuration use the =custom-set-variables=
+    function to set variables. This ensures that any special handling
+    by packages is executed along with setting the variable.
 
-    My previous implementation for handling this had become too complicated
-    and had some trouble with ordering. So, I have simplified things by
-    having several functions.
+    #+BEGIN_SRC emacs-lisp
+      (custom-set-variables '(custom-file (expand-file-name "custom.el" user-emacs-directory)))
+    #+END_SRC
 
-**** Custom Settings
-
-     Keep emacs Custom-settings in separate file. I previously converted
-     most of my variable assignmets to setting custom variables during
-     init. Therefore, the contents of the =custom.el= file is mostly
-     populated from configuration.
-
-     #+BEGIN_SRC emacs-lisp
-       (custom-set-variables '(custom-file (expand-file-name "custom.el" user-emacs-directory)))
-     #+END_SRC
-
-**** Basic loading function
-
-     #+BEGIN_SRC emacs-lisp
-       (defun jme:load (directory base)
-         "Look for files located in DIRECTORY whose base name is BASE.
-
-       Check the base name against several extensions.  If a file with
-       that name exists, then load it."
-         (let ((literate      (expand-file-name (concat base ".org") directory))
-               (encrypted-org (expand-file-name (concat base ".org.gpg") directory))
-               (plain         (expand-file-name (concat base ".el") directory))
-               (encrypted-el  (expand-file-name (concat base ".el.gpg") directory)))
-          (cond
-           ((file-exists-p encrypted-org) (org-babel-load-file encrypted-org))
-           ((file-exists-p encrypted-el)  (load encrypted-el))
-           ((file-exists-p literate)      (org-babel-load-file literate))
-           ((file-exists-p plain)         (load plain)))))
-     #+END_SRC
-
-**** Private settings
-
-     Personal information that should not be shared is kept in a private
-     file.
-
-     #+BEGIN_SRC emacs-lisp
-       (jme:load user-emacs-directory ".private")
-     #+END_SRC
-
-**** OS-specific settings
-
-     Settings specific to machine type are kept in their own settings file.
-
-     #+BEGIN_SRC emacs-lisp
-       (let* ((system-type-name (symbol-name system-type))
-              (base-name (replace-regexp-in-string "/" "-" system-type-name)))
-         (jme:load user-emacs-directory base-name))
-     #+END_SRC
-
-**** Hostname-specific settings
-
-     Settings specific to a particular machine, identified by host name,
-     are stored in their own settings file.
-
-     #+BEGIN_SRC emacs-lisp
-       (let ((host-name-base (car (split-string (system-name) "\\."))))
-         (jme:load user-emacs-directory host-name-base))
-     #+END_SRC
-
-**** User-specific settings
-
-     #+BEGIN_SRC emacs-lisp
-       (jme:load user-emacs-directory user-login-name)
-     #+END_SRC
-
-**** Custom configuration
-
-     Finally, we load any settings set by ~customize~.
-
-     #+BEGIN_SRC emacs-lisp
-       (load custom-file)
-     #+END_SRC
-
-** General Emacs Settings
-
-   There are a number of configuration items I tend to look at as basic
-   configuration. There is a fine line between what is a /package/ and what
-   is just part of Emacs, especially at the rate things are being included
-   in the /official/ distribution.
-
+** General Settings
 *** Window sizing
 
     When using a =window-system=, which I most often do, I like to start
@@ -377,10 +280,7 @@
           (jme:emacs-max)))
     #+END_SRC
 
-    I start off with Emacs in its minimal state when starting up. Since
-    moving to the =mac= Emacs port on my Apple machines, as opposed to the
-    =ns= version, I don't really use the toggle much anymore. Instead I use
-    the mac fullscreen mode.
+    I start off with Emacs in its minimal state when starting up.
 
     #+BEGIN_SRC emacs-lisp
       (if window-system
@@ -569,33 +469,6 @@
        (size-indication-mode 1)
      #+END_SRC
 
-***** Battery information
-
-      I have opted for a simpler and 'clearer' solution to displaying
-      battery information utilizing the `fancy-battery` package.
-
-      #+BEGIN_SRC emacs-lisp
-        (use-package fancy-battery
-          :ensure t
-          :config
-          (add-hook 'after-init-hook #'fancy-battery-mode))
-      #+END_SRC
-
-***** Time
-
-      I often run emacs in a fullscreen fashion that does not display the
-      system clock on my desktop. However, I often refer to the clock, thus
-      I add it to the modeline. The =display-time= functionality in Emacs
-      is quite robust and can potentially display much more information
-      than just the time. I configure it here to my liking.
-
-      #+BEGIN_SRC emacs-lisp
-        (custom-set-variables '(display-time-default-load-average nil)  ; Don't display load
-                              '(display-time-day-and-date nil)          ; Don't display date
-                              '(display-time-format "%l:%M%p"))
-        (add-hook 'after-init-hook #'display-time-mode)
-      #+END_SRC
-
 *** Miscellaneous
 
     Add newline to end of file on save.
@@ -694,31 +567,6 @@
        (custom-set-variables '(auto-revert-verbose nil))
      #+END_SRC
 
-**** Git gutter
-
-     Git gutter is a nice little utility that adds markers in the fringe to
-     denote changes in a file. I like this everywhere, so I turn it on
-     globally.
-
-     #+BEGIN_SRC emacs-lisp
-       (use-package git-gutter-fringe
-         :ensure t
-         :diminish git-gutter-mode
-         :config
-         (progn
-           (custom-set-variables '(git-gutter:lighter " GG"))
-           (global-git-gutter-mode)))
-     #+END_SRC
-
-**** Git messenger
-
-     #+BEGIN_SRC emacs-lisp
-       (use-package git-messenger
-         :ensure t
-         :commands git-messenger:popup-message
-         :bind ("C-x v p" . git-messenger:popup-message))
-     #+END_SRC
-
 **** Recentf
 
      Save recently used files. This turns on the "Open Recent" submenu
@@ -738,13 +586,12 @@
 
      #+BEGIN_SRC emacs-lisp
        (use-package recentf
+         :custom
+         (recentf-save-file meta-recent "Set the save file to be in meta area.")
+         (recentf-max-saved-items 100 "Save 100 recent items.")
+         (recentf-max-menu-items 15 "Maximum number of items in the recentf menu.")
          :config
-         (progn
-           (custom-set-variables
-             '(recentf-save-file meta-recent)
-             '(recentf-max-saved-items 100)
-             '(recentf-max-menu-items 15))
-           (recentf-mode t)))
+           (recentf-mode t))
      #+END_SRC
 
 **** Savehist
@@ -762,14 +609,14 @@
 
      #+BEGIN_SRC emacs-lisp
        (use-package savehist
+         :custom
+         (savehist-additional-variables
+          '(kill-ring search-ring regexp-search-ring))
+         (savehist-autosave-interval 300)
+         (savehist-file meta-savehist)
+         (history-delete-duplicates t)
          :config
-         (progn
-           (custom-set-variables '(savehist-additional-variables
-                                   '(kill-ring search-ring regexp-search-ring))
-                                 '(savehist-autosave-interval 300)
-                                 '(savehist-file meta-savehist)
-                                 '(history-delete-duplicates t))
-           (savehist-mode t)))
+         (savehist-mode t))
      #+END_SRC
 
 **** Saveplace
@@ -785,50 +632,6 @@
          (progn
            (custom-set-variables '(save-place-file meta-saveplace))
            (save-place-mode t)))
-     #+END_SRC
-
-**** Smartparens
-
-     I like to visually see the matching parens. =smartparens-mode= is a
-     global minor mode that highlights matching parens.
-
-     If there are specific modes in which =smartparens-mode= should not be
-     enabled, they can be added to the =sp-ignore-modes-list=.
-
-     #+BEGIN_SRC emacs-lisp
-       (use-package smartparens
-         :ensure t
-         :commands (smartparens-mode
-                    show-smartparens-mode
-                    show-smartparens-global-mode)
-         :demand t
-         :diminish smartparens-mode
-         :config
-         (progn
-           (require 'smartparens-config)
-           (smartparens-global-mode)))
-     #+END_SRC
-
-**** Undo-tree-mode
-
-     =undo-tree-mode= replaces Emacs' standard undo feature with a more
-     powerful, yet easier to user version, that treats the undo history as
-     what it is: a tree.
-
-     If a specific mode is not compatible with =undo-tree-mode=, it can be
-     added to the list =undo-tree-incompatible-major-modes=.
-
-     Enable =undo-tree-mode= globally.
-
-     #+BEGIN_SRC emacs-lisp
-       (use-package undo-tree
-         :ensure t
-         :diminish undo-tree-mode
-         :config
-         (progn
-           (custom-set-variables '(undo-tree-visualizer-timestamps t)
-                                 '(undo-tree-visualizer-diff t))
-           (global-undo-tree-mode)))
      #+END_SRC
 
 **** Whitespace
@@ -850,78 +653,81 @@
      #+BEGIN_SRC emacs-lisp
        (use-package whitespace
          :diminish global-whitespace-mode
+         :custom
+         (whitespace-style '(face trailing space-before-tab
+                                  indentation space-after-tab))
+         (whitespace-line-column 80)
          :config
-         (progn
-           (custom-set-variables '(whitespace-style '(face trailing space-before-tab
-                                                      indentation space-after-tab))
-                                 '(whitespace-line-column 80))
-           (global-whitespace-mode 1)))
+         (global-whitespace-mode 1))
      #+END_SRC
 
-**** Winner
+**** Uniquify
 
-     Winner mode is a minor mode which keeps a history of changes to window
-     configurations. This allows you to easily undo (=winner-undo=) and
-     redo (=winner-redo=) window configurations.
+     By default, Emacs makes buffer names unique by adding =<2>=, =<3>=,
+     etc. to the end of the buffer name. I don't find this particularly
+     useful. Using the =Uniquify= package, I can easily change this behavior.
+
+     Use the =post-forward= type of naming for buffers. This names the buffer
+     with the file name followed by a shortened form of the path.
+
+     For example:
+
+     =/foo/bar/mumble/name= becomes =name|bar/mumble=
+
+     I change the string used as a separator for the buffer name components
+     to be ":".
+
+     Also, make sure to rerationalize buffer names after a buffer has been
+     killed.
+
+     Some buffers should not be uniquified. I also provide a regular
+     expression here for these exceptions.
 
      #+BEGIN_SRC emacs-lisp
-       (use-package winner
-         :ensure t
-         :if (not noninteractive)
-         :demand t
-         :config (winner-mode 1))
+       (use-package uniquify
+         :custom
+         (uniquify-buffer-name-style 'post-forward)
+         (uniquify-separator ":")
+         (uniquify-after-kill-buffer-p t)
+         (uniquify-ignore-buffers-re "^\\*"))
      #+END_SRC
 
-* Utility functions
+**** Cleanup
 
-  There are a number of /utility/ functions that I keep around for handling
-  different things. Some of them are experimental, but they /do/ work.
+     Whitespace cleanup can be dangerous if it changes the content of the
+     file. Some changes are guaranteed to be safe, which this function sticks
+     to, allowing it to be safe for a =before-save-hook=. (see [[http://whattheemacsd.com/buffer-defuns.el-01.html][this article]].)
 
-** Hide or Expand
+     #+BEGIN_SRC emacs-lisp
+       (defun jme:cleanup-buffer-safe ()
+         "Perform a bunch of safe operations on the whitespace content of a buffer.
+       Does not indent buffer, because it is used for a `before-save-hook', and that
+       might be bad."
+         (interactive)
+         (untabify (point-min) (point-max))
+         (delete-trailing-whitespace)
+         (set-buffer-file-coding-system 'utf-8))
+     #+END_SRC
 
-   I have kept this around for a long time and go through different phases
-   of using it. I have recently gone back to using it quite a bit now that
-   I have been using =winner= mode.
+     If we want to be less careful when cleaning up, we can do that too.
 
-   #+BEGIN_SRC emacs-lisp
-     (defun hide-or-expand ()
-       "Hide or expand a window."
-       (interactive)
-       (if (> (length (window-list)) 1)
-           (delete-other-windows)
-         (bury-buffer)))
-   #+END_SRC
+     #+BEGIN_SRC emacs-lisp
+       (defun jme:cleanup-buffer ()
+         "Perform a bunch of operations on the whitespace content of a buffer.
+       Including indent-buffer, which should not be called automatically on save."
+         (interactive)
+         (jme:cleanup-buffer-safe)
+         (indent-region (point-min) (point-max)))
+     #+END_SRC
 
-* Package Specific Settings
-** Avy
+     Make sure we hook this into our save process.
 
-   Replacement for ace-jump-mode and other things.
+     #+BEGIN_SRC emacs-lisp
+       (add-hook 'before-save-hook 'jme:cleanup-buffer-safe)
+     #+END_SRC
 
-   #+BEGIN_SRC emacs-lisp
-     (use-package avy
-       :ensure t
-       :commands avy-goto-word-1
-       :bind ("C-. C-s" . avy-goto-word-1))
-   #+END_SRC
 
-** Aggressive Indent
-
-   Avoid manual indentation with 'aggressive indent'. I am not sure I am
-   comfortable with this mode anywhere but in lisp code just yet.
-
-   It can be turned on globally with =(global-aggressive-indent-mode 1)=.
-
-   If used globally, specific modes can be excluded with the list
-   =aggressive-indent-excluded-modes=.
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package aggressive-indent
-        :ensure t
-        :diminish (aggressive-indent-mode . "➠")
-        :config
-          (add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode))
-   #+END_SRC
-
+* Functionality Tweaks
 ** Auto complete (Company)
 
    I have fiddled around with different auto-completion packages and
@@ -930,13 +736,25 @@
    #+BEGIN_SRC emacs-lisp
      (use-package company
        :ensure t
+       :defer 2
        :diminish company-mode
+       :custom
+       (company-idle-delay .3)
+       (company-minimum-prefix-length 2)
+       (company-show-numbers t)
+       (company-tooltip-align-annotations 't)
        :config
-       (global-company-mode)
-       :init
-       (progn
-         (custom-set-variables '(company-tooltip-limit 20)
-                               '(company-idle-delay .3))))
+       (global-company-mode))
+   #+END_SRC
+
+   Statistical recent completions.
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package company-statistics
+       :ensure t
+       :after (company)
+       :config
+       (company-statistics-mode))
    #+END_SRC
 
    Also enable fuzzy matching.
@@ -949,162 +767,37 @@
        (company-flx-mode +1))
    #+END_SRC
 
-** YASnippet
+** Diminish
 
-   YASnippet is an excellent template system for Emacs and it works very
-   well with Auto Complete. I use it everywhere I can.
-
-   YASnippet does not provide a way to expand a snippet programmatically,
-   so we create one. (Based on code from [[http://stackoverflow.com/questions/10211730/insert-yasnippet-by-name][this]] Stack Overflow question.)
+   I use diminish to hide most of minor modes from the modeline. Most of
+   the diminish functionality has been updated into the =use-package=
+   calls.
 
    #+BEGIN_SRC emacs-lisp
-     (use-package yasnippet
+     (use-package diminish
        :ensure t
-       :diminish yas-minor-mode
        :config
        (progn
-         (add-to-list 'yas-snippet-dirs (concat user-emacs-directory "snippets"))
-         (yas-global-mode 1)))
-
-     (defun jme:insert-yas-by-name (name)
-       "Insert YASnippet by NAME."
-       (yas-expand-snippet (yas-lookup-snippet name)))
-   #+END_SRC
-
-   Add =helm= support for yas.
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package helm-c-yasnippet
-       :ensure t
-       :after helm
-       :bind ("C-c y" . helm-yas-complete)
-       :config (custom-set-variables '(helm-yas-space-match-any-greedy t)))
-   #+END_SRC
-
-   Here we provide an indication that there is a yasnippet available to be
-   used. (From [[https://github.com/pcmantz/elisp/blob/master/my-bindings.el][here]] and [[http://pages.sachachua.com/.emacs.d/Sacha.html#unnumbered-132][here]]).
-
-   #+BEGIN_SRC emacs-lisp
-     (defvar default-cursor-color (cdr (assoc 'cursor-color (frame-parameters)))
-       "Capture the default cursor color so we can switch back to it if needed.")
-     (defvar yasnippet-can-fire-cursor-color "purple"
-       "Color to change cursor when yasnippet is available.")
-
-     (defun jme:yasnippet-can-fire-p (&optional field)
-       "Test if yasnippet can expand based on FIELD."
-       (interactive)
-       (setq yas--condition-cache-timestamp (current-time))
-       (let (templates-and-pos)
-         (unless (and yas-expand-only-for-last-commands
-                      (not (member last-command yas-expand-only-for-last-commands)))
-           (setq templates-and-pos (if field
-                                       (save-restriction
-                                         (narrow-to-region (yas--field-start field)
-                                                           (yas--field-end field))
-                                         (yas--templates-for-key-at-point))
-                                     (yas--templates-for-key-at-point))))
-         (and templates-and-pos (first templates-and-pos))))
-
-     (defun jme:change-cursor-color-when-can-expand (&optional field)
-       "Update the cursor color if a snippet is available, based on FIELD."
-       (interactive)
-       (when (eq last-command 'self-insert-command)
-         (set-cursor-color (if (jme:can-expand)
-                               yasnippet-can-fire-cursor-color
-                             default-cursor-color))))
-
-     (defun jme:can-expand ()
-       "Return true if right after an expandable thing."
-       (or (abbrev--before-point) (jme:yasnippet-can-fire-p)))
-
-     (add-hook 'post-command-hook 'jme:change-cursor-color-when-can-expand)
-   #+END_SRC
-
-** Clojure
-
-   Support for Clojure.
-
-*** Clojure Mode
-
-    #+BEGIN_SRC emacs-lisp
-      (use-package clojure-mode
-        :ensure t
-        :init
-        (progn
-          (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode)
-          (add-hook 'clojure-mode-hook #'smartparens-strict-mode)))
-    #+END_SRC
-
-*** Cider
-
-    #+BEGIN_SRC emacs-lisp
-      (use-package cider
-        :ensure t
-        :init
-        (progn
-          (add-hook 'cider-mode-hook #'eldoc-mode)
-          (add-hook 'cider-mode-hook #'rainbow-delimiters-mode)
-          (add-hook 'cider-repl-mode-hook #'smartparens-strict-mode)
-          (add-hook 'cider-repl-mode-hook #'rainbow-delimiters-mode)))
-    #+END_SRC
-
-*** Clojure Cheatsheet
-    #+BEGIN_SRC emacs-lisp
-      (use-package clojure-cheatsheet
-        :ensure t)
-    #+END_SRC
-
-*** Clojure mode extra font locking
-    #+BEGIN_SRC emacs-lisp
-      (use-package clojure-mode-extra-font-locking
-        :ensure t)
-    #+END_SRC
-
-*** Clojure snippets for Yasnippets
-    #+BEGIN_SRC emacs-lisp
-      (use-package clojure-snippets
-        :ensure t)
-    #+END_SRC
-
-*** Flycheck for Clojure
-    #+BEGIN_SRC emacs-lisp
-      (use-package flycheck-clojure
-        :ensure t)
-    #+END_SRC
-
-*** Slamhound
-    #+BEGIN_SRC emacs-lisp :tangle no
-      (use-package slamhound
-        :disabled t)
-    #+END_SRC
-
-** CSS
-
-   Mode for handling CSS.
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package css-mode)
+         (eval-after-load "highlight-indentation" '(diminish 'highlight-indentation-mode))
+         (diminish 'auto-revert-mode)
+         (diminish 'auto-fill-function)
+         (diminish 'overwrite-mode "💀")))
    #+END_SRC
 
 ** Dired
-
-   I have been trying to train myself to use =dired= as much as
+      I have been trying to train myself to use =dired= as much as
    possible. My go-to alternative is the command line, which often
    interrupts whatever I was doing in the particular shell I choose. My
    settings here are still very much experimental.
 
-   I moved to using =dired+= to pick up some extra features.
-
-   Make sure =image-dired= keeps its files in the meta directory.
-
    #+BEGIN_SRC emacs-lisp
-     (use-package dired+
-       :ensure t
-       :config
-       (progn
-         (custom-set-variables '(image-dired-dir (concat metafiles-dir "/image-dired")))
-         (put 'dired-find-alternate-file 'disabled nil)  ;enable `a' command
-         (diredp-toggle-find-file-reuse-dir 1)))
+     (defun jme:dired-mode-setup ()
+       "Setup for dired mode."
+       (dired-hide-details-mode t))
+
+     (use-package dired
+       :commands dired
+       :hook (dired-mode . jme:dired-mode-setup))
    #+END_SRC
 
    All-the-icons support in dired buffers. Becasue, who doesn't like icons?
@@ -1114,8 +807,7 @@
     :ensure t
     :after all-the-icons
     :commands all-the-icons-dired-mode
-    :config
-    (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+    :hook (dired-mode . all-the-icons-dired-mode))
    #+END_SRC
 
    Subtree support.
@@ -1136,51 +828,34 @@
      (use-package dired-filter
        :ensure t
        :after dired
-       :config
-       (custom-set-variables '(dired-filter-group-saved-groups '(("default"
-                                                                  ("Archives"
-                                                                   (extension "zip" "rar" "gz" "bz2" "tar"))
-                                                                  ("Data"
-                                                                   (extension "json" "xml" "dat" "csv"))
-                                                                  ("Documents"
-                                                                   (extension "org" "markdown" "md" "adoc" "txt"))
-                                                                  ("Binary"
-                                                                   (extension "elc" "pyc"))
-                                                                  ("Backup"
-                                                                   (extension "el~" "backup"))
-                                                                  ("Language"
-                                                                   (extension "el" "py" "java" "sh" "awk" "rb"))
-                                                                  ("LaTeX"
-                                                                   (extension "tex" "bib"))
-                                                                  ("Mac"
-                                                                   (extension . "DS_Store"))
-                                                                  ("PDF"
-                                                                   (extension . "pdf"))
-                                                                  ("Version Control"
-                                                                   (extension "git" "gitignore" "gitconfig" "gitmodules"))
-                                                                  )))))
+       :custom
+       (dired-filter-group-saved-groups '(("default"
+                                           ("Archives"
+                                            (extension "zip" "rar" "gz" "bz2" "tar"))
+                                           ("Data"
+                                            (extension "json" "xml" "dat" "csv"))
+                                           ("Documents"
+                                            (extension "org" "markdown" "md" "adoc" "txt"))
+                                           ("Binary"
+                                            (extension "elc" "pyc"))
+                                           ("Backup"
+                                            (extension "el~" "backup"))
+                                           ("Language"
+                                            (extension "el" "py" "java" "sh" "awk" "rb"))
+                                           ("LaTeX"
+                                            (extension "tex" "bib"))
+                                           ("Mac"
+                                            (extension . "DS_Store"))
+                                           ("PDF"
+                                            (extension . "pdf"))
+                                           ("Version Control"
+                                            (extension "git" "gitignore" "gitconfig" "gitmodules"))
+                                           ))))
    #+END_SRC
 
-** Elfeed
-
-   A utility mode for reading RSS.
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package elfeed
-       :ensure t)
-   #+END_SRC
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package elfeed-org
-       :ensure t
-       :after elfeed
-       :config
-       (progn
-         (custom-set-variables '(rmh-elfeed-org-files (list "~/.elfeed/elfeed.org")))
-         (elfeed-org)))
-   #+END_SRC
 
 ** Expand Region
+
 
    A fantastically useful package to gradually expand selected region.
 
@@ -1191,55 +866,56 @@
        :bind ("C-=" . er/expand-region))
    #+END_SRC
 
-** Flycheck
-
-   Removed snippet:
-
-   (custom-set-variables '(flycheck-disabled-checkers
-                               (append flycheck-disabled-checkers
-                                       '(javascript-jshint))))
+** Helpful
 
    #+BEGIN_SRC emacs-lisp
-     (use-package flycheck
+     (use-package helpful
        :ensure t
-       :diminish flycheck-mode
-       :config
-       (progn
-         (custom-set-variables '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
-         (flycheck-clojure-setup)
-         (global-flycheck-mode)
-         (flycheck-add-mode 'javascript-eslint 'web-mode)
-         (flycheck-add-mode 'html-tidy 'web-mode)
-         (define-key flycheck-mode-map (kbd "C-c ! h") 'helm-flycheck)))
+       :bind (("C-h f" . helpful-callable)
+              ("C-h v" . helpful-variable)
+              ("C-h k" . helpful-key)))
    #+END_SRC
+** Paradox
+
+
+   Better package management.
 
    #+BEGIN_SRC emacs-lisp
-     (use-package flycheck-pos-tip
-       :ensure t)
-   #+END_SRC
-
-** Flyspell
-
-   I often use =flyspell= mode when writing text documents. I typically
-   turn this on a some point after I have already begun writing. This bit
-   of advice ensures that the buffer is checked when I turn =flyspell= on.
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package flyspell
-       :config
-       (defadvice flyspell-mode (after advice-flyspell-check-buffer-on-start activate)
-         (flyspell-buffer)))
-   #+END_SRC
-
-** Graphviz
-
-   Support for Graphviz dot language.
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package graphviz-dot-mode
+     (use-package paradox
        :ensure t
-       :mode ("\\.dot\\'" . graphviz-dot-mode))
+       :commands paradox-list-packages)
    #+END_SRC
+
+** Rainbow Delimiters
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package rainbow-delimiters
+       :ensure t
+       :defer 1
+       :hook (prog-mode . rainbow-delimiters-mode))
+   #+END_SRC
+
+** Smartparens
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package smartparens
+       :ensure t
+       :defer 1
+       :diminish
+       :config
+       (smartparens-global-mode 1))
+   #+END_SRC
+
+** Window switching
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package ace-window
+       :ensure t
+       :commands ace-window
+       :bind ("C-x o" . ace-window)
+       :config (custom-set-variables '(aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))))
+   #+END_SRC
+
 
 ** Which Key
 
@@ -1260,12 +936,77 @@
        (which-key-mode 1))
    #+END_SRC
 
+** Yasnippet
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package yasnippet
+       :ensure t
+       :defer 1
+       :diminish yas-minor-mode
+       :config (yas-global-mode))
+
+     (use-package yasnippet-snippets
+       :ensure t
+       :after yasnippet
+       :config (yasnippet-snippets-initialize))
+   #+END_SRC
+
+* Functional Package Configuration
+
+** AsciiDoc
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package adoc-mode
+       :ensure t)
+   #+END_SRC
+
+** Flycheck
+
+    #+BEGIN_SRC emacs-lisp
+     (use-package flycheck
+       :ensure t
+       :diminish flycheck-mode
+       :custom
+       (flycheck-display-errors-function #'flycheck-pos-tip-error-messages)
+       :config
+       (global-flycheck-mode))
+   #+END_SRC
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package flycheck-pos-tip
+       :ensure t)
+   #+END_SRC
+
+** Dashboard
+
+   #+BEGIN_SRC emacs-lisp
+          (defun jme:dashboard-banner ()
+            """Set a dashboard banner including information on package initialization
+             time and garbage collections."""
+            (setq dashboard-banner-logo-title
+                  (format "Emacs ready in %.2f seconds with %d garbage collections."
+                          (float-time (time-subtract after-init-time before-init-time)) gcs-done)))
+
+          (use-package dashboard
+            :ensure t
+            :hook ((dashboard-mode . jme:dashboard-banner)
+                   (after-init . dashboard-refresh-buffer))
+            :config
+            (setq dashboard-startup-banner 'logo)
+            (setq dashboard-items '((agenda . 5)
+                                    (recents . 5)
+                                    (projects . 5)
+                                    (bookmarks . 5)
+                                    (registers . 5)))
+            (dashboard-setup-startup-hook))
+   #+END_SRC
+
 ** Helm
 
    Helm helps with completion of many things. I am finding it easier to
    work with than other modules.
 
-   #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp :tangle no
      (use-package helm
        :ensure t
        :diminish helm-mode
@@ -1293,14 +1034,14 @@
 
    Helm can do a great job of describing bindings.
 
-   #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp :tangle no
      (use-package helm-descbinds
        :ensure t
        :commands (helm-descbinds)
        :bind ("C-h b" . helm-descbinds))
    #+END_SRC
 
-   #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp :tangle no
      (use-package helm-swoop
        :commands (helm-swoop helm-swoop-back-to-last-point)
        :ensure t
@@ -1315,145 +1056,37 @@
               ("C-r" . helm-previous-line)))
    #+END_SRC
 
-*** Flycheck
-
-    Add helm support for flycheck.
-
-    #+BEGIN_SRC emacs-lisp
-      (use-package helm-flycheck
-        :ensure t)
-    #+END_SRC
-
-** Javascript
-
-   Make sure to handle json files appropriately.
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package json-mode
-       :ensure t
-       :commands json-mode
-       :mode ("\\.json$" . json-mode))
-   #+END_SRC
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package js2-mode
-       :ensure t
-       :commands js2-mode
-       :mode ("\\.js$" . js2-mode)
-       :bind (:map js2-mode-map
-                   ("C-x C-e" . js-send-last-sexp)
-                   ("C-M-x" . js-send-last-sexp-and-go)
-                   ("C-c b" . js-send-buffer)
-                   ("C-c l" . js-load-file-and-go))
-       :init
-       (progn
-         (add-to-list 'interpreter-mode-alist (cons "node" 'js2-mode))))
-   #+END_SRC
-
-   If we have the ability to use javascript in an inferior process, use
-   Node for that.
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package js-comint
-       :disabled t
-       :init
-       (custom-set-variables '(inferior-js-program-command "node")))
-   #+END_SRC
-
-** Lisp
-
-   Eldoc provides minibuffer hints when working with Emacs lisp.
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package eldoc
-       :diminish eldoc-mode
-       :commands eldoc-mode
-       :bind (:map emacs-lisp-mode-map
-              ("C-c ." . find-function-at-point)
-              ("C-c f" . find-function)
-              ("M-:" . pp-eval-expression))
-       :init
-       (progn
-         (add-hook 'lisp-interaction-mode-hook 'eldoc-mode)
-         (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)))
-
-     (add-hook 'lisp-mode-hook (lambda () (local-set-key (kbd "RET") 'newline-and-indent)))
-     (add-hook 'emacs-lisp-mode-hook (lambda () (local-set-key (kbd "RET") 'newline-and-indent)))
-   #+END_SRC
-
 ** Magit
 
    #+BEGIN_SRC emacs-lisp
      (use-package magit
        :commands magit-status
+       :ensure t)
+   #+END_SRC
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package magit-gitflow
        :ensure t
-       :bind ("C-x d" . magit-status))
+       :hook (magit-mode . turn-on-magit-gitflow))
    #+END_SRC
 
-** Markdown
+** ile
 
-   #+BEGIN_SRC emacs-lisp
-     (use-package markdown-mode
-       :commands markdown-mode
-       :mode
-       (("\\.markdown$" . markdown-mode)
-        ("\\.md$" . markdown-mode)))
-   #+END_SRC
-
-** Org
-
-   My =org= mode settings are contained in their own file. This function
-   loads the configuration based on my login name.
-
-   #+BEGIN_SRC emacs-lisp
-     (jme:load user-emacs-directory (concat user-login-name "-org"))
-   #+END_SRC
-
-** Paradox
-
-   Better package management.
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package paradox
-       :ensure t
-       :commands paradox-list-packages)
-   #+END_SRC
-
-** PDF-tools
-
-   Package has been pinned to =manual=, since it requires an extra install
-   step.
-
-   After updating, the package needs to be activated with =(pdf-tools-install)=.
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package pdf-tools
-       :pin manual
-       :bind (:map pdf-view-mode-map
-              ("h" . pdf-annot-add-highlight-markup-annotation)
-              ("t" . pdf-annot-add-text-annotation)
-              ("D" . pdf-annot-delete))
-       :config
-       (progn
-         (setq-default pdf-view-display-size 'fit-page)
-         (setq pdf-annot-activate-created-annotations t)))
-   #+END_SRC
-
-** Projectile
 
    Projectile works as a nice, light-weight, project management tool.
 
    #+BEGIN_SRC emacs-lisp
-     (use-package projectile
-       :ensure t
-       :diminish projectile-mode
-       :config
-       (progn
-         (custom-set-variables '(projectile-cache-file (concat metafiles-dir "/projectile.cache"))
-                               '(projectile-known-projects-file (concat metafiles-dir "/projectile-bookmarks.eld"))
-                               '(projectile-keymap-prefix (kbd "C-c p"))
-                               '(projectile-enable-caching t))
-         (projectile-mode)))
+          (use-package projectile
+            :ensure t
+            :diminish projectile-mode
+            :custom
+            (projectile-cache-file (concat metafiles-dir "/projectile.cache"))
+            (projectile-known-projects-file (concat metafiles-dir "/projectile-bookmarks.eld"))
+            (projectile-keymap-prefix (kbd "C-c p"))
+            (projectile-enable-caching t)
+            (projectile-completion-system 'ivy)
+            :config
+            (projectile-mode))
    #+END_SRC
 
    Support for org tasks associated with projectile projects.
@@ -1473,7 +1106,7 @@
 
    Projectile Helm support.
 
-   #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp :tangle no
      (use-package helm-projectile
        :ensure t
        :after projectile
@@ -1488,150 +1121,139 @@
 ;       :bind (("C-c n p" . org-projectile-helm-template-or-project)))
    #+END_SRC
 
-** Python
+** Ivy Support
+
+   This is my attempt to switch from using Helm to Ivy.
+
+   Add in counsel.
 
    #+BEGIN_SRC emacs-lisp
-     ; Bring back indent after newline
-     (add-hook 'python-mode-hook '(lambda ()
-                  (define-key python-mode-map "\C-m" 'newline-and-indent)))
-
-   #+END_SRC
-
-   Use python3
-
-   #+BEGIN_SRC emacs-lisp
-     (setq python-shell-interpreter "python3"
-           python-shell-interpreter-args "-i")
-   #+END_SRC
-
-   use ipython (no more)
-
-   #+BEGIN_SRC emacs-lisp :tangle no
-     (setq python-shell-interpreter "ipython"
-            python-shell-interpreter-args "-i -v")
-   #+END_SRC
-
-   Jedi for Python. To use auto-complete with Jedi, we require only
-   company-jedi and not make reference to jedi-core package.
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package company-jedi
+     (use-package counsel
        :ensure t
-       :commands (jedi:goto-definition jedi-mode company-jedi)
-       :bind (:map python-mode-map
-                   ("M-." . jedi:goto-definition)
-                   ("M-," . jedi:goto-definition-pop-marker))
+       :after ivy
+       :config (counsel-mode))
+   #+END_SRC
+
+   Ivy package
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package ivy
+       :ensure t
+       :defer 0.1
+       :diminish
+       :bind (("C-c C-r" . ivy-resume)
+              ("C-x B" . ivy-switch-buffer-other-window))
+       :custom
+       (ivy-count-format "(%d/%d) ")
+       (ivy-display-style 'fancy)
+       (ivy-use-virtual-buffers t)
+       :config (ivy-mode))
+   #+END_SRC
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package ivy-hydra
+       :ensure t)
+   #+END_SRC
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package ivy-rich
+       :ensure t
+       :after ivy
+       :custom
+       (ivy-virtual-abbreviate 'full
+                               ivy-rich-switch-buffer-align-virtual-buffer t
+                               ivy-rich-path-style 'abbrev)
        :config
-       (setq jedi:complete-on-dot t))
+       (ivy-set-display-transformer 'ivy-switch-buffer
+                                    'ivy-rich-switch-buffer-transformer)
+       (ivy-rich-mode))
    #+END_SRC
 
-   Highlight indentation
-
    #+BEGIN_SRC emacs-lisp
-     (use-package highlight-indent-guides
-      :ensure t
-      :commands highlight-indent-guides-mode
-      :init
-      (progn
-       (custom-set-variables '(highlight-indent-guides-method 'character))
-       (add-hook 'python-mode-hook 'highlight-indent-guides-mode)))
-   #+END_SRC
-
-*** Anaconda
-
-    #+BEGIN_SRC emacs-lisp
-      (use-package anaconda-mode
-        :ensure t
-        :commands anaconda-mode
-        :init (add-hook 'python-mode-hook 'anaconda-mode))
-    #+END_SRC
-
-*** Company Anaconda
-
-    #+BEGIN_SRC emacs-lisp
-      (use-package company-anaconda
-        :ensure t
-        :after company
-        :config
-        (add-to-list 'company-backends '(company-anaconda :with company-capf)))
-    #+END_SRC
-
-*** Helm Pydoc
-
-    #+BEGIN_SRC emacs-lisp
-      (use-package helm-pydoc
-        :ensure t
-        :after helm
-        :commands helm-pydoc
-        :bind (:map python-mode-map ("C-c C-d" . helm-pydoc)))
-    #+END_SRC
-
-*** Nose
-
-    #+BEGIN_SRC emacs-lisp
-      (use-package nose
-        :ensure t
-        :after python
-        :commands (nosetests-one
-                   nosetests-pdb-one
-                   nosetests-all
-                   nosetests-pdb-all
-                   nosetests-module
-                   nosetests-pdb-module
-                   nosetests-suite
-                   nosetests-pdb-suite)
-        :config
-        (add-hook 'python-mode-hook (lambda () (nose-mode t))))
-    #+END_SRC
-
-*** Pythonic
-
-    #+BEGIN_SRC emacs-lisp
-    (use-package pythonic
-      :ensure t
-      :commands pythonic-activate)
-    #+END_SRC
-
-
-** Java
-
-*** Eclim
-
-    Eclipse front-end for Java development.
-
-    #+BEGIN_SRC emacs-lisp
-      (use-package eclim
-        :commands eclim-mode
-        :config
-        (progn
-          (use-package company-emacs-eclim
-            :after company
-            :config
-            (company-emacs-eclim-setup))
-          (setq eclimd-autostart t)
-          (add-hook 'java-mode-hook (lambda () (eclim-mode 1)))))
-    #+END_SRC
-
-*** Java utilities
-
-    Auto byte-code disassembly.
-
-    #+BEGIN_SRC emacs-lisp
-      (use-package autodisass-java-bytecode
-        :ensure t
-        :defer t)
-    #+END_SRC
-
-** Rainbow mode
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package rainbow-mode
-       :commands rainbow-mode
+     (use-package all-the-icons-ivy
        :ensure t
-       :after css-mode
-       :init
-       (add-hook 'css-mode-hook 'rainbow-mode))
+       :config
+       (all-the-icons-ivy-setup))
    #+END_SRC
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package swiper
+       :ensure t
+       :after ivy
+       :bind (("C-s" . swiper)
+              ("C-r" . swiper)))
+   #+END_SRC
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package counsel-projectile
+       :ensure t
+       :after (ivy projectile)
+       :config
+       (counsel-projectile-mode))
+   #+END_SRC
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package ivy-yasnippet
+       :ensure t
+       :after (ivy yasnippet))
+   #+END_SRC
+
+* Lanugage Support
+** JavaScript
+
+   Support for editing JSON files.
+
+   #+BEGIN_SRC emacs-lisp
+      (use-package json-mode
+        :ensure t
+        :commands json-mode
+        :mode ("\\.json$" . json-mode))
+   #+END_SRC
+
+   General JavaScript support using j2s-mode.
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package js2-mode
+       :ensure t
+       :commands js2-mode
+       :mode ("\\.js$" . js2-mode)
+       :bind (:map js2-mode-map
+                   ("C-x C-e" . js-send-last-sexp)
+                   ("C-M-x" . js-send-last-sexp-and-go)
+                   ("C-c b" . js-send-buffer)
+                   ("C-c l" . js-load-file-and-go))
+       :init
+       (progn
+         (setq js-indent-level 2)
+         (setq js-strict-missing-semi-warning nil)
+         (add-to-list 'interpreter-mode-alist (cons "node" 'js2-mode))))
+   #+END_SRC
+
+   Support for editing React JSX files.
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package rjsx-mode
+       :ensure t
+       :after js2-mode)
+   #+END_SRC
+
+
+* Custom Settings
+
+  Load any local customizations. Note that by doing this at the end of
+  the process, we are ensuring that any configuration items
+  specifically set in the configuration files overrides user
+  settings. This occurs since /most/ of the configuration settings use
+  =custom-set-variables=, which would override any customization done
+  by the user during a previous session. This allows some
+  experimentation through the =customize= interface which would be
+  sanitized on the next run. This does not serve to clean out any
+  customizations which are not explicitly covered in configuration
+  files.
+
+  #+BEGIN_SRC emacs-lisp
+    (load custom-file)
+  #+END_SRC
 
 ** Shell
 
@@ -1727,13 +1349,13 @@
                     ("M-n" . comint-next-matching-input-from-input)
                     ("C-M-n" . comint-next-input)
                     ("C-M-p" . comint-previous-input))
+        :custom
+        (comint-prompt-read-only t)
         :init
-        (progn
-          (custom-set-variables '(comint-prompt-read-only t))
-          (add-hook 'term-exec-hook
-                    (function
-                     (lambda ()
-                       (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix))))))
+        (add-hook 'term-exec-hook
+                  (function
+                   (lambda ()
+                     (set-buffer-process-coding-system 'utf-8-unix 'utf-8-unix)))))
     #+END_SRC
 
 *** Tramp
@@ -1744,627 +1366,640 @@
 
     #+BEGIN_SRC emacs-lisp
       (use-package tramp
-        :init
-        (custom-set-variables
-          '(tramp-default-method "ssh")
-          '(tramp-persistency-file-name meta-tramp)))
+        :custom
+        (tramp-default-method "ssh")
+        (tramp-persistency-file-name meta-tramp))
     #+END_SRC
 
-** Uniquify
-
-   By default, Emacs makes buffer names unique by adding =<2>=, =<3>=,
-   etc. to the end of the buffer name. I don't find this particularly
-   useful. Using the =Uniquify= package, I can easily change this behavior.
-
-   Use the =post-forward= type of naming for buffers. This names the buffer
-   with the file name followed by a shortened form of the path.
-
-   For example:
-
-   =/foo/bar/mumble/name= becomes =name|bar/mumble=
-
-   I change the string used as a separator for the buffer name components
-   to be ":".
-
-   Also, make sure to rerationalize buffer names after a buffer has been
-   killed.
-
-   Some buffers should not be uniquified. I also provide a regular
-   expression here for these exceptions.
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package uniquify
-       :init
-       (custom-set-variables
-         '(uniquify-buffer-name-style 'post-forward)
-         '(uniquify-separator ":")
-         '(uniquify-after-kill-buffer-p t)
-         '(uniquify-ignore-buffers-re "^\\*")))
-   #+END_SRC
-
-** Web mode
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package web-mode
-       :ensure t
-       :mode
-       (("\\.jsx$" . web-mode)
-        ("\\.html?\\'" . web-mode))
-       :config
-       (progn
-         (custom-set-variables '(web-mode-markup-indent-offset 2)
-                               '(web-mode-css-indent-offset 2)
-                               '(web-mode-code-indent-offset 2)
-                               '(web-mode-enable-current-column-highlight t))
-         (defadvice web-mode-highlight-part (around tweak-jsx activate)
-           (if (equal web-mode-content-type "jsx")
-               (let ((web-mode-enable-part-face nil))
-                 ad-do-it)
-             ad-do-it))
-         (add-hook 'web-mode-hook
-                   (lambda ()
-                     (when (equal web-mode-content-type "jsx")
-                       (flycheck-select-checker 'javascript-eslint)
-                       (flycheck-select-checker 'flycheck-tidyrc))))))
-   #+END_SRC
-
-** Diminish
-
-   I use diminish to hide most of minor modes from the modeline. Most of
-   the diminish functionality has been updated into the =use-package=
-   calls.
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package diminish
-       :ensure t
-       :config
-       (progn
-         (eval-after-load "highlight-indentation" '(diminish 'highlight-indentation-mode))
-         (diminish 'auto-revert-mode)
-         (diminish 'auto-fill-function)
-         (diminish 'overwrite-mode "💀")))
-   #+END_SRC
 
 * Custom Configuration
-
-** Window handling
-
-*** Rotating Windows
-
-    I often have my frame split into multiple windows. I find it very handy
-    to swap buffers between windows if I am working in multiple buffers at
-    the same time. I came across this function to rotate buffers through
-    windows (you can find it [[http://whattheemacsd.com/buffer-defuns.el-02.html][here]].)
-
-    #+BEGIN_SRC emacs-lisp
-      (defun jme:rotate-windows ()
-        "Rotate your windows."
-        (interactive)
-        (cond ((not (> (count-windows)1))
-               (message "You can't rotate a single window!"))
-              (t
-               (let ((i 1)
-                     (numWindows (count-windows)))
-               (while  (< i numWindows)
-                 (let* (
-                        (w1 (elt (window-list) i))
-                        (w2 (elt (window-list) (+ (% i numWindows) 1)))
-                        (b1 (window-buffer w1))
-                        (b2 (window-buffer w2))
-                        (s1 (window-start w1))
-                        (s2 (window-start w2))
-                        )
-                   (set-window-buffer w1  b2)
-                   (set-window-buffer w2 b1)
-                   (set-window-start w1 s2)
-                   (set-window-start w2 s1)
-                   (setq i (1+ i))))))))
-    #+END_SRC
-
-*** Window Split
-
-    This function toggles between horizontal and vertical layout of two
-    windows. (Picked up from [[http://whattheemacsd.com/buffer-defuns.el-03.html][here]].)
-
-    #+BEGIN_SRC emacs-lisp
-      (defun jme:toggle-window-split ()
-       "Toggle between horizontal and vertical layout of windows."
-        (interactive)
-        (if (= (count-windows) 2)
-            (let* ((this-win-buffer (window-buffer))
-                   (next-win-buffer (window-buffer (next-window)))
-                   (this-win-edges (window-edges (selected-window)))
-                   (next-win-edges (window-edges (next-window)))
-                   (this-win-2nd (not (and (<= (car this-win-edges)
-                                               (car next-win-edges))
-                                           (<= (cadr this-win-edges)
-                                               (cadr next-win-edges)))))
-                   (splitter
-                    (if (= (car this-win-edges)
-                           (car (window-edges (next-window))))
-                        'split-window-horizontally
-                      'split-window-vertically)))
-              (delete-other-windows)
-              (let ((first-win (selected-window)))
-                (funcall splitter)
-                (if this-win-2nd (other-window 1))
-                (set-window-buffer (selected-window) this-win-buffer)
-                (set-window-buffer (next-window) next-win-buffer)
-                (select-window first-win)
-                (if this-win-2nd (other-window 1))))))
-    #+END_SRC
-
-*** More window splitting
-
-    I really like the idea of the following functions (covered by Sacha
-    [[https://www.youtube.com/watch?v%3DnKCKuRuvAOw&feature%3Dyoutu.be][here]], original source [[http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tricks/chldury][here]]). I don't override the normal split
-    keybindings since I very often want several windows with the same
-    buffer.
-
-    #+BEGIN_SRC emacs-lisp
-      (defun jme:vsplit-last-buffer (prefix)
-        "Split the window vertically and display the previous buffer."
-        (interactive "p")
-        (split-window-vertically)
-        (other-window 1 nil)
-        (if (= prefix 1)
-          (switch-to-next-buffer)))
-      (defun jme:hsplit-last-buffer (prefix)
-        "Split the window horizontally and display the previous buffer."
-        (interactive "p")
-        (split-window-horizontally)
-        (other-window 1 nil)
-        (if (= prefix 1) (switch-to-next-buffer)))
-    #+END_SRC
-
-*** Window switching
-
-    #+BEGIN_SRC emacs-lisp
-      (use-package ace-window
-        :ensure t
-        :commands ace-window
-        :bind ("C-x o" . ace-window)
-        :config (custom-set-variables '(aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))))
-    #+END_SRC
-
-** Cleanup
-
-   Whitespace cleanup can be dangerous if it changes the content of the
-   file. Some changes are guaranteed to be safe, which this function sticks
-   to, allowing it to be safe for a =before-save-hook=. (see [[http://whattheemacsd.com/buffer-defuns.el-01.html][this article]].)
+** Font
 
    #+BEGIN_SRC emacs-lisp
-     (defun jme:cleanup-buffer-safe ()
-       "Perform a bunch of safe operations on the whitespace content of a buffer.
-     Does not indent buffer, because it is used for a `before-save-hook', and that
-     might be bad."
-       (interactive)
-       (untabify (point-min) (point-max))
-       (delete-trailing-whitespace)
-       (set-buffer-file-coding-system 'utf-8))
+     (defun jme:set-font-scale (size)
+       "Adjust the font scale used."
+       (interactive "nWhat font size fo you want? ")
+       (set-face-attribute 'mode-line nil :inherit 'default :height (+ 10 size))
+       (eval-after-load "org"
+         (set-face-attribute 'org-block nil :inherit 'fixed-pitch))
+       (cond
+        ((find-font (font-spec :family "Hack Mono"))
+         (progn
+           (set-face-attribute 'default nil :family "Hack Mono" :height size)
+           (set-face-attribute 'fixed-pitch nul :family "Hack Mono" :inherit 'default)))
+        ((find-font (font-spec :family "Noto Mono"))
+         (progn
+           (set-face-attribute 'default nil :family "Noto Mono" :weight 'light :height size)
+           (set-face-attribute 'variable-pitch nil :family "Noto Mono" :inherit 'default)))))
+
+     (defun jme:update-font-scale ()
+       "Increase the font scale to handle HDPI issues on Pixelbook"
+       (if window-system
+           (jme:set-font-scale 160)))
+
+     (add-hook 'window-setup-hook 'jme:update-font-scale)
    #+END_SRC
 
-   If we want to be less careful when cleaning up, we can do that too.
-
-   #+BEGIN_SRC emacs-lisp
-     (defun jme:cleanup-buffer ()
-       "Perform a bunch of operations on the whitespace content of a buffer.
-     Including indent-buffer, which should not be called automatically on save."
-       (interactive)
-       (jme:cleanup-buffer-safe)
-       (indent-region (point-min) (point-max)))
-   #+END_SRC
-
-   Make sure we hook this into our save process.
-
-   #+BEGIN_SRC emacs-lisp
-     (add-hook 'before-save-hook 'jme:cleanup-buffer-safe)
-   #+END_SRC
-
-** Movement
-
-*** Better handling of move to beginning of line
-
-    I find it useful to move to the beginning of the indentation as opposed
-    to strickly the beginning of the line. This accomplishes that in a
-    smart way. (See [[http://emacsredux.com/blog/2013/05/22/smarter-navigation-to-the-beginning-of-a-line/][this article]].)
-
-    #+BEGIN_SRC emacs-lisp
-      (defun jme:smarter-move-beginning-of-line (arg)
-        "Move point back to indentation of beginning of line.
-
-      Move point to the first non-whitespace character on this line.
-      If point is already there, move to the beginning of the line.
-      Effectively toggle between the first non-whitespace character and
-      the beginning of the line.
-
-      If ARG is not nil or 1, move forward ARG - 1 lines first.  If
-      point reaches the beginning or end of the buffer, stop there."
-        (interactive "^p")
-        (setq arg (or arg 1))
-
-        ;; Move lines first
-        (when (/= arg 1)
-          (let ((line-move-visual nil))
-            (forward-line (1- arg))))
-
-        (let ((orig-point (point)))
-          (back-to-indentation)
-          (when (= orig-point (point))
-            (move-beginning-of-line 1))))
-
-      ;; remap C-a to `smarter-move-beginning-of-line'
-      (global-set-key [remap move-beginning-of-line]
-                      'jme:smarter-move-beginning-of-line)
-    #+END_SRC
-
-** Mark
-
-   Mark handling when ~transient-mark-mode~ can be a little confusing when
-   you want to set the mark but not engage /tmm/. ~Mastering Emacs~ has a
-   good [[http://www.masteringemacs.org/articles/2010/12/22/fixing-mark-commands-transient-mark-mode/][article]] on the subject.
-
-   #+BEGIN_SRC emacs-lisp
-     (defun jme:push-mark-no-activate ()
-       "Pushes `point' to `mark-ring' and does not activate the region.
-     Equivalent to \\[set-mark-command] when \\[transient-mark-mode] is disabled"
-       (interactive)
-       (push-mark (point) t nil)
-       (message "Pushed mark to ring"))
-   #+END_SRC
-
-   #+BEGIN_SRC emacs-lisp
-     (defun jme:jump-to-mark ()
-       "Jumps to the local mark, respecting the `mark-ring' order.
-     This is the same as using \\[set-mark-command] with the prefix argument."
-       (interactive)
-       (set-mark-command 1))
-   #+END_SRC
-
-   #+BEGIN_SRC emacs-lisp
-     (defun jme:exchange-point-and-mark-no-activate ()
-       "Identical to \\[exchange-point-and-mark] but will not activate the region."
-       (interactive)
-       (exchange-point-and-mark)
-       (deactivate-mark nil))
-     (define-key global-map [remap exchange-point-and-mark] 'jme:exchange-point-and-mark-no-activate)
-   #+END_SRC
-
-* Theme Configuration
-
-** Custom Themes
-
-   I tend to like playing around with different color themes. Sometimes
-   this is based on mood, sometimes it is based on environment. These
-   themes go into their own directory.
-
-   #+BEGIN_SRC emacs-lisp
-     (setq custom-theme-directory (concat user-emacs-directory "themes"))
-   #+END_SRC
-
-   Support easy switching of themes via helm.
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package helm-themes
-       :ensure t
-       :after helm)
-   #+END_SRC
-
-** Fonts
-
-   I have moved to using the =Adobe Source Code Pro= font. More information
-   may be found on Source Code Pro can be found [[http://blog.typekit.com/2012/09/24/source-code-pro/][here]].
-
-   Two separate fonts are possible, one for normal use and the other for
-   use in presentation mode. Define some variables to hold them.
-
-   #+BEGIN_SRC emacs-lisp
-     (defvar jme:default-font (face-font 'default)
-       "Default font to use.")
-     (defvar jme:presentation-font (face-font 'default)
-       "Font to use for presentations.")
-   #+END_SRC
-
-   Set appropriate fonts for the platform.
-
-   #+BEGIN_SRC emacs-lisp
-     (when window-system
-       (setq jme:default-font "-*-Source Code Pro-normal-normal-normal-*-14-*-*-*-m-0-iso10646-1")
-       (if (string-equal system-type "darwin")
-         (setq jme:presentation-font "-*-Source Code Pro-normal-normal-normal-*-18-*-*-*-m-0-iso10646-1")
-         (setq jme:presentation-font "-bitstream-bitstream vera sans mono-medium-r-*-*-*-120-*-*-*-*-*-*"))
-       (set-face-attribute 'default nil :font jme:default-font))
-   #+END_SRC
-
-** Load custom theme
-
-*** Org source blocks
-
-    Color source blocks in org to make them stand out.
-
-    See [[http://www.howardism.org/Technical/LP/dot-emacs.html][Howard Abrams Emacs Config]].
-
-    #+BEGIN_SRC emacs-lisp
-      (defun jme:org-src-color-blocks-light ()
-        "Colors the block headers and footers to make them stand out more for lighter themes."
-        (interactive)
-        (custom-set-faces
-         '(org-block-begin-line
-          ((t (:underline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF"))))
-         '(org-block-background
-           ((t (:background "#FFFFEA"))))
-         '(org-block-end-line
-           ((t (:overline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF"))))))
-
-      (defun jme:org-src-color-blocks-dark ()
-        "Colors the block headers and footers to make them stand out more for dark themes."
-        (interactive)
-        (custom-set-faces
-         '(org-block-begin-line
-           ((t (:foreground "#008ED1" :background "#002E41"))))
-         '(org-block-background
-           ((t (:background "#111111"))))
-         '(org-block-end-line
-           ((t (:foreground "#008ED1" :background "#002E41"))))))
-    #+END_SRC
-
-*** Presentation and Default theme
-
-    Under certain situations, changing the theme is desirable, specifically
-    when projecting on a larger screen. The following provides functions
-    for switching themes. I have updated this to use the sanityinc versions
-    of Chris Kempson's tommorow themes.
-
-    Need to make sure to capture the default cursor color so we can switch
-    it when appropriate.
-
-    hide-mode-line provides a way for me to hide the mode line during
-    presentations.
-
+** Theme
+*** Material
     #+BEGIN_SRC emacs-lisp
       (use-package material-theme
         :ensure t)
-
-      (defun use-presentation-theme ()
-       "Switch to presentation theme."
-        (interactive)
-        (load-theme 'material-light t)
-        (when (boundp 'jme:presentation-font)
-          (set-frame-font jme:presentation-font :frames nil)
-          (set-face-attribute 'default nil :font jme:presentation-font))
-        (setq default-cursor-color (cdr (assoc 'cursor-color (frame-parameters)))))
-
-      (defun use-default-theme ()
-       "Switch to the default theme."
-        (interactive)
-        (load-theme 'material t)
-        (when (boundp 'jme:default-font)
-          (set-frame-font jme:default-font :frames nil)
-          (set-face-attribute 'default nil :font jme:default-font))
-        (setq default-cursor-color (cdr (assoc 'cursor-color (frame-parameters)))))
-
-      (defun toggle-presentation-mode ()
-       "Toggle between presentation and default theme."
-        (interactive)
-        (if (string= (frame-parameter nil 'font) jme:default-font)
-            (use-presentation-theme)
-          (use-default-theme)))
-
-      (use-default-theme)
     #+END_SRC
+*** Spaceline
+
+    Configure spaceline for mode-line theme. I am overly specific in
+    toggling the segments. As I work to improve the way my mode line works
+    (which is a continuous effort), I find it best to be very specific about
+    which features to turn on/off.
 
     #+BEGIN_SRC emacs-lisp
-      (use-package hide-mode-line)
-    #+END_SRC
-
-    For presentations themselves, provide org-present.
-
-    #+BEGIN_SRC emacs-lisp
-(use-package org-present
-  :config (add-hook 'org-present-mode-hook
-                    (lambda ()
-                       (org-display-inline-images)
-                       (hide-mode-line)
-                       (use-presentation-theme)))
-          (add-hook 'org-present-mode-quit-hook
-                    (lambda ()
-                       (org-remove-inline-images)
-                       (use-default-theme)
-                       (hide-mode-line))))
-    #+END_SRC
-
-** Demo-It
-
-   As an alternative means of managing presentations, I have been getting
-   comfortable with the [[https://github.com/howardabrams/demo-it][demo-it]] package by Howard Abrams.
-
-   The demo-it package suggests a couple of other packages which are
-   helpful in presentations. Load those here also.
-
-*** org-tree-slide
-
-    Handle each tree in an org buffer as a slide.
-
-    #+BEGIN_SRC emacs-lisp
-      (use-package org-tree-slide
+      (use-package spaceline
         :ensure t
-        :commands org-tree-slide-mode
         :config
-        (setq org-tree-slide-skip-outline-level 4)
-        (org-tree-slide-simple-profile))
+        (use-package spaceline-all-the-icons
+          :ensure t
+          :config
+          (progn
+            (dolist (s '((jme:spaceline-read-only "#4271AE" "Read only buffer face.")
+                         (jme:spaceline-modified "#F36C60" "Modified buffer face.")
+                         (jme:spaceline-unmodified "#78909C" "Unmodified buffer face.")))
+              (eval `(defface ,(nth 0 s)
+                       `((t (:background ,(nth 1 s)
+                                         :foreground "#3E3D31"
+                                         :inherit 'mode-line)))
+                       ,(nth 2 s)
+                       :group 'spaceline)))
+
+            (defun jme:spaceline-highlight-face-modified ()
+              "Set the highlight face depending on the buffer modified status.
+               Set `spaceline-highlight-face-func' to
+               `spaceline-highlight-face-modified' to use this."
+              (cond
+               (buffer-read-only 'jme:spaceline-read-only)
+               ((buffer-modified-p) 'jme:spaceline-modified)
+               (t 'jme:spaceline-unmodified)))
+
+            (setq-default spaceline-highlight-face-func 'jme:spaceline-highlight-face-modified)
+            (setq-default spaceline-all-the-icons-separator-type 'cup)
+            (spaceline-toggle-all-the-icons-modified-on)
+            (spaceline-toggle-all-the-icons-bookmark-off)
+            (spaceline-toggle-all-the-icons-dedicated-off)
+            (spaceline-toggle-all-the-icons-window-number-off)
+            (spaceline-toggle-all-the-icons-eyebrowse-workspace-off)
+            (spaceline-toggle-all-the-icons-buffer-size-on)
+            (spaceline-toggle-all-the-icons-projectile-on)
+            (spaceline-toggle-all-the-icons-mode-icon-on)
+            (spaceline-toggle-all-the-icons-buffer-id-on)
+            (spaceline-toggle-all-the-icons-buffer-path-off)
+            (spaceline-toggle-all-the-icons-process-off)
+            (spaceline-toggle-all-the-icons-position-on)
+            (spaceline-toggle-all-the-icons-region-info-on)
+            (spaceline-toggle-all-the-icons-fullscreen-off)
+            (spaceline-toggle-all-the-icons-text-scale-on)
+            (spaceline-toggle-all-the-icons-multiple-cursors-off)
+            (spaceline-toggle-all-the-icons-narrowed-on)
+            (spaceline-toggle-all-the-icons-vc-icon-off)
+            (spaceline-toggle-all-the-icons-vc-status-on)
+            (spaceline-toggle-all-the-icons-git-status-off)
+            (spaceline-toggle-all-the-icons-git-ahead-off)
+            (spaceline-toggle-all-the-icons-flycheck-status-on)
+            (spaceline-toggle-all-the-icons-flycheck-status-info-off)
+            (spaceline-toggle-all-the-icons-package-updates-off)
+            (spaceline-toggle-all-the-icons-org-clock-current-task-on)
+            (spaceline-toggle-all-the-icons-hud-off)
+            (spaceline-toggle-all-the-icons-buffer-position-off)
+            (spaceline-toggle-all-the-icons-battery-status-on)
+            (spaceline-toggle-all-the-icons-time-on)
+            (spaceline-toggle-all-the-icons-which-function-on)
+            (spaceline-toggle-all-the-icons-temperature-off)
+            (spaceline-toggle-all-the-icons-weather-off)
+            (spaceline-toggle-all-the-icons-minor-modes-off)
+            (spaceline-toggle-all-the-icons-nyan-cat-off)
+            (spaceline-all-the-icons-theme)
+            (spaceline-all-the-icons--setup-paradox))))
     #+END_SRC
 
-*** fancy-narrow
 
-    [[https://github.com/Malabarba/fancy-narrow][fancy-narrow]] allows for visually highlighting a section of a buffer. This can be
-    done without narrowing 'out' a specific region, but by 'dimming' the
-    surrounding content.
+* Org Mode
+** What I Use Org For
+
+   Just about everything.
+
+   Anything I write these days is written completely, or at least starts, in
+   Org.
+
+   I have recently started keeping day specific notes. Each day is
+   represented by an individual Org file, referred to as a ~daypage~. The
+   original mechanism I use for handling this is inspired by [[http://tomparslow.co.uk][Thomas
+   Parslow's]] article [[http://almostobsolete.net/daypage.html][A day page for Org-Mode]].
+
+** Configuration
+
+   Inspired by the [[https://github.com/eschulte/emacs24-starter-kit][Emacs Starter Kit]], I set up my configuration file using
+   Org-babel. My personal move to this literate style of configuration
+   programming began with this file. My main configuration file loads this
+   automatically by using =(org-babel-load-file "/path/to/file")=.
+
+*** General settings
+**** Modules
+
+     Org has a number of handy optional modules. The following table lists
+     the org modules which I have looked into at some point in time. This
+     table serves as a reference for their functionality.
+
+     | Name              | Description                                                        |
+     |-------------------+--------------------------------------------------------------------|
+     | org-annotate-file | Provides a means to annotate arbitraty files in a central location |
+     | org-bbdb          | Allows linking to BBDB entries from within org                     |
+     | org-bibtex        | Allows links to database entries in BibTeX files                   |
+     | org-eshell        | Allows linking to an eshell and executing a command                |
+     | org-eww           | Allows creating a link to URL of an eww buffer                     |
+     | org-feed          | Allows entries to be created and changed by items in an RSS feed   |
+     | org-git-link      | Allows linking to files in git repository                          |
+     | org-panel         | A kind of control panel for org - facilitates quick navigation     |
+
+     The default set of modules (as of 24.4) are:
+
+     - org-w3m
+     - org-bbdb
+     - org-bibtex
+     - org-docview
+     - org-gnus
+     - org-info
+     - org-irc
+     - org-mhe
+     - org-rmail
+
+     The following list are the set of modules that I am currently
+     experimenting with.
+
+     #+BEGIN_SRC emacs-lisp
+       (setq org-modules '(org-annotate-file
+                           org-bibtex
+                           org-eww
+                           org-list))
+     #+END_SRC
+
+**** Org Files
+
+     I use a number of files to break up tasks into resonably grouped files.
+
+     - =work.org= - Work-specific items, general projects (ones that do not
+       have their own project structure).
+     - =tasks.org= - General tasks, potentially re-filed.
+     - =notes.org= - General notes file, doubles as journal if needed.
+     - =calendar.org= - specific calendar items I want to show in my
+       agenda. This does not contain my full calendar as I do not want my
+       agenda views clouded by all the meetings I need to go to.
+
+     Daypages have their own directory and the files are generated
+     on-demand.
+
+     #+BEGIN_SRC emacs-lisp
+       (setq daypage-path (concat org-directory "/days/"))
+       (setq diary-file (concat org-directory "/diary"))
+       (setq org-agenda-files (list (concat org-directory "/work.org")
+                                    (concat org-directory "/tasks.org")
+                                    (concat org-directory "/notes.org")
+                                    (concat org-directory "/calendar.org")))
+       (setq org-default-notes-file (concat org-directory "/notes.org"))
+       (setq org-annotate-file-storage-file (concat org-directory "/annotated.org"))
+       (setq org-agenda-include-diary nil)
+     #+END_SRC
+
+*** Babel
+
+    Ensure we have support for programming languages used in code blocks.
 
     #+BEGIN_SRC emacs-lisp
-      (use-package fancy-narrow
-        :ensure t)
+      (org-babel-do-load-languages
+       'org-babel-load-languages
+       '((emacs-lisp . t)
+         (ditaa . t)
+         (dot . t)
+         (gnuplot . t)
+         (plantuml . t)
+         (python . t)
+         (js . t)
+         (lisp . t)
+         (sh . t)
+         (shell . t)))
     #+END_SRC
 
-*** demo-it
+*** Look and Feel
 
-    The actual demo-it package.
+    Use utf-8 bullets for nicer look.
 
     #+BEGIN_SRC emacs-lisp
-      (use-package demo-it
-        :ensure t)
+      (use-package org-bullets
+        :after org
+        :ensure t
+        :demand t
+        :hook (org-mode . (lambda () (org-bullets-mode 1))))
     #+END_SRC
 
-** Spaceline
+    =org-sticky-header= shows off-screen Org heading at top of window.
 
-   Configure spaceline for mode-line theme. I am overly specific in
-   toggling the segments. As I work to improve the way my mode line works
-   (which is a continuous effort), I find it best to be very specific about
-   which features to turn on/off.
+    #+BEGIN_SRC emacs-lisp
+      (use-package org-sticky-header
+        :after org
+        :ensure t
+        :demand t
+        :hook (org-mode . org-sticky-header-mode)
+        :config
+        (setq org-sticky-header-full-path 'full))
+    #+END_SRC
 
-   #+BEGIN_SRC emacs-lisp
-     (use-package spaceline
-       :ensure t
-       :config
-       (use-package spaceline-all-the-icons
-         :ensure t
-         :config
-         (progn
-           (dolist (s '((jme:spaceline-read-only "#4271AE" "Read only buffer face.")
-                        (jme:spaceline-modified "#F36C60" "Modified buffer face.")
-                        (jme:spaceline-unmodified "#78909C" "Unmodified buffer face.")))
-             (eval `(defface ,(nth 0 s)
-                      `((t (:background ,(nth 1 s)
-                                        :foreground "#3E3D31"
-                                        :inherit 'mode-line)))
-                      ,(nth 2 s)
-                      :group 'spaceline)))
+    Startup with content not folded.
 
-           (defun jme:spaceline-highlight-face-modified ()
-             "Set the highlight face depending on the buffer modified status.
-              Set `spaceline-highlight-face-func' to
-              `spaceline-highlight-face-modified' to use this."
-             (cond
-              (buffer-read-only 'jme:spaceline-read-only)
-              ((buffer-modified-p) 'jme:spaceline-modified)
-              (t 'jme:spaceline-unmodified)))
+    #+BEGIN_SRC emacs-lisp
+      (setq org-startup-folded nil)
+    #+END_SRC
 
-           (setq-default spaceline-highlight-face-func 'jme:spaceline-highlight-face-modified)
-           (setq-default spaceline-all-the-icons-separator-type 'cup)
-           (spaceline-toggle-all-the-icons-modified-on)
-           (spaceline-toggle-all-the-icons-bookmark-off)
-           (spaceline-toggle-all-the-icons-dedicated-off)
-           (spaceline-toggle-all-the-icons-window-number-off)
-           (spaceline-toggle-all-the-icons-eyebrowse-workspace-off)
-           (spaceline-toggle-all-the-icons-buffer-size-on)
-           (spaceline-toggle-all-the-icons-projectile-on)
-           (spaceline-toggle-all-the-icons-mode-icon-on)
-           (spaceline-toggle-all-the-icons-buffer-id-on)
-           (spaceline-toggle-all-the-icons-buffer-path-off)
-           (spaceline-toggle-all-the-icons-process-off)
-           (spaceline-toggle-all-the-icons-position-on)
-           (spaceline-toggle-all-the-icons-region-info-on)
-           (spaceline-toggle-all-the-icons-fullscreen-off)
-           (spaceline-toggle-all-the-icons-text-scale-on)
-           (spaceline-toggle-all-the-icons-multiple-cursors-off)
-           (spaceline-toggle-all-the-icons-narrowed-on)
-           (spaceline-toggle-all-the-icons-vc-icon-off)
-           (spaceline-toggle-all-the-icons-vc-status-on)
-           (spaceline-toggle-all-the-icons-git-status-off)
-           (spaceline-toggle-all-the-icons-git-ahead-off)
-           (spaceline-toggle-all-the-icons-flycheck-status-on)
-           (spaceline-toggle-all-the-icons-flycheck-status-info-off)
-           (spaceline-toggle-all-the-icons-package-updates-off)
-           (spaceline-toggle-all-the-icons-org-clock-current-task-on)
-           (spaceline-toggle-all-the-icons-hud-off)
-           (spaceline-toggle-all-the-icons-buffer-position-off)
-           (spaceline-toggle-all-the-icons-battery-status-on)
-           (spaceline-toggle-all-the-icons-time-on)
-           (spaceline-toggle-all-the-icons-which-function-on)
-           (spaceline-toggle-all-the-icons-temperature-off)
-           (spaceline-toggle-all-the-icons-weather-off)
-           (spaceline-toggle-all-the-icons-minor-modes-off)
-           (spaceline-toggle-all-the-icons-nyan-cat-off)
-           (spaceline-all-the-icons-theme)
-           (spaceline-all-the-icons--setup-paradox))))
-   #+END_SRC
+    The following ensures that I do not accidentally make edits to invisible
+    areas. A value of ~show~ causes the point to become visible and actually
+    do the requested edit.
 
-* Key Bindings
+    #+BEGIN_SRC emacs-lisp
+      (setq org-catch-invisible-edits 'smart)
+    #+END_SRC
 
-  I have debated several times about where to locate key bindings. While
-  there is a good argument to keeping them near the functions/configuration
-  they relate to, I find it better to have all global keys in one place.
+**** Code block fontification
 
-  | Key        | Action                      | Comments                            |
-  |------------+-----------------------------+-------------------------------------|
-  | =C-z=      | hide-or-expand              | Thought of as analog to shell sleep |
-  | =M-`=      | jme:push-mark-no-activate   |                                     |
-  | =C-`=      | pop-to-mark-command         |                                     |
-  | =C-==      | expand-region               |                                     |
-  | =C-c h=    | helm-mini                   |                                     |
-  | =C-c n=    | jme:cleanup-buffer          | Destructive cleanup of buffer       |
-  | =C-c on=   | jme:todays-daypage          | Open daypage for current day        |
-  | =C-c oN=   | jme:find-daypage            | Open a specific day page            |
-  | =C-c t=    | multi-term-next             | Reuse terminal                      |
-  | =C-c T=    | multi-term                  | Create a new terminal               |
-  | =C-c v p=  | git-messenger:popup-message | Popup the last git commit message   |
-  | =C-x <up>= | jme:rotate-windows          | Rotates windows                     |
-  | =C-. C-s=  | ace-jump-mode               |                                     |
-  | =C-<f9>=   | toggle-presentation-mode    | switch in/out presentation theme    |
+     The following displays the contents of code blocks using the major-mode
+     of the code.  It also changes the behavior of ~TAB~ to work as
+     appropriate for the major-mode.  This allows for reading and writing
+     code inside of Org to be closer to the experience in the major-mode
+     itself.
 
-** Top-level mappings
+     #+BEGIN_SRC emacs-lisp
+       (setq
+        org-src-fontify-natively t
+        org-src-tab-acts-natively t)
+     #+END_SRC
 
-   #+BEGIN_SRC emacs-lisp
-     (bind-key "C-z" 'hide-or-expand)
+**** Targets
 
-     (bind-key "M-`" 'jme:push-mark-no-activate)
-     (bind-key "C-`" 'pop-to-mark-command)
-   #+END_SRC
+     Targets include this file and any file contributing to the agenda - up
+     to 5 levels deep.
 
-** =C-c= mappings
+     #+BEGIN_SRC emacs-lisp
+       (setq org-refile-targets '((org-agenda-files . (:maxlevel . 5))))
+     #+END_SRC
 
-   #+BEGIN_SRC emacs-lisp
-     (bind-key "C-c n" 'jme:cleanup-buffer)
-     (bind-key "C-c on" 'jme:todays-daypage)
-     (bind-key "C-c oN" 'jme:find-daypage)
-   #+END_SRC
+     Targets start with the file name. This allows creating level 1 tasks.
 
-** =C-x= mappings
+     #+BEGIN_SRC emacs-lisp
+       (setq org-refile-use-outline-path 'file)
+     #+END_SRC
 
-   #+BEGIN_SRC emacs-lisp
-     (bind-key "C-x <up>" 'jme:rotate-windows)
-   #+END_SRC
+     Targets complete in steps so we start with filename, TAB shows the next
+     level of targets etc.
 
-** Function Key mappings
+     #+BEGIN_SRC emacs-lisp
+       (setq org-outline-path-complete-in-steps t)
+     #+END_SRC
 
-   #+BEGIN_SRC emacs-lisp
-     (bind-key "C-<f9>" 'toggle-presentation-mode)
-   #+END_SRC
+     Allow refile to create parent tasks with confirmation.
 
-* Emacs Server
+     #+BEGIN_SRC emacs-lisp
+       (setq org-refile-allow-creating-parent-nodes 'confirm)
+     #+END_SRC
 
-   #+BEGIN_SRC emacs-lisp
-     ;; Don't start the server unless we can verify that it isn't running.
-     (use-package server
-       :if (and window-system
-                (not noninteractive))
-       :config
-       (when (and (functionp 'server-running-p) (not (server-running-p)))
-          (server-start)))
+*** Task settings
 
-     ;; Support for Chrome 'edit with emacs' extension
-     (use-package edit-server
-       :ensure t
-       :if (and window-system
-                (not noninteractive))
-       :init
-       (add-hook 'after-init-hook 'edit-server-start t))
-   #+END_SRC
+**** Timestamps
+
+     Add a timestamp to the task when it moves to the DONE state.
+
+     #+BEGIN_SRC emacs-lisp
+       (setq org-log-done 'time
+             org-log-into-drawer "LOGBOOK")
+     #+END_SRC
+
+**** Workflows
+
+     Personal todo items are tracked with TODO, other tracked items are
+     labeled with TASK. Inspired by [[http://juanreyero.com/article/emacs/org-teams.html][Org-mode tricks for team management]].
+
+     #+BEGIN_SRC emacs-lisp
+       (setq org-todo-keywords
+             '((sequence "TODO(t)" "STARTED(s!)" "WAITING(w@/!)" "STALLED(x@/!)" "|" "DONE(d!)" "CANCELLED(c@)")
+               (sequence "TASK(f)" "|" "DONE(d!)")
+               (sequence "MAYBE(m)" "|" "DONE(d!)" "CANCELLED(c@)")
+               (sequence "RISK(r)" "|" "MITIGATED(i@)")))
+     #+END_SRC
+
+     Add some color to the different items to make them easier to visualize.
+
+     #+BEGIN_SRC emacs-lisp
+       (setq org-todo-keyword-faces
+             '(("TODO" . (:foreground "DarkOrange" :weight bold))
+               ("STARTED" . (:foreground "DarkOrange" :weight bold))
+               ("WAITING" . (:foreground "gold" :weight bold))
+               ("MAYBE" . (:foreground "spring green"))
+               ("DONE" . (:foreground "dark sea green"))
+               ("STALLED" . (:foreground "slate grey"))
+               ("CANCELLED" . (:foreground "slate grey"))
+               ("TASK" . (:foreground "DeepSkyBlue"))
+               ("RISK" . (:foreground "white" :background "orange red"))
+               ("MITIGATED" . (:foreground "white" :background "dark green"))))
+     #+END_SRC
+
+***** Projects
+
+      Collections of tasks and other items are projects, and are marked with
+      the =prj= tag. They should contain todo items and are considered stuck
+      unless they do. The =prj= tag should not be inheritable, otherwise its
+      tasks will also appear as projects.
+
+      #+BEGIN_SRC emacs-lisp
+        (setq org-tags-exclude-from-inheritance '("prj"))
+      #+END_SRC
+
+**** Templates
+
+     #+BEGIN_SRC emacs-lisp
+       (setq org-capture-templates
+             '(("t" "Todo" entry (file+headline "tasks.org" "Tasks")
+                "* TODO %^{Brief Description} %^g\n Added: %U\n\n  %?\n")
+               ("T" "Quick task" entry (file+headline "tasks.org" "Tasks")
+                "* TASK %^{Task}"
+                :immediate-finish t)
+               ("j" "Journal entry" plain (file+datetree "notes.org")
+                "%K - %a\n%i\n%?\n"
+                :unnarrowed t)
+               ("J" "Journal entry with date" plain (file+datetree+prompt "notes.org")
+                "%K - %a\n%i\n%?\n"
+                :unnarrowed t)
+               ("n" "Notes" entry (file+datetree "notes.org" "Inbox")
+                "* %^{Description} %^g\n  Added: %U\n\n  %?\n")))
+     #+END_SRC
+
+**** Archiving
+
+     Archiving of completed tasks. see
+     http://article.gmane.org/gmane.emacs.orgmode/3629.
+
+     Alternative implementations:
+     - [[https://stackoverflow.com/questions/6997387/how-to-archive-all-the-done-tasks-using-a-single-command][How to archive all the DONE tasks using a single command]]
+
+     To set an org file up for archiving you need to add the following at
+     the top of the file (replace archive.text with the archive file):
+
+     =-*- mode: org; after-save-hook: (archive-done-tasks) -*-=
+     =#+ARCHIVE: archive.txt::* %s archive=
+
+     #+BEGIN_SRC emacs-lisp
+       (defvar jme:org-archive-expiry-days 7
+         "The number of days after which a completed task should be auto-archived.
+           This can be 0 for immediate, or a floating point value.")
+
+       (defun jme:archive-p (p)
+         "Determine if the headline at point P needs to be archived."
+         (let* ((props (org-entry-properties p))
+                (closed (assoc "CLOSED" props)))
+           (if closed
+               (let ((when-closed (org-parse-time-string (cdr closed))))
+                 (if (>= (time-to-number-of-days (time-subtract (current-time)
+                                                                (apply #'encode-time when-closed)))
+                         jme:org-archive-expiry-days)
+                     t)))))
+
+       (defun jme:does-item-need-archive? ()
+         "Does item at point need to be archived?"
+         (interactive)
+         (if (jme:archive-p (point))
+             (message "Yes")
+           (message "No")))
+
+       (defun jme:org-archive-done-tasks ()
+         (interactive)
+         (save-excursion
+           (goto-char (point-min))
+           (let ((done-regexp
+                  (concat "\\* \\(" (regexp-opt org-done-keywords) "\\) "))
+                 (state-regexp
+                  (concat "- State \"\\(" (regexp-opt org-done-keywords)
+                          "\\)\"\\s-*\\[\\([^]\n]+\\)\\]")))
+             (while (re-search-forward done-regexp nil t)
+               (let ((end (save-excursion
+                            (outline-next-heading)
+                            (point)))
+                     begin)
+                 (goto-char (line-beginning-position))
+                 (setq begin (point))
+                 (if (jme:archive-p begin)
+                   (org-archive-subtree)
+                  (goto-char end)))))
+           (save-buffer)))
+
+           (setq safe-local-variable-values (quote ((after-save-hook archive-done-tasks))))
+           (defalias 'archive-done-tasks 'jme:org-archive-done-tasks)
+     #+END_SRC
+
+*** Agenda Settings
+
+    Look ahead two days of my agenda at a time.
+
+    #+BEGIN_SRC emacs-lisp
+      (setq org-agenda-span 2)
+    #+END_SRC
+
+    A common problem with all-day and multi-day events in org agenda view is
+    that they become separated from timed events and are placed below all
+    =TODO= items. Likewise, additional fields such as =Location:= are
+    orphaned from their parent events. The following hook will ensure that
+    all events are correctly placed in the agenda:
+
+    See http://orgmode.org/worg/org-contrib/org-mac-iCal.html
+
+    #+BEGIN_SRC emacs-lisp
+      (add-hook 'org-agenda-cleanup-fancy-diary-hook
+                (lambda ()
+                  (goto-char (point-min))
+                  (save-excursion
+                    (while (re-search-forward "^[a-z]" nil t)
+                      (goto-char (match-beginning 0))
+                      (insert "0:00-24:00")))
+                  (while (re-search-forward "^ [a-z]" nil t)
+                    (goto-char (match-beginning 0))
+                    (save-excursion
+                      (re-search-backward "^[0-9]+:[0-9]+-[0-9]+:[0-9]+ " nil t))
+                    (insert (match-string 0)))))
+    #+END_SRC
+
+**** Allow quickly marking items as done in the agenda view. (From [[http://pages.sachachua.com/.emacs.d/Sacha.html#unnumbered-82][here]]).
+
+     #+BEGIN_SRC emacs-lisp
+       (defun jme:org-agenda-done (&optional arg)
+         "Mark current TODO as done.
+       This changes the line at point, all other lines in the agenda referring to
+       the same tree node, and the headline of the tree node in the org file."
+         (interactive "P")
+         (org-agenda-todo "DONE"))
+       ;(bind-key "x" 'jme:org-agenda-done org-agenda-mode-map)
+
+       (defun jme:org-agenda-done-and-add-followup ()
+         "Mark the current TODO as done and add another task after it.
+       Creates it at the same level as the previous task."
+         (interactive)
+         (org-agenda-todo "DONE")
+         (org-agenda-switch-to)
+         (org-capture 0 "t"))
+       ;(bind-key "X" 'jme:org-agenda-done-and-add-followup org-agenda-mode-map)
+     #+END_SRC
+
+*** Clocking
+
+    I have recently been trying to train myself to use org clocking as a
+    means of improving my task efficiency. My configuration here is probably
+    pretty light and not comprehensive. I expect, like everything else, it
+    will evolve over time.
+
+**** Configuration
+
+     Make sure clock history, as well as any running clocks, are preserved
+     across emacs sessions. Perserving the clock is a necessity for me as I
+     often have time when I need to restart Emacs while working on some
+     task.
+
+     =org-clock-in-resume= ensures that when clocking into a task with an
+     open clock, the clock is resumed.
+
+     Make sure =org-clock-persist-query-resume= is nil, so that there is no
+     prompt when attempting to resume a clock. Just resume it.
+
+     #+BEGIN_SRC emacs-lisp
+       (org-clock-persistence-insinuate)
+       (setq org-clock-persist t)
+       (setq org-clock-in-resume t)
+       (setq org-clock-perist-query-resume nil)
+     #+END_SRC
+
+     Set up some pre-sets for Effort.
+
+     #+BEGIN_SRC emacs-lisp
+       (setq org-global-properties
+             '(("Effort_ALL" .
+                "0:15 0:30 0:45 1:00 2:00 3:00 4:00 5:00 6:00 0:00")))
+     #+END_SRC
+
+     =org-columns= provides a nice overview of tasks in the buffer. Set the
+     default format to include effort and clock summary.
+
+     #+BEGIN_SRC emacs-lisp
+       (setq org-columns-default-format "%50ITEM(Task) %TODO %2PRIORITY %10Effort(Effort){:} %10CLOCKSUM %TAGS")
+     #+END_SRC
+
+*** LaTeX
+
+    Use smart quotes when exporting.
+
+    #+BEGIN_SRC emacs-lisp
+      (setq org-export-with-smart-quotes t)
+    #+END_SRC
+
+**** Source code listings
+
+     Use the ~minted~ package for source code fontification and coloring.
+
+     #+BEGIN_SRC emacs-lisp
+       (add-to-list 'org-latex-packages-alist '("" "minted"))
+       (setq org-latex-listings 'minted)
+       (setq org-latex-minted-options
+          '(("frame" "lines")
+            ("fontsize" "\\scriptsize")))
+     #+END_SRC
+
+     We need to also ensure that the PDF conversion process adds the
+     =-shell-escape= option to pdflatex.
+
+     #+BEGIN_SRC emacs-lisp
+       (setq org-latex-pdf-process
+          '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+            "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+            "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+     #+END_SRC
+
+     Add custom document classes.
+
+     #+BEGIN_SRC emacs-lisp
+       (require 'ox-latex)
+       (add-to-list 'org-latex-classes
+             '("mezeoorgdoc" "\\documentclass[10pt,oneside]{mezeoorgdoc}"
+               ("\\chapter{%s}" . "\\chapter*{%s}")
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
+       (add-to-list 'org-latex-classes
+             '("jmeorgdoc" "\\documentclass[10pt,oneside]{jmeorgdoc}"
+               ("\\chapter{%s}" . "\\chapter*{%s}")
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
+       (add-to-list 'org-latex-classes
+             '("jmeorgarticle" "\\documentclass[10pt,oneside,article]{jmeorgdoc}"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
+       (add-to-list 'org-latex-classes
+              '("synacororgarticle" "\\documentclass[10pt,oneside,article]{synacororgarticle}"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
+     #+END_SRC
+
+*** Key bindings
+
+**** Org specific keybindings
+
+     Bind keys specific to org-mode. I try to train myself in using the
+     default keybindings. This helps to ensure that I handle things more
+     easily as they naturally evolve with the org package. However, there
+     are some functions I use regularly which have no keybindings. These
+     bindings need to be watched with a careful eye as they may end up
+     overriding something in the future.
+
+     I use timestamps quite frequently in my logging/journaling and many
+     times I want an /inactive/ timestamp (=org-time-stamp-inactive=)
+     instead of an /active/ (=org-time-stamp=) one. It is easy enough to
+     toggle them with =org-toggle-timestamp-type=, but that has no
+     keybinding either. I bound =org-time-stamp-inactive= to =C-c t= since
+     it was unbound and =t= is a good representation for /time/.
+
+     #+BEGIN_SRC emacs-lisp
+       (bind-key "C-c t" 'org-time-stamp-inactive org-mode-map)
+     #+END_SRC
+
+**** Org global keybindings
+
+     Bind keys which should be available in the global keymap which support
+     org-mode functions.
+
+    #+BEGIN_SRC emacs-lisp
+      (bind-key "C-c l" 'org-store-link)
+      (bind-key "C-c L" 'org-insert-link-global)
+      (bind-key "C-c a" 'org-agenda)
+      (bind-key "C-c c" 'org-capture)
+      (bind-key "C-c b" 'org-iswitchb)
+    #+END_SRC
+
 
 * Footer
 
   Add in the expected Emacs module footer.
 
   #+BEGIN_SRC emacs-lisp
-    (provide 'init-ext)
+    (provide 'init-ext.el)
     ;;; init-ext.el ends here
   #+END_SRC
