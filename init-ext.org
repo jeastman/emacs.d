@@ -1263,21 +1263,6 @@
 
 * Custom Settings
 
-  Load any local customizations. Note that by doing this at the end of
-  the process, we are ensuring that any configuration items
-  specifically set in the configuration files overrides user
-  settings. This occurs since /most/ of the configuration settings use
-  =custom-set-variables=, which would override any customization done
-  by the user during a previous session. This allows some
-  experimentation through the =customize= interface which would be
-  sanitized on the next run. This does not serve to clean out any
-  customizations which are not explicitly covered in configuration
-  files.
-
-  #+BEGIN_SRC emacs-lisp
-    (load custom-file)
-  #+END_SRC
-
 ** Shell
 
    I try to use my shell within Emacs as much as possible. I will admit
@@ -2018,31 +2003,46 @@
 
 * Additional Configuration
 
-**** Private settings
+** Private settings
 
-     Personal information that should not be shared is kept in a private
-     file.
+   Personal information that should not be shared is kept in a private
+   file.
 
-     #+BEGIN_SRC emacs-lisp
-       (jme:load user-emacs-directory ".private")
-     #+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (jme:load user-emacs-directory ".private")
+   #+END_SRC
 
-**** OS-specific settings
+** OS-specific settings
 
-     Settings specific to machine type are kept in their own settings file.
+   Settings specific to machine type are kept in their own settings file.
 
-     #+BEGIN_SRC emacs-lisp
-       (let* ((system-type-name (symbol-name system-type))
-              (base-name (replace-regexp-in-string "/" "-" system-type-name)))
-         (jme:load user-emacs-directory base-name))
-     #+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (let* ((system-type-name (symbol-name system-type))
+            (base-name (replace-regexp-in-string "/" "-" system-type-name)))
+       (jme:load user-emacs-directory base-name))
+   #+END_SRC
 
-**** User-specific settings
+** User-specific settings
 
-     #+BEGIN_SRC emacs-lisp
-       (jme:load user-emacs-directory user-login-name)
-     #+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (jme:load user-emacs-directory user-login-name)
+   #+END_SRC
 
+** Custom Settings
+   Load any local customizations. Note that by doing this at the end of
+   the process, we are ensuring that any configuration items
+   specifically set in the configuration files overrides user
+   settings. This occurs since /most/ of the configuration settings use
+   =custom-set-variables=, which would override any customization done
+   by the user during a previous session. This allows some
+   experimentation through the =customize= interface which would be
+   sanitized on the next run. This does not serve to clean out any
+   customizations which are not explicitly covered in configuration
+   files.
+
+   #+BEGIN_SRC emacs-lisp
+     (load custom-file)
+   #+END_SRC
 
 * Footer
 
