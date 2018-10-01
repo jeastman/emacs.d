@@ -34,6 +34,7 @@
 
   These items need to be setup as early as possible in the Emacs loading process.
 
+
 ** Auto compilation
 
    While using =load-prefer-newer= will prevent outdated byte code
@@ -59,13 +60,35 @@
    Some variables require being defined early on due to their use in
    other modules.
 
-   #+BEGIN_SRC emacs-lisp :tangle no
-     (defvar jme:helm-sources '(helm-source-buffers-list
-                                helm-source-recentf
-                                helm-source-bookmarks
-                                helm-source-file-cache
-                                helm-source-files-in-current-dir))
+** Basic loading function
+
+   #+BEGIN_SRC emacs-lisp
+     (defun jme:load (directory base)
+       "Look for files located in DIRECTORY whose base name is BASE.
+
+     Check the base name against several extensions.  If a file with
+     that name exists, then load it."
+       (let ((literate      (expand-file-name (concat base ".org") directory))
+             (encrypted-org (expand-file-name (concat base ".org.gpg") directory))
+             (plain         (expand-file-name (concat base ".el") directory))
+             (encrypted-el  (expand-file-name (concat base ".el.gpg") directory)))
+        (cond
+         ((file-exists-p encrypted-org) (org-babel-load-file encrypted-org))
+         ((file-exists-p encrypted-el)  (load encrypted-el))
+         ((file-exists-p literate)      (org-babel-load-file literate))
+         ((file-exists-p plain)         (load plain)))))
    #+END_SRC
+
+**** Hostname-specific settings
+
+     Settings specific to a particular machine, identified by host name,
+     are stored in their own settings file. This should be utilized for
+     setting path related information specific to a host.
+
+     #+BEGIN_SRC emacs-lisp
+       (let ((host-name-base (car (split-string (system-name) "\\."))))
+         (jme:load user-emacs-directory host-name-base))
+     #+END_SRC
 
 
 * General configuration
@@ -1583,7 +1606,6 @@
          (python . t)
          (js . t)
          (lisp . t)
-         (sh . t)
          (shell . t)))
     #+END_SRC
 
@@ -1996,25 +2018,6 @@
 
 * Additional Configuration
 
-**** Basic loading function
-
-     #+BEGIN_SRC emacs-lisp
-       (defun jme:load (directory base)
-         "Look for files located in DIRECTORY whose base name is BASE.
-
-       Check the base name against several extensions.  If a file with
-       that name exists, then load it."
-         (let ((literate      (expand-file-name (concat base ".org") directory))
-               (encrypted-org (expand-file-name (concat base ".org.gpg") directory))
-               (plain         (expand-file-name (concat base ".el") directory))
-               (encrypted-el  (expand-file-name (concat base ".el.gpg") directory)))
-          (cond
-           ((file-exists-p encrypted-org) (org-babel-load-file encrypted-org))
-           ((file-exists-p encrypted-el)  (load encrypted-el))
-           ((file-exists-p literate)      (org-babel-load-file literate))
-           ((file-exists-p plain)         (load plain)))))
-     #+END_SRC
-
 **** Private settings
 
      Personal information that should not be shared is kept in a private
@@ -2032,16 +2035,6 @@
        (let* ((system-type-name (symbol-name system-type))
               (base-name (replace-regexp-in-string "/" "-" system-type-name)))
          (jme:load user-emacs-directory base-name))
-     #+END_SRC
-
-**** Hostname-specific settings
-
-     Settings specific to a particular machine, identified by host name,
-     are stored in their own settings file.
-
-     #+BEGIN_SRC emacs-lisp
-       (let ((host-name-base (car (split-string (system-name) "\\."))))
-         (jme:load user-emacs-directory host-name-base))
      #+END_SRC
 
 **** User-specific settings
