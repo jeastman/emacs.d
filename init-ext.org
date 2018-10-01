@@ -1406,10 +1406,10 @@
        (eval-after-load "org"
          (set-face-attribute 'org-block nil :inherit 'fixed-pitch))
        (cond
-        ((find-font (font-spec :family "Hack Mono"))
+        ((find-font (font-spec :family "Hack"))
          (progn
-           (set-face-attribute 'default nil :family "Hack Mono" :height size)
-           (set-face-attribute 'fixed-pitch nul :family "Hack Mono" :inherit 'default)))
+           (set-face-attribute 'default nil :family "Hack" :height size)
+           (set-face-attribute 'fixed-pitch nul :family "Hack" :inherit 'default)))
         ((find-font (font-spec :family "Noto Mono"))
          (progn
            (set-face-attribute 'default nil :family "Noto Mono" :weight 'light :height size)
