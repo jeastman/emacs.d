@@ -1424,9 +1424,11 @@
     #+BEGIN_SRC emacs-lisp
       (use-package spaceline
         :ensure t
+        :pin melpa-stable
         :config
         (use-package spaceline-all-the-icons
           :ensure t
+          :pin melpa-stable
           :config
           (progn
             (dolist (s '((jme:spaceline-read-only "#4271AE" "Read only buffer face.")
@@ -1441,8 +1443,8 @@
 
             (defun jme:spaceline-highlight-face-modified ()
               "Set the highlight face depending on the buffer modified status.
-               Set `spaceline-highlight-face-func' to
-               `spaceline-highlight-face-modified' to use this."
+                     Set `spaceline-highlight-face-func' to
+                     `spaceline-highlight-face-modified' to use this."
               (cond
                (buffer-read-only 'jme:spaceline-read-only)
                ((buffer-modified-p) 'jme:spaceline-modified)
