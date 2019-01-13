@@ -1,9 +1,0 @@
-[submodule "vendor/pianobar"]
-	path = vendor/pianobar
-	url = git://github.com/agrif/pianobar.el.git
-[submodule "vendor/pycoverage.el"]
-	path = vendor/pycoverage.el
-	url = https://github.com/mattharrison/pycoverage.el.git
-[submodule "vendor/bind-key"]
-	path = vendor/bind-key
-	url = git://github.com/jwiegley/bind-key.git
