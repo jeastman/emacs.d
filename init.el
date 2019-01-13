@@ -1,70 +1,165 @@
-;;; init.el --- Emacs configuration file
-;;
-;; Converted to literate format
+;;; init.el --- Emacs configuration file -*- lexical-binding: t -*-
+
 ;; Author: John Eastman
-;; Date: 2013-10-24
+;; Created: 06 Jan 2019
+
+;; This file is not part of GNU Emacs.
+
+;; This file is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License as
+;; published by the Free Software Foundation; either version 2, or
+;; (at your option) any later version.
 ;;
+;; This file is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License along
+;; with this file; see the file COPYING.  If not, see see
+;; <https://www.gnu.org/licenses/>.
+
 ;;; Commentary:
 ;;
-;; Bootstrap initialization file.  Just enough configuration
-;; to initialize the packaging system and ensure org is loaded
-;; so that the rest of the configuration can be loaded.
+;; I moved my Emacs configuration to a literate format in 2013 and
+;; have been using that since.  While literate code, expecially for a
+;; configuration file, seems like a great idea and would lead to a
+;; wonderful experience, it has not.  I find that as I hack on my
+;; configuration, the added literate verbiage seems contrived.  Most of
+;; the time, the code speaks for itself and the addition of literate
+;; text is just redundant.  While this may not be true for some of the
+;; larger components (org for example), most of the time it is
+;; sufficient.
 ;;
+;; My new plan is to revert back to plain elisp code and add in
+;; documentation comments as necessary.  That is the point of code
+;; comments anyway.
+;;
+;; I've decided to do this by re-creating my configuration from the
+;; ground up.  It's always good to do on occasion.  There are plenty of
+;; new packages that I was either not taking advantage of or not using
+;; properly.  This iteration of refresh is intended to make use of
+;; those things, as well as weed out the cruft.
+;;
+;; Since I am starting all over, I have decided to give straight
+;; (https://github.com/raxod502/straight.el) a try.
+
 ;;; Code:
-;;
 
-;; Bling on Software tip about Garbage Collection
-;; http://bling.github.io/blog/2016/01/18/why-are-you-changing-gc-cons-threshold/
-;; Original source appears to be:
-;; https://www.reddit.com/r/emacs/comments/3kqt6e/2_easy_little_known_steps_to_speed_up_emacs_start/
-(let ((gc-cons-threshold most-positive-fixnum))
+(defvar jme:config-dir
+  (concat (expand-file-name user-emacs-directory) "config")
+  "Custom configuration directory.")
 
-  ;; Warn about using older versions of Emacs
-  ;; Nothing specific here, but this configuration is developed and maintained on
-  ;; version specified here.
-  (when (version< emacs-version "25")
-    (warn "This configuration expects Emacs version 25 or greater - you are running %s!"
-          emacs-version))
+;; Ensure newest files are loaded
+(setq load-prefer-newer t)
 
-  ;; require the package manager
-  (require 'package)
+;; straight bootstrap code (bootstrap-version 5)
+(setq straight-use-package-by-default t)
+(defvar boostrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory)))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-  ;; Set some startup configuration values
-  (setq-default
-   load-prefer-newer t            ; load prefers the newest version of a file
-   package-enable-at-startup nil) ; Prevent packages from being activated after reading init
+;; Hack to load org using straight
+;; MUST be done before any reference to Org
+(load (expand-file-name
+       (concat jme:config-dir "/org-hack.el") user-emacs-directory))
 
-  ;; initialize the ELPA repositories where packages are fetched
-  (setq package-archives '(("org"   . "http://orgmode.org/elpa/")
-                           ("melpa" . "https://melpa.org/packages/")
-                           ("gnu"   . "https://elpa.gnu.org/packages/")))
+;; utilize use-package
+(straight-use-package 'use-package)
 
-  (package-initialize)
+;; we need to load diminish early so that it can catch the other modes
+;(use-package diminish)
+(use-package delight
+  :demand t)
 
-  ;; Utilize use-package
-  (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-    (package-install 'use-package))
+(use-package auto-compile
+  :demand t
+  :config
+  (auto-compile-on-load 1)
+  (auto-compile-on-save-mode 1))
 
-  (eval-when-compile
-    (require 'use-package))
-  (unless (package-installed-p 'diminish)
-    (package-refresh-contents)
-    (package-install 'diminish)
-    (require 'dimish))
-  (require 'bind-key)
-  (custom-set-variables
-   '(use-package-verbose t))
+(defun jme:load (directory base)
+  "Look for files located in DIRECTORY whose base name is BASE.
 
-  ;; load org and make sure we have the right version
-  (use-package org
-    :ensure org-plus-contrib
-    :pin org)
+Check the base name against several extensions.  If a file with
+that name exists, then load it."
+  (let ((literate      (expand-file-name (concat base ".org") directory))
+        (encrypted-org (expand-file-name (concat base ".org.gpg") directory))
+        (plain         (expand-file-name (concat base ".el") directory))
+        (encrypted-el  (expand-file-name (concat base ".el.gpg") directory)))
+    (cond
+     ((file-exists-p encrypted-org) (org-babel-load-file encrypted-org))
+     ((file-exists-p encrypted-el)  (load encrypted-el))
+     ((file-exists-p literate)      (org-babel-load-file literate))
+     ((file-exists-p plain)         (load plain)))))
 
-  ;; load the literate init file
-  (org-babel-load-file (expand-file-name "init-ext.org" user-emacs-directory))
+;; load paths first to ensure emacs-user-directory stays clean
+(jme:load jme:config-dir "paths")
 
-  ;; trigger garbage collection to clean up our deferred mess
-  (garbage-collect))
-(provide 'init)
+;; load os-specific settings
+(let* ((system-type-name (symbol-name system-type))
+       (base-name (replace-regexp-in-string "/" "-" system-type-name)))
+  (jme:load jme:config-dir base-name))
+
+;; load system specific file
+(let ((host-name-base (car (split-string (system-name) "\\."))))
+  (jme:load jme:config-dir host-name-base))
+
+;; load configuration files
+(mapc (lambda (f) (jme:load jme:config-dir f))
+      '("backup"
+        "core"
+        "features"
+        "modeline"
+        "ui"
+        "dired"
+        "completion"
+        "editor"
+        "help"
+        "history"
+        "lint"
+        "orgmode"
+        "prog-modes"
+        "lsp"
+        "projects"
+        "shell"
+        "snippets"
+        "version-control"))
+
+;; (jme:load jme:config-dir "backup")
+;; (jme:load jme:config-dir "core")
+;; (jme:load jme:config-dir "features")
+;; (jme:load jme:config-dir "modeline")
+;; (jme:load jme:config-dir "ui")
+;; (jme:load jme:config-dir "dired")
+;; (jme:load jme:config-dir "completion")
+;; (jme:load jme:config-dir "editor")
+;; (jme:load jme:config-dir "help")
+;; (jme:load jme:config-dir "history")
+;; (jme:load jme:config-dir "lint")
+;; (jme:load jme:config-dir "orgmode")
+;; (jme:load jme:config-dir "prog-modes")
+;; (jme:load jme:config-dir "lsp")
+;; (jme:load jme:config-dir "projects")
+;; (jme:load jme:config-dir "shell")
+;; (jme:load jme:config-dir "snippets")
+;; (jme:load jme:config-dir "version-control")
+
+;; load customization file
+(setq custom-file
+      (concat (file-name-directory user-init-file) "custom.el"))
+(when (file-exists-p custom-file)
+  (load custom-file))
+
+;; private settings
+(jme:load user-emacs-directory ".private")
+
 ;;; init.el ends here
