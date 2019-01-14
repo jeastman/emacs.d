@@ -151,6 +151,12 @@ This can be 0 for immediate, or a floating point value.")
 
 (defalias 'archive-done-tasks 'jme:org-archive-done-tasks)
 
+(defun jme:org-archive-and-publish ()
+  "Archive old tasks and publish as html."
+  (interactive)
+  (archive-done-tasks)
+  (org-html-export-to-html))
+
 ;; Clocking
 
 (org-clock-persistence-insinuate)  ; set clocks up to persist
