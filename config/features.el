@@ -29,15 +29,15 @@
 ;; SEE: https://github.com/domtronn/all-the-icons.el/issues/99
 ;; SEE: https://github.com/domtronn/all-the-icons.el/issues/121#issuecomment-423759625
 ;; TODO: Revert to main repository once issue is fixed.
-;; (use-package all-the-icons
-;;   :straight (all-the-icons :files (:defaults "data")
-;;                            :host github
-;;                            :repo "domtronn/all-the-icons.el"
-;;                            :fork (:host github
-;;                                         :remote "ubolonton"
-;;                                         :repo "ubolonton/all-the-icons.el"
-;;                                         :branch "font-lock-fix")))
-(use-package all-the-icons)
+(use-package all-the-icons
+   :straight (all-the-icons :files (:defaults "data")
+                            :host github
+                            :repo "domtronn/all-the-icons.el"
+                            :fork (:host github
+                                         :remote "ubolonton"
+                                         :repo "ubolonton/all-the-icons.el"
+                                         :branch "font-lock-fix")))
+;; (use-package all-the-icons)
 
 (use-package all-the-icons-ivy
   :after (ivy)

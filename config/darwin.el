@@ -29,7 +29,7 @@
 
 (setq markdown-command "/usr/local/bin/mmd")
 
-(setq "NODE_PATH" "/usr/local/lib/node_modules")
+(setenv "NODE_PATH" "/usr/local/lib/node_modules")
 
 ;; Make use of the Mac system trash
 (if (boundp 'mac-system-move-file-to-trash-use-finder)
