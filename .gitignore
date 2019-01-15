@@ -7,6 +7,7 @@ config/john.eastman.el
 config/john.eastman.org
 jeastman.el
 jeastman.org
+.private.el
 pecoux.el
 scribble.el
 swank.scm
