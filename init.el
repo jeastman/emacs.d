@@ -104,12 +104,12 @@ that name exists, then load it."
 ;; load paths first to ensure emacs-user-directory stays clean
 (jme:load jme:config-dir "paths")
 
-;; load os-specific settings
+;; load os-specific settings - should be limitied to path setup
 (let* ((system-type-name (symbol-name system-type))
        (base-name (replace-regexp-in-string "/" "-" system-type-name)))
   (jme:load jme:config-dir base-name))
 
-;; load system specific file
+;; load system specific file - should be limited to path setup
 (let ((host-name-base (car (split-string (system-name) "\\."))))
   (jme:load jme:config-dir host-name-base))
 
@@ -153,11 +153,18 @@ that name exists, then load it."
 ;; (jme:load jme:config-dir "snippets")
 ;; (jme:load jme:config-dir "version-control")
 
+;; load host specific packages
+(let ((host-name-base (car (split-string (system-name) "\\."))))
+  (jme:load jme:config-dir (concat host-name-base "-pkg")))
+
 ;; load customization file
 (setq custom-file
       (concat (file-name-directory user-init-file) "custom.el"))
 (when (file-exists-p custom-file)
   (load custom-file))
+
+;; User specific settings
+(jme:load jme:config-dir user-login-name)
 
 ;; private settings
 (jme:load user-emacs-directory ".private")

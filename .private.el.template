@@ -1,0 +1,53 @@
+;;; .private.el --- Personal Configuration -*- lexical-binding: t -*-
+
+;; This file is not part of GNU Emacs.
+
+;; This file is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License as
+;; published by the Free Software Foundation; either version 2, or
+;; (at your option) any later version.
+;;
+;; This file is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License along
+;; with this file; see the file COPYING.  If not, see see
+;; <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
+;;
+;; This file provides a means of creating untracked configuration changes.
+;; This is useful for things which we do not specifically under version
+;; control because of sensitive information or are just specific to this
+;; particular machine's configuration and does not need any kind of
+;; sharing.
+
+;;; Code:
+
+(custom-set-variables
+ '(user-mail-address "user@example.com")
+ '(user-full-name "User"))
+
+(use-package smtpmail
+  :custom
+  (smtpmail-default-smtp-server "smtp.example.com")
+  (smtpmail-smtp-server "smtp.example.com")
+  (smtpmail-smtp-user "user@example.com")
+  (smtpmail-local-domain "example.com")
+  (smtpmail-debug-info t)
+  (send-mail-function 'smtpmail-send-it)
+  (message-send-mail-function 'smtpmail-send-it)
+  (smtpmail-smtp-service 587))
+
+;; Adjust the font scale for local resolution
+(setq jme:default-font-scale 140)
+
+;; Set a sound for org notifications
+(setq org-clock-sound "/usr/local/share/sounds/appt.wav")
+
+;; Auto-set agenda items today to receive notifications
+(run-at-time "07:50" 86400 '(lambda () (org-agenda-to-appt)))
+
+;;; .private.el ends here
