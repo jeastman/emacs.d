@@ -47,6 +47,11 @@
 ;; Set a sound for org notifications
 (setq org-clock-sound "/usr/local/share/sounds/appt.wav")
 
+;; call it once on startup
+(org-agenda-to-appt)
+(appt-activate t)
+
+;; set up to run once daily for long running sessions
 ;; Auto-set agenda items today to receive notifications
 (run-at-time "07:50" 86400 '(lambda () (org-agenda-to-appt)))
 
