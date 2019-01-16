@@ -52,6 +52,9 @@
   :config
   (global-whitespace-mode 1))
 
+;; Helpful package for visualizing color identifiers.
+(use-package rainbow-mode)
+
 ;; Whitespace cleanup can be dangerous if it changes the content of the
 ;; file. Some changes are guaranteed to be safe, which this function sticks
 ;; to, allowing it to be safe for a before-save-hook.
