@@ -14,3 +14,5 @@ swank.scm
 /sbcl.core-for-slime
 custom.el
 straight
+.cask
+elpa
