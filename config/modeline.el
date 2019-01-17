@@ -33,7 +33,14 @@
   :commands (doom-modeline-init)
   :config
   (setq doom-modeline-major-mode-color-icon t)
+  (setq doom-modeline-minor-modes t)
+  (setq doom-modeline-github t)
   :hook (after-init . doom-modeline-init))
+
+(use-package minions
+  :after (doom-modeline)
+  :config
+  (minions-mode 1))
 
 (use-package spaceline-all-the-icons
   :disabled

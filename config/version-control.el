@@ -30,6 +30,8 @@
   (magit-completing-read-function 'ivy-completing-read "Use ivy for completing reads.")
   :bind ("C-x d" . magit-status))
 
+(use-package ghub)
+
 (use-package magit-gitflow
   :commands (turn-on-magit-gitflow)
   :hook (magit-mode . turn-on-magit-gitflow))
