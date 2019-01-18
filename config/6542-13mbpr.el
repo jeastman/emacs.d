@@ -43,7 +43,7 @@
         (file-expand-wildcards
          (concat
           jme:projects-dir
-          "e/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target/repository/plugins/org.eclipse.equinox.launcher.cocoa.macosx*.jar")))))
+          "e/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target/repository/plugins/org.eclipse.equinox.launcher_*.jar")))))
   (setenv "CLASSPATH"
           (concat (getenv "CLASSPATH") ":" lsp-jar)))
 
