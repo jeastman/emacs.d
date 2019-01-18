@@ -79,4 +79,10 @@
                       '(url-cookie-file (concat meta-url "/cookies"))
                       '(url-cache-directory (concat temporary-file-directory "url/cache")))
 
+;; Projects directory
+;; All of my machines utilize a similar project structure
+;; rooted in a "Projects" directory
+(defvar jme:projects-dir (expand-file-name "~/Projects/")
+  "Project home directory.")
+
 ;;; paths.el ends here

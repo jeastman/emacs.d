@@ -25,13 +25,26 @@
 ;;; Code:
 
 (custom-set-variables
- '(plantuml-jar-path "/usr/local/Cellar/plantuml/1.2018.14/libexec/plantuml.jar")
- '(org-plantuml-jar-path "/usr/local/Cellar/plantuml/1.2018.14/libexec/plantuml.jar")
- '(org-ditaa-jar-path "/usr/local/Cellar/ditaa/0.11.0/libexec/ditaa-0.11.0-standalone.jar")
+ '(plantuml-jar-path (car (file-expand-wildcards
+                           "/usr/local/Cellar/plantuml/*/libexec/plantuml.jar")))
+ '(org-plantuml-jar-path (car (file-expand-wildcards
+                               "/usr/local/Cellar/plantuml/*/libexec/plantuml.jar")))
+ '(org-ditaa-jar-path (car (file-expand-wildcards
+                            "/usr/local/Cellar/ditaa/*/libexec/ditaa-*-standalone.jar")))
  '(org-directory "~/Documents/org")
  '(org-refile-targets '((org-agenda-files :maxlevel . 5)
                         (("~/Documents/org/task_archive.txt") :maxlevel . 5)
                         (nil :maxlevel . 5)))
  )
+
+;; CLASSPATH needs to include eclipse.jdt.ls jar in order for lsp to work.
+(let ((lsp-jar
+       (car
+        (file-expand-wildcards
+         (concat
+          jme:projects-dir
+          "e/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target/repository/plugins/org.eclipse.equinox.launcher.cocoa.macosx*.jar")))))
+  (setenv "CLASSPATH"
+          (concat (getenv "CLASSPATH") ":" lsp-jar)))
 
 ;;; 6542-13mbpr.el ends here
