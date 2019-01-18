@@ -27,11 +27,14 @@
 (when (fboundp 'imagemagick-register-types)
   (imagemagick-register-types))
 
+;; General Email settings
 (setq message-kill-buffer-on-exit t)
 
 (use-package org-mime
   :bind (:map message-mode-map
               ("C-c h" . org-mime-htmlize))
+  :custom
+  (org-mime-default-header "#+OPTIONS: latex:t toc:nil H:3 num:nil\n")
   :init
   (progn
     (defun jme/org-mime-html-hook ()
@@ -167,12 +170,19 @@ This can be used with `notmuch-tag-format-image-data'"
       <path fill=\"#c0ff3e\" d=\"M7 12.119v3.881l-6-6 6-6v3.966c6.98 0.164 6.681-4.747 4.904-7.966 4.386 4.741 3.455 12.337-4.904 12.119z\"></path>
     </svg>")
 
+(defun jme:notmuch-mua-user-agent ()
+  "Generate a `User-Agent:' string suitable for notmuch."
+  (concat "Emacs/" emacs-version " (Org/" (org-version)")"))
+
 (use-package notmuch
+  :commands (notmuch)
   :custom
   (notmuch-search-oldest-first nil)
   (notmuch-show-logo nil)
   (notmuch-archive-tags '("-inbox" "+archive"))
   (notmuch-hello-thousands-separator ",")
+  (notmuch-mua-user-agent-function 'jme:notmuch-mua-user-agent)
+  (mail-user-agent 'notmuch-user-agent)
   :bind
   (:map notmuch-show-mode-map
         ("d" . (lambda ()
@@ -196,7 +206,11 @@ This can be used with `notmuch-tag-format-image-data'"
         ("S" . (lambda ()
                  "mark message as spam"
                  (interactive)
-                 (notmuch-search-tag '("+spam" "-inbox")))))
+                 (notmuch-search-tag '("+spam" "-inbox"))))
+        :map notmuch-message-mode-map
+        ("C-c M-o" . org-mode)
+        :map org-mode-map
+        ("C-c M-o" . notmuch-message-mode))
   :init
   (setq notmuch-tag-formats
         '(("unread" (propertize tag (quote face) (quote notmuch-tag-unread)))
@@ -214,5 +228,39 @@ This can be used with `notmuch-tag-format-image-data'"
           ("replied" (notmuch-tag-format-image-data tag (jme:notmuch-tag-replied-icon)))))
   :config
   (require 'org-notmuch))
+
+
+;; mu4e
+;; Since I've loaded mu via brew, there is no local repo for mu4e.
+;; Since I am also using straight/use-package, I cannot utilize use-package for mu4e.
+;; We fall back to the old, simple require
+(require 'mu4e)
+
+(custom-set-variables
+ '(shr-color-visible-luminance-min 65)
+ '(shr-color-visible-distance-min 5)
+ '(mu4e-sent-folder "/Sent")
+ '(mu4e-drafts-folder "/Drafts")
+ '(mu4e-trash-folder "/Trash")
+ '(mu4e-refile-folder "/Archive")
+ '(mu4e-use-fancy-chars t)
+ '(mu4e-view-show-images t)
+ '(mu4e-index-cleanup nil)
+ '(mu4e-index-lazy-check t)
+ '(mu4e-confirm-quit nil)
+ '(mu4e-compose-dont-reply-to-self t)
+ '(mu4e-change-filenames-when-moving t)  ; required for mbsync
+ '(mu4e-maildir-shortcuts
+   '(("/Archive"         . ?A)
+     ("/inbox"           . ?i)
+     ("/Activity Stream" . ?a)
+     ("/Sent"            . ?s)))
+
+ '(mu4e-headers-fields
+   '( (:human-date       . 12)
+      (:flags            .  6)
+      (:from             . 22)
+      (:maildir          . 10)
+      (:thread-subject   . nil))))
 
 ;;; 6542-13mbpr-pkg.el ends here
