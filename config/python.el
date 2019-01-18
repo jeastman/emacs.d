@@ -32,4 +32,11 @@
    pipenv-projectile-after-switch-function
    #'pipenv-projectile-after-switch-extended))
 
+;; See: https://github.com/ambv/black
+;; black will need to be installed separately
+;; See also: https://github.com/rupert/pyls-black
+;; for LSP integration
+(use-package blacken
+  :commands (blacken-mode))
+
 ;;; python.el ends here
