@@ -35,7 +35,7 @@
   (setq doom-modeline-major-mode-color-icon t)
   (setq doom-modeline-minor-modes t)
   (setq doom-modeline-github t)
-  :hook (after-init . doom-modeline-init))
+  :hook (after-init . doom-modeline-mode))
 
 (use-package minions
   :after (doom-modeline)
