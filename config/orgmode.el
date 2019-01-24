@@ -88,15 +88,23 @@
 
 (use-package org-bullets
   :commands (org-bullets-mode)
+  :custom
+  (org-bullets-bullet-list
+   `(,(all-the-icons-faicon "circle")
+     ,(all-the-icons-faicon "chevron-circle-right")
+     ,(all-the-icons-faicon "arrow-circle-right")
+     ,(all-the-icons-faicon "arrow-right")
+     ,(all-the-icons-faicon "hand-o-right")))
   :hook (org-mode . (lambda () (org-bullets-mode 1))))
 
 (use-package org-fancy-priorities
   :hook
   (org-mode . org-fancy-priorities-mode)
-  :config
-  (custom-set-variables
-   '(org-priority-faces (quote ((65 . "red") (66 . "yellow") (67 . "orange"))))
-   '(org-fancy-priorities-list '( "!" "⌚" "⌛" ))))
+  :custom
+  (org-priority-faces (quote ((65 . "red") (66 . "yellow") (67 . "orange"))))
+  (org-fancy-priorities-list `(,(all-the-icons-faicon "bell")
+                               ,(all-the-icons-faicon "bell-o")
+                               ,(all-the-icons-faicon "bell-slash-o"))))
 
 (use-package org-sticky-header
   :commands (org-sticky-header-mode)
