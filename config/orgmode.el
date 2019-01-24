@@ -44,6 +44,8 @@
  '(org-refile-use-outline-path 'file)
  '(org-outline-path-complete-in-steps t)
  '(org-refile-allow-creating-parent-nodes 'confirm)
+ '(org-agenda-span 'day)
+ '(org-agenda-restore-windows-after-quit t)
  '(org-log-done 'time)
  '(org-log-into-drawer "LOGBOOK")
  '(org-global-properties
