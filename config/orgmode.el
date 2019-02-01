@@ -86,6 +86,40 @@
                           ("RISK" . (:foreground "white" :background "orange red"))
                           ("MITIGATED" . (:foreground "white" :background "dark green")))))
 
+;; Setup for capture
+
+;; Load code review functions needed for capture tempates
+(jme:load jme:config-dir "code-review")
+
+(let ((task-file (expand-file-name (concat org-directory "/tasks.org")))
+      (calendar-file (expand-file-name (concat org-directory "/calendar.org"))))
+  (setq org-capture-templates
+        `(("t" "Task" entry (file+headline ,task-file "Tasks")
+           "* TODO %^{What} %^g\n  %U\n" :immediate-finish t)
+          ("d" "Deadline" entry (file+headline ,task-file "Tasks")
+           "* TODO %^{What} %^g\nDEADLINE: %^{Deadline}t\n  %U\n" :immediate-finish t)
+          ("m" "Ad-hoc meeting" entry (file+olp ,calendar-file "Meetings" "Other Discussions")
+           "* TODO Discussion with %^{Who} %^g\n" :clock-in t :clock-keep t :immediate-finish t)
+          ("c" "Item to Current Clocked Task" item (clock)
+           "%i" :immediate-finish :empty-lines 1)
+          ("C" "Contents to Current Clocked Task" plain (clock)
+           "%i" :immediate-finish t :empty-lines 1)
+          ("k" "Kill-ring to Current Clocked Task" plain (clock)
+           "%c" :immediate-finish t :empty-lines 1)
+          ("F" "Code Reference with Comments to Current Task" plain (clock)
+           "%(jme:org-capture-code-snippet \"%F\")\n\n   %?"
+           :empty-lines 1)
+          ("f" "Code Reference to Current Task" plain (clock)
+           "%(jme:org-capture-code-snippet \"%F\")"
+           :empty-lines 1 :immediate-finish t)
+          ("1" "One-on-one meeting" entry (file+olp ,calendar-file "Meetings" "Other Discussions")
+           "* TODO Discussion with %^{Who} %^g\nSCHEDULED: %^{When}T\n" :immediate-finish t)
+          ("p" "Project meeting" entry (file+olp ,calendar-file "Meetings" "Project Meetings")
+           "* TODO %^{Project} %^g\nSCHEDULED: %^{When}T\n" :immediate-finish t)
+          ("e" "Event" entry (file+olp ,calendar-file "Meetings" "Events")
+           "* TODO %^{What} %^g\nSCHEDULED: %^{When}T\n:PROPERTIES:\n:CATEGORY: %^{Type|Meeting|Event|Other}\n:END:\n" :immediate-finish t)
+          )))
+
 (use-package org-bullets
   :commands (org-bullets-mode)
   :custom
@@ -183,6 +217,6 @@ This can be 0 for immediate, or a floating point value.")
 (bind-key "C-c l" 'org-store-link)
 (bind-key "C-c L" 'org-insert-link-global)
 (bind-key "C-c a" 'org-agenda)
-(bind-key "C-c c" 'org-capture)
+(bind-key "C-c c" 'counsel-org-capture)
 
 ;;; orgmode.el ends here
