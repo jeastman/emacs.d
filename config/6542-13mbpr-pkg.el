@@ -229,38 +229,4 @@ This can be used with `notmuch-tag-format-image-data'"
   :config
   (require 'org-notmuch))
 
-
-;; mu4e
-;; Since I've loaded mu via brew, there is no local repo for mu4e.
-;; Since I am also using straight/use-package, I cannot utilize use-package for mu4e.
-;; We fall back to the old, simple require
-(require 'mu4e)
-
-(custom-set-variables
- '(shr-color-visible-luminance-min 65)
- '(shr-color-visible-distance-min 5)
- '(mu4e-sent-folder "/Sent")
- '(mu4e-drafts-folder "/Drafts")
- '(mu4e-trash-folder "/Trash")
- '(mu4e-refile-folder "/Archive")
- '(mu4e-use-fancy-chars t)
- '(mu4e-view-show-images t)
- '(mu4e-index-cleanup nil)
- '(mu4e-index-lazy-check t)
- '(mu4e-confirm-quit nil)
- '(mu4e-compose-dont-reply-to-self t)
- '(mu4e-change-filenames-when-moving t)  ; required for mbsync
- '(mu4e-maildir-shortcuts
-   '(("/Archive"         . ?A)
-     ("/inbox"           . ?i)
-     ("/Activity Stream" . ?a)
-     ("/Sent"            . ?s)))
-
- '(mu4e-headers-fields
-   '( (:human-date       . 12)
-      (:flags            .  6)
-      (:from             . 22)
-      (:maildir          . 10)
-      (:thread-subject   . nil))))
-
 ;;; 6542-13mbpr-pkg.el ends here
