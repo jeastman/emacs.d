@@ -30,6 +30,15 @@
   :mode ("\\.adoc\\'" . adoc-mode)
   :hook (adoc-mode-hook . (lambda() (buffer-face-mode t))))
 
+;; Graphviz support
+(use-package graphviz-dot-mode
+  :custom
+  (graphviz-dot-preview-extension "svg"))
+
+;; Yaml support
+(use-package yaml-mode
+  :mode ("\\.yml\\'" . yaml-mode))
+
 ;; Javascript
 (use-package js2-mode
   :commands (js2-mode)
@@ -55,6 +64,8 @@
   :mode ("components\\/.*\\.js\\'" . rjsx-mode)
   :after js2-mode)
 
+(load (concat jme:config-dir "/elisp.el"))
+(load (concat jme:config-dir "/java.el"))
 (load (concat jme:config-dir "/python.el"))
 
 ;;; prog-modes.el ends here
