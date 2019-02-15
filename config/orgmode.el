@@ -95,9 +95,9 @@
       (calendar-file (expand-file-name (concat org-directory "/calendar.org"))))
   (setq org-capture-templates
         `(("t" "Task" entry (file+headline ,task-file "Tasks")
-           "* TODO %^{What} %^g\n  %U\n" :immediate-finish t)
+           "* TODO %^{What} %^g\n:PROPERTIES:\n:CREATED:  %U\n:END:\n\n" :immediate-finish t)
           ("d" "Deadline" entry (file+headline ,task-file "Tasks")
-           "* TODO %^{What} %^g\nDEADLINE: %^{Deadline}t\n  %U\n" :immediate-finish t)
+           "* TODO %^{What} %^g\nDEADLINE: %^{Deadline}t\n:PROPERTIES:\n:CREATED:  %U\n:END:\n\n" :immediate-finish t)
           ("m" "Ad-hoc meeting" entry (file+olp ,calendar-file "Meetings" "Other Discussions")
            "* TODO Discussion with %^{Who} %^g\n" :clock-in t :clock-keep t :immediate-finish t)
           ("c" "Item to Current Clocked Task" item (clock)
@@ -147,7 +147,7 @@
   (org-sticky-header-full-path 'full "Show the full outline path.")
   (org-sticky-heading-star "-"))
 
-(defvar jme:org-archive-expiry-days 7
+(defvar jme:org-archive-expiry-days 14
   "The number of days after which a completed task should be auto-archived.
 This can be 0 for immediate, or a floating point value.")
 
