@@ -61,7 +61,7 @@
 
 (use-package swiper
   :after ivy
-  :bind ("C-s" . swiper))
+  :bind ("C-s" . swiper-isearch))
 
 ;; Add limit of line length to optimize for large files (logs)
 ;; See https://oremacs.com/2018/03/05/grep-exclude/
