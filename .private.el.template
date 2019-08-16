@@ -41,6 +41,35 @@
   (message-send-mail-function 'smtpmail-send-it)
   (smtpmail-smtp-service 587))
 
+(defun jme:mu4e-private-config()
+  "Private configuration of mu4e.
+This function should be called after mu4e has been initialized."
+  (custom-set-variables
+   '(mu4e-user-mail-address-list '("YourEmail@example.com"))
+   '(mu4e-compose-signature "\nFrom Me!")
+   '(mu4e-attachment-dir "~/Downloads")
+   '(mu4e-maildir "/path/to/Maildir")
+   '(mu4e-drafts-folder "/Drafts")
+   '(mu4e-sent-folder "/Sent")
+   '(mu4e-trash-folder "/Trash")
+   '(mu4e-maildir-shortcuts
+     '(("/Activity Stream" . ?a)
+       ("/inbox"           . ?i)
+       ("/Archive"         . ?o)
+       ("/Notifications"    . ?n)
+       ("/Sent"            . ?s)))
+   '(mu4e-headers-fields
+     '((:human-date    .  12)
+       (:flags         .   4)
+       (:mailing-list  .   6)
+       (:from-or-to    .  22)
+       (:thread-subject       .  nil))))
+
+  (add-to-list 'mu4e-bookmarks '("date:today..now" "Today" ?d))
+  (add-to-list 'mu4e-bookmarks '("flag:unread maildir:/inbox" "Unread Inbox" ?x))
+  (add-to-list 'mu4e-bookmarks '("maildir:/inbox and date:today..now" "Today's Inbox" ?n))
+  (add-to-list 'mu4e-bookmarks '("maildir:\"/Activity Stream\"" "Activity Stream" ?a)))
+
 ;; Adjust the font scale for local resolution
 (setq jme:default-font-scale 140)
 
