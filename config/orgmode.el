@@ -26,7 +26,6 @@
 
 ;; Original value of org-modules
 ;; (org-w3m org-bbdb org-bibtex org-docview org-gnus org-info org-irc org-mhe org-rmail org-eww)
-
 (custom-set-variables
  '(org-modules '(org-annotate-file
                  org-bibtex
@@ -113,6 +112,8 @@
   (setq org-capture-templates
         `(("t" "Task" entry (file+headline ,task-file "Tasks")
            "* TODO %^{What} %^g\n:PROPERTIES:\n:CREATED:  %U\n:END:\n\n" :immediate-finish t)
+          ("e" "Task from Email" entry (file+headline ,task-file "Email")
+           "* TODO [#A] %?\nSCHEDULED: %(org-insert-timestamp (org-read-date nil t \"+0d\"))\n%a\n")
           ("d" "Deadline" entry (file+headline ,task-file "Tasks")
            "* TODO %^{What} %^g\nDEADLINE: %^{Deadline}t\n:PROPERTIES:\n:CREATED:  %U\n:END:\n\n" :immediate-finish t)
           ("m" "Ad-hoc meeting" entry (file+olp ,calendar-file "Meetings" "Other Discussions")
@@ -163,6 +164,9 @@
   :custom
   (org-sticky-header-full-path 'full "Show the full outline path.")
   (org-sticky-heading-star "-"))
+
+;; Support conversion of code blocks to HTML for export.
+(use-package htmlize)
 
 (defvar jme:org-archive-expiry-days 14
   "The number of days after which a completed task should be auto-archived.
