@@ -33,7 +33,13 @@
   (projectile-enable-caching t)
   (projectile-completion-system 'ivy)
   :config
-  (projectile-mode))
+  (projectile-mode)
+  (projectile-register-project-type 'poetry '("pyproject.toml")
+                                    :compile "poetry build"
+                                    :test "poetry run pytest"
+                                    :test-prefix "test_"
+                                    :test-suffix "_test"
+                                    :test-dir "tests"))
 
 (use-package counsel-projectile
   :after (ivy projectile)

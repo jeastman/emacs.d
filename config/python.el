@@ -26,11 +26,28 @@
 (setq python-indent-guess-indent-offset-verbose nil
       python-shell-interpreter "python3")
 
+
+(use-package pyenv-mode
+  :init
+  (add-to-list 'exec-path "~/.pyenv/shims")
+  (setenv "WORKON_HOME" "~/.pyenv/versions/")
+  :config
+  (pyenv-mode)
+  (let ((global-pyenv
+         (replace-regexp-in-string "\n" ""
+                                   (shell-command-to-string "pyenv global"))))
+    (pyenv-mode-set global-pyenv)
+    (setq pyenv-current-version global-pyenv)))
+
 (use-package pipenv
   :init
   (setq
    pipenv-projectile-after-switch-function
    #'pipenv-projectile-after-switch-extended))
+
+(use-package python-pytest
+  :custom
+  (python-pytest-executable "poetry run pytest"))
 
 ;; See: https://github.com/ambv/black
 ;; black will need to be installed separately
