@@ -31,6 +31,7 @@
                                "/usr/local/Cellar/plantuml/*/libexec/plantuml.jar")))
  '(org-ditaa-jar-path (car (file-expand-wildcards
                             "/usr/local/Cellar/ditaa/*/libexec/ditaa-*-standalone.jar")))
+ '(ob-mermaid-cli-path "/usr/local/bin/mmdc")
  '(org-directory "~/Documents/org")
  '(org-refile-targets '((org-agenda-files :maxlevel . 5)
                         (("~/Documents/org/task_archive.txt") :maxlevel . 5)
@@ -47,4 +48,6 @@
   (setenv "CLASSPATH"
           (concat (getenv "CLASSPATH") ":" lsp-jar)))
 
+;; Export org to confluence
+(require 'ox-confluence)
 ;;; 6542-13mbpr.el ends here

@@ -35,6 +35,13 @@
   :custom
   (graphviz-dot-preview-extension "svg"))
 
+(use-package mermaid-mode
+  :custom
+  (mermaid-output-format "svg"))
+
+(use-package plantuml-mode
+  :mode ("\\.uml\\'" . plantuml-mode))
+
 ;; Yaml support
 (use-package yaml-mode
   :mode ("\\.yml\\'" . yaml-mode))

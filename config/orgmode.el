@@ -67,6 +67,23 @@
  'org-babal-load-languages
  'org-babal-load-languages)
 
+(use-package ob-mermaid
+  :config
+  (add-to-list 'org-babel-load-languages '(mermaid . t))
+  (org-babel-do-load-languages
+   'org-babal-load-languages
+   'org-babal-load-languages))
+
+(require 'ox-latex)
+(add-to-list 'org-latex-classes
+             '("synacororgspec" "\\documentclass[10pt,oneside,article]{synacororgspec}"
+               ("\\chapter{%s}" . "\\chapter*{%s}")
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
+
 ;; TODO Keywords
 
 (custom-set-variables '(org-todo-keywords
