@@ -27,12 +27,18 @@
 
 ;;; Code:
 
-(tool-bar-mode -1)                   ; disable the toolbar
-(scroll-bar-mode -1)                 ; disable the scrollbar
-(blink-cursor-mode 0)                ; don't blink the cursor
-(global-hl-line-mode t)              ; highlight current line
-(show-paren-mode t)                  ; highlight matching parens
-(fringe-mode 16 )                    ; Make the fringe slightly wider
+(if (fboundp 'tool-bar-mode)
+    (tool-bar-mode -1))              ; disable the toolbar
+(if (fboundp 'scroll-bar-mode)
+    (scroll-bar-mode -1))            ; disable the scrollbar
+(if (fboundp 'blink-cursor-mode)
+    (blink-cursor-mode 0))           ; don't blink the cursor
+(if (fboundp 'global-hl-line-mode)
+    (global-hl-line-mode t))         ; highlight current line
+(if (fboundp 'show-paren-mode)
+    (show-paren-mode t))             ; highlight matching parens
+(if (fboundp 'fringe-mode)
+    (fringe-mode 16 ))               ; Make the fringe slightly wider
 
 ;; The menu is kind of a waste of space for me
 ;; Disable it when not on MacOS (darwin)
