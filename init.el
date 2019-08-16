@@ -75,6 +75,18 @@
 ;; utilize use-package
 (straight-use-package 'use-package)
 
+;; Handle setting proper environment on Mac
+(use-package exec-path-from-shell
+  :if (memq window-system '(mac ns))
+  :config
+  (progn
+    (when (string-match-p "/zsh$" (getenv "SHELL"))
+      ;; Use a non-interactive login shell to ensure
+      ;; zsh path is loaded properly from .zprofile
+      ;; which only loads with a login shell.
+      (setq exec-path-from-shell-arguments '("-l")))
+    (exec-path-from-shell-initialize)))
+
 ;; we need to load diminish early so that it can catch the other modes
 ;(use-package diminish)
 (use-package delight

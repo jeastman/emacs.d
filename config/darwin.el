@@ -83,4 +83,22 @@ the TITLE and the TEXT are replaced with single quotes."
       (funcall fn title text speak-it))))
 
 
+;; Ensure we activate frames when created
+
+(defun jme:raise-emacs ()
+  "Raise Emacs window."
+  (when (memq window-system '(mac ns))
+    (mac-do-applescript "tell application \"Emacs\" to activate")))
+
+(defun jme:raise-emacs-with-frame (frame)
+  "Raise Emacs and select the provided FRAME."
+  (with-selected-frame frame
+    (when (display-graphic-p)
+      (jme:raise-emacs))))
+
+(add-hook 'after-make-frame-functions 'jme:raise-emacs-with-frame)
+
+;; Start the emacs server
+(when (and (functionp 'server-running-p) (not (server-running-p)))
+  (server-start))
 ;;; darwin.el ends here
