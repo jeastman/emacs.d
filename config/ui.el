@@ -79,6 +79,9 @@
         doom-themes-enable-italic t)
   (load-theme 'doom-one t))
 
+(when (display-graphic-p)
+  (set-mouse-color "#51afef"))
+
 ;; Font configuration
 (defvar jme:default-font-scale 120 "Default font scale.")
 (defvar jme:default-font-family "Hack" "Default font to use.")
