@@ -29,23 +29,28 @@
 
 ;; General Email settings
 (setq message-kill-buffer-on-exit t)
+;;(setq mail-user-agent 'notmuch-user-agent)
+(setq mail-user-agent 'mu4e-user-agent)
 
 (use-package org-mime
   :bind (:map message-mode-map
               ("C-c h" . org-mime-htmlize))
   :custom
   (org-mime-default-header "#+OPTIONS: latex:t toc:nil H:3 num:nil\n")
-  :init
-  (progn
-    (defun jme/org-mime-html-hook ()
-      "Update the pre tag css for org-mime exports."
-      (let* ((my-pre-bg (face-background 'default))
-             (my-pre-fg (face-foreground 'default)))
-        (org-mime-change-element-style
-         "pre" (format "background-color: %s; color: %s; padding: 0.5em;"
-                       my-pre-bg my-pre-fg))))
-    (setq org-mime-preserve-breaks nil)
-    (add-hook 'org-mime-html-hook 'jme/org-mime-html-hook)))
+  (org-mime-beautify-quoted-mail t)
+  (org-mime-preserve-breaks nil)
+  :config
+  (defun jme/org-mime-html-hook ()
+    "Update the pre tag css for org-mime exports."
+    (let* ((my-pre-bg (face-background 'default))
+           (my-pre-fg (face-foreground 'default)))
+      (org-mime-change-element-style
+       "pre" (format "background-color: %s; color: %s; padding: 0.5em;"
+                     my-pre-bg my-pre-fg))))
+  (setq org-mime-export-options '(:section-numbers nil
+                                  :with-author nil
+                                  :with-toc nil))
+  (add-hook 'org-mime-html-hook 'jme/org-mime-html-hook))
 
 (defun jme:notmuch-tag-star-icon ()
   "Return SVG data representing a star icon.
@@ -182,7 +187,7 @@ This can be used with `notmuch-tag-format-image-data'"
   (notmuch-archive-tags '("-inbox" "+archive"))
   (notmuch-hello-thousands-separator ",")
   (notmuch-mua-user-agent-function 'jme:notmuch-mua-user-agent)
-  (mail-user-agent 'notmuch-user-agent)
+;  (mail-user-agent 'notmuch-user-agent)
   :bind
   (:map notmuch-show-mode-map
         ("d" . (lambda ()
@@ -228,5 +233,109 @@ This can be used with `notmuch-tag-format-image-data'"
           ("replied" (notmuch-tag-format-image-data tag (jme:notmuch-tag-replied-icon)))))
   :config
   (require 'org-notmuch))
+
+
+(defun jme:gnus-block-images-group (group)
+  "Handle blocking images based on GROUP.
+Allows images based on `gnus-block-private-groups' if GROUP is
+set, otherwise blocks external images.  In my experience, GROUP
+is not set when viewing mails with mu4e using gnus article view.
+When GROUP is nil, `gnus' uses the default select method instead,
+meaning it could look like a valid newsgroup (nntp in my case).
+
+This is used to explicitly block external images (thought to be
+trackers) when viewing email.
+
+Images can be explicitly shown in an article view using
+`gnus-article-show-images'.
+
+To use this, set `gnus-blocked-images' to this function."
+  (if group
+      (gnus-block-private-groups group)
+    "."))
+
+(use-package mu4e
+  :straight (mu4e :type built-in)
+  :custom
+  (mu4e-change-filenames-when-moving t) ; needed for mbsync
+  (mu4e-compose-dont-reply-to-self t)
+  (mu4e-compose-format-flowed t)
+  (mu4e-confirm-quit nil)
+  (mu4e-headers-auto-update t)
+  (mu4e-headers-include-related t)
+  (mu4e-headers-skip-duplicates t)
+  (mu4e-headers-time-format "%H:%M")
+  (mu4e-sent-messages-behavior 'sent)
+  (mu4e-show-images t)
+  (mu4e-update-interval (* 60 5)) ; update every 5 mins
+  (mu4e-use-fancy-chars t)
+  (mu4e-view-prefer-html t)
+  (mu4e-view-show-addresses t)
+  (mu4e-view-show-images t)
+  (mu4e-view-use-gnus t)
+  (gnus-treat-from-gravatar 'head)
+  (gnus-treat-mail-gravatar 'head)
+  (gnus-blocked-images 'jme:gnus-block-images-group)
+  :bind (("C-c m" . jme:mu4e-show))
+  :config
+  (setq mu4e-headers-draft-mark     `("D" . ,(all-the-icons-faicon "pencil-square-o"))
+        mu4e-headers-flagged-mark   `("F" . ,(all-the-icons-faicon "flag"))
+        mu4e-headers-new-mark       `("N" . ,(all-the-icons-faicon "check-circle"))
+        mu4e-headers-passed-mark    `("P" . ,(all-the-icons-faicon "share"))
+        mu4e-headers-replied-mark   `("R" . ,(all-the-icons-faicon "reply"))
+        mu4e-headers-seen-mark      `("S" . ,(all-the-icons-faicon "envelope-o"))
+        mu4e-headers-trashed-mark   `("T" . ,(all-the-icons-faicon "trash"))
+        mu4e-headers-attach-mark    `("a" . ,(all-the-icons-faicon "paperclip"))
+        mu4e-headers-encrypted-mark `("x" . ,(all-the-icons-faicon "lock"))
+        mu4e-headers-signed-mark    `("s" . ,(all-the-icons-faicon "key"))
+        mu4e-headers-unread-mark    `("u" . ,(all-the-icons-faicon "envelope"))
+        ;; thread prefix marks
+        mu4e-headers-has-child-prefix    `("+"  . ,(all-the-icons-material "subdirectory_arrow_right"))
+        mu4e-headers-empty-parent-prefix `("-"  . ,(all-the-icons-faicon "arrows-h"))
+        mu4e-headers-first-child-prefix  `("\\" . ,(all-the-icons-material "subdirectory_arrow_right"))
+        mu4e-headers-duplicate-prefix    `("="  . ,(all-the-icons-faicon "bars"))
+        mu4e-headers-default-prefix      `("|"  . ,(all-the-icons-faicon "caret-right"))
+        message-citation-line-format "On %B %e, %Y at %l:%M %p, %f (%n) wrote:\n"
+        message-citation-line-function 'message-insert-formatted-citation-line)
+
+  (defun jme:mu4e-show ()
+    "Launch mu4e and preserve windows (if not already running).
+Window preservation is only done on first launch, now when
+switching back to already running mu4e. Basically, windows are
+captured at first launch of `mu4e' and restored when quit. If
+`mu4e' is called before quit, new window layout is not
+preserved. The simple use cases here are as follows:
+- Use case 1:
+-- Launch mu4e -> enter full screen (hide other windows)
+-- exit mu4e (via quit) -> windows restored
+- Use case 2:
+-- Launch mu4e -> enter full screen (hide other windows)
+-- do some mu4e things....
+-- switch buffers/window arrangement to check on something
+-- back to mu4e to finish things..
+-- exit mu4e (via quit) -> original window layout restored"
+    (interactive)
+    (let ((already-running (mu4e-running-p)))
+      (if (not already-running)
+        (window-configuration-to-register :mu4e-fullscreen))
+      (mu4e)
+      (if (not already-running)
+          (mu4e-update-mail-and-index t)
+          (delete-other-windows))))
+  (defun jme:mu4e-stop-advice ()
+    "Exit mu4e and restore windows."
+    (if (get-register :mu4e-fullscreen)
+        (jump-to-register :mu4e-fullscreen))
+    (set-register :mu4e-fullscreen nil))
+  (advice-add 'mu4e~stop :after #'jme:mu4e-stop-advice)
+  (use-package org-mu4e
+    :straight (org-mu4e :type built-in)
+    :custom
+    (org-mu4e-link-query-in-headers-mode nil) ; store links to message, not query
+    :config
+    (load (concat jme:config-dir "/mail-org.el")))
+  ;; If private configuration has been added, call it.
+  (if (functionp 'jme:mu4e-private-config)
+      (jme:mu4e-private-config)))
 
 ;;; 6542-13mbpr-pkg.el ends here
