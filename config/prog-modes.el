@@ -71,6 +71,9 @@
   :mode ("components\\/.*\\.js\\'" . rjsx-mode)
   :after js2-mode)
 
+
+(use-package slime)
+
 (load (concat jme:config-dir "/elisp.el"))
 (load (concat jme:config-dir "/java.el"))
 (load (concat jme:config-dir "/python.el"))
