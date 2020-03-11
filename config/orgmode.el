@@ -110,7 +110,7 @@
 (let ((task-file (expand-file-name (concat org-directory "/tasks.org")))
       (calendar-file (expand-file-name (concat org-directory "/calendar.org"))))
   (setq org-capture-templates
-        `(("t" "Task" entry (file+headline ,task-file "Tasks")
+        `(("t" "Task" entry (file+headline ,task-file "Inbox")
            "* TODO %^{What} %^g\n:PROPERTIES:\n:CREATED:  %U\n:END:\n\n" :immediate-finish t)
           ("e" "Task from Email" entry (file+headline ,task-file "Email")
            "* TODO [#A] %?\nSCHEDULED: %(org-insert-timestamp (org-read-date nil t \"+0d\"))\n%a\n")
@@ -132,11 +132,33 @@
            :empty-lines 1 :immediate-finish t)
           ("1" "One-on-one meeting" entry (file+olp ,calendar-file "Meetings" "Other Discussions")
            "* TODO Discussion with %^{Who} %^g\nSCHEDULED: %^{When}T\n" :immediate-finish t)
-          ("p" "Project meeting" entry (file+olp ,calendar-file "Meetings" "Project Meetings")
+          ("P" "Project meeting" entry (file+olp ,calendar-file "Meetings" "Project Meetings")
            "* TODO %^{Project} %^g\nSCHEDULED: %^{When}T\n" :immediate-finish t)
           ("e" "Event" entry (file+olp ,calendar-file "Meetings" "Events")
            "* TODO %^{What} %^g\nSCHEDULED: %^{When}T\n:PROPERTIES:\n:CATEGORY: %^{Type|Meeting|Event|Other}\n:END:\n" :immediate-finish t)
+          ("p" "Protocol" entry (file+headline ,task-file "Inbox")
+           "* %^{Title}\n:PROPERTIES:\n:CREATED:  %U\n:END:\nSource: %:annotation\n #+begin_quote\n%i\n#+end_quote\n\n%?")
+          ("z" "Protocol no prompt" entry (file+headline ,task-file "Inbox")
+           "* %:description\n:PROPERTIES:\n:CREATED:  %U\n:END:\n\n#+begin_quote\n%i\n#+end_quote\n\n%?")
+          ("s" "Protocol to clock" plain (clock)
+           "Source: %u, %:annotation\n#+begin_quote\n%i#+end_quote\n" :immediate-finish t :empty-lines 1)
+          ("L" "Prrotocol Link" entry (file+headline ,task-file "Inbox")
+           "* %? [[%:link][%:description]] \n:PROPERTIES:\n:CREATED:  %U\n:END:\n\n")
           )))
+
+;;; See the following - friendly handling of capture-specific frame
+;;; https://www.diegoberrocal.com/blog/2015/08/19/org-protocol/
+(defadvice org-capture
+    (after make-full-window-frame activate)
+  "Advise capture to be the only window when used as a popup."
+  (if (equal "emacs-capture" (frame-parameter nil 'name))
+      (delete-other-windows)))
+
+(defadvice org-capture-finalize
+    (after delete-capture-frame activate)
+  "Advise capture to close the frame when done."
+  (if (equal "emacs-capture" (frame-parameter nil 'name))
+      (delete-frame)))
 
 (use-package org-bullets
   :commands (org-bullets-mode)
