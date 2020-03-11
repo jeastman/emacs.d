@@ -87,4 +87,29 @@
   (("C-x o" . switch-window)
    ("C-x w" . switch-window-then-swap-buffer)))
 
+(use-package deft
+  :commands
+  (deft)
+  :bind
+  (("C-c n d" . deft))
+  :custom
+  (deft-recursive t)
+  (deft-use-filter-string-for-filename t)
+  (deft-default-extension "org"))
+
+(use-package org-roam
+  :after org
+  :commands (org-roam--build-cache)
+  :straight (:host github :repo "jethrokuan/org-roam")
+  :hook
+  (after-init . org-roam-mode)
+  :bind (:map org-roam-mode-map
+              (("C-c n l" . org-roam)
+               ("C-c n f" . org-roam-find-file)
+               ("C-c n g" . org-roam-show-graph))
+              :map org-mode-map
+              (("C-c n i" . org-roam-insert)))
+  :custom-face
+  (org-roam-link ((t (:inherit org-link :foreground "#C991E1")))))
+
 ;;; features.el ends here

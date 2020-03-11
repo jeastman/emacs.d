@@ -33,10 +33,14 @@
                             "/usr/local/Cellar/ditaa/*/libexec/ditaa-*-standalone.jar")))
  '(ob-mermaid-cli-path "/usr/local/bin/mmdc")
  '(org-directory "~/Documents/org")
+ '(org-roam-directory "~/Documents/notes")
+ '(deft-directory "~/Documents/notes")
  '(org-refile-targets '((org-agenda-files :maxlevel . 5)
                         (("~/Documents/org/task_archive.txt") :maxlevel . 5)
                         (nil :maxlevel . 5)))
  )
+
+(setq org-directory "~/Documents/org")
 
 ;; CLASSPATH needs to include eclipse.jdt.ls jar in order for lsp to work.
 (let ((lsp-jar
