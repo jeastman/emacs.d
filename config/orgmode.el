@@ -252,6 +252,22 @@ This can be 0 for immediate, or a floating point value.")
 ;; TODO - Some keybindings are needed
 (use-package counsel-org-clock)
 
+(use-package verb
+  :after org
+  :config
+  (add-to-list 'verb-content-type-handlers '("text/javascript" verb--handler-json))
+  (add-to-list 'verb-content-type-handlers '("application/soap+xml" xml-mode))
+  (define-key org-mode-map (kbd "C-c r") verb-command-map))
+
+(use-package org-web-tools
+  :after org
+  :commands (org-web-tools-insert-link-for-url
+             org-web-tools-insert-web-page-as-entry
+             org-web-tools-read-url-as-org
+             org-web-tools-convert-links-to-page-entries
+             org-web-tools-archive-attach
+             org-web-tools-archive-view))
+
 ;; Visual Tweaks
 
 ;;; Style org buffers for readability
