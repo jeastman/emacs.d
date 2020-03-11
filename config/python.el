@@ -49,6 +49,8 @@
   :custom
   (python-pytest-executable "poetry run pytest"))
 
+(use-package poetry)
+
 ;; See: https://github.com/ambv/black
 ;; black will need to be installed separately
 ;; See also: https://github.com/rupert/pyls-black
