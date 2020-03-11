@@ -59,6 +59,11 @@
   :config
   (ivy-rich-mode))
 
+(use-package all-the-icons-ivy-rich
+  :after (ivy counsel ivy-rich)
+  :config
+  (all-the-icons-ivy-rich-mode 1))
+
 (use-package swiper
   :after ivy
   :bind ("C-s" . swiper-isearch))
