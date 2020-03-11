@@ -100,5 +100,7 @@ the TITLE and the TEXT are replaced with single quotes."
 
 ;; Start the emacs server
 (when (and (functionp 'server-running-p) (not (server-running-p)))
-  (server-start))
+  (progn
+    (server-start)
+    (require 'org-protocol)))
 ;;; darwin.el ends here
