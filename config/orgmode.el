@@ -36,6 +36,7 @@
                           (concat org-directory "/calendar.org")))
  '(org-default-notes-file (concat org-directory "/notes.org"))
  '(org-startup-folded nil)
+ '(org-hide-emphasis-markers t)
  '(org-catch-invisible-edits 'smart)
  '(org-src-fontify-natively t)
  '(org-src-tab-acts-natively t)
@@ -45,6 +46,7 @@
  '(org-refile-allow-creating-parent-nodes 'confirm)
  '(org-agenda-span 'day)
  '(org-agenda-restore-windows-after-quit t)
+ '(org-agenda-start-with-log-mode t)
  '(org-log-done 'time)
  '(org-log-into-drawer "LOGBOOK")
  '(org-global-properties
@@ -184,8 +186,7 @@
   :commands (org-sticky-header-mode)
   :hook (org-mode . org-sticky-header-mode)
   :custom
-  (org-sticky-header-full-path 'full "Show the full outline path.")
-  (org-sticky-heading-star "-"))
+  (org-sticky-header-full-path 'full "Show the full outline path."))
 
 ;; Support conversion of code blocks to HTML for export.
 (use-package htmlize)
@@ -251,6 +252,22 @@ This can be 0 for immediate, or a floating point value.")
 ;; TODO - Some keybindings are needed
 (use-package counsel-org-clock)
 
+;; Visual Tweaks
+
+;;; Style org buffers for readability
+;;; inspired by:
+;;; github.com/jethrokuan
+(font-lock-add-keywords 'org-mode
+                        '(("^ *\\([-]\\) "
+                           (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+(defun jme:style-org ()
+  "Apply customized styling to org."
+;  (setq line-spacing 0.2)
+  (variable-pitch-mode t)
+  (visual-line-mode t))
+
+(add-hook 'org-mode-hook #'jme:style-org)
 ;; Key bindings
 
 ;; Org mode
