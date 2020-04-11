@@ -77,7 +77,7 @@
 
 ;; Handle setting proper environment on Mac
 (use-package exec-path-from-shell
-  :if (memq window-system '(mac ns))
+  :if (memq window-system '(mac ns x))
   :config
   (progn
     (when (string-match-p "/zsh$" (getenv "SHELL"))
