@@ -30,7 +30,8 @@
  '(org-modules '(org-annotate-file
                  org-bibtex
                  org-eww
-                 org-list))
+                 org-list
+                 org-drill))
  '(org-agenda-files (list (concat org-directory "/tasks.org")
                           (concat org-directory "/notes.org")
                           (concat org-directory "/calendar.org")))
@@ -267,6 +268,11 @@ This can be 0 for immediate, or a floating point value.")
              org-web-tools-convert-links-to-page-entries
              org-web-tools-archive-attach
              org-web-tools-archive-view))
+
+
+(use-package org-drill
+  :after org
+  :commands (org-drill))
 
 ;; Visual Tweaks
 
