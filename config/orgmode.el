@@ -269,6 +269,7 @@ This can be 0 for immediate, or a floating point value.")
              org-web-tools-archive-attach
              org-web-tools-archive-view))
 
+(use-package org-ref)
 
 (use-package org-drill
   :after org
