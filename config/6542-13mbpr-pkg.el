@@ -338,4 +338,46 @@ preserved. The simple use cases here are as follows:
   (if (functionp 'jme:mu4e-private-config)
       (jme:mu4e-private-config)))
 
+
+(use-package org-msg
+  :after (mu4e)
+  :config
+  (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil"
+        org-msg-startup "hidestars indent inlineimages"
+        org-msg-greeting-fmt "\nHi %s,\n\n"
+        org-msg-greeting-name-limit 3
+        org-msg-text-plain-alternative t
+        org-msg-startup "hidestars indent inlineimages"
+        org-msg-signature "
+ #+begin_signature
+--
+#+begin_export html
+<strong>John Eastman</strong><br/>
+john.eastman@synacor.com<br/>
+m:832-721-5255
+#+end_export
+#+begin_export ascii
+John Eastman
+john.eastman@synacor.comm
+m:832-721-5255
+#+end_export
+#+end_signature
+
+#begin_signature
+--
+#+begin_export html
+<div>
+<div>John Eastman |&nbsp; VP Client Solutions</div>
+<div>+1.713.590.2753 | <a href=\"mailto:john.eastman@synacor.com\" style=\"color:rgb( 31 , 73 , 125 );text-decoration:none\">john.eastman@synacor.com</a></div>
+<div><strong><span style=\"background-color:rgb( 252 , 253 , 254 );color:rgb( 192 , 0 , 0 )\">Synacor Inc.</span></strong></div>
+<div><a href=\"https://www.synacor.com\" style=\"color:rgb( 31 , 73 , 125 );text-decoration:none\">www.synacor.com</a></div>
+</div>
+#+end_export
+#+begin_export ascii
+John Eastman | VP Client Solutions
++1.713.590.2753 | john.eastman@synacor.com
+https://www.synacor.com
+#+end_export
+#+end_signature")
+  (org-msg-mode))
 ;;; 6542-13mbpr-pkg.el ends here

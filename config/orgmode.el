@@ -43,7 +43,7 @@
  '(org-src-tab-acts-natively t)
  '(org-refile-targets '((org-agenda-files . (:maxlevel . 5))))
  '(org-refile-use-outline-path 'file)
- '(org-outline-path-complete-in-steps t)
+ '(org-outline-path-complete-in-steps nil)
  '(org-refile-allow-creating-parent-nodes 'confirm)
  '(org-agenda-span 'day)
  '(org-agenda-restore-windows-after-quit t)
@@ -89,12 +89,13 @@
 ;; TODO Keywords
 
 (custom-set-variables '(org-todo-keywords
-                        '((sequence "TODO(t)" "STARTED(s!)" "WAITING(w@/!)" "STALLED(x@/!)" "|" "DONE(d!)" "CANCELLED(c@)")
+                        '((sequence "TODO(t)" "NEXT(n!)" "STARTED(s!)" "WAITING(w@/!)" "STALLED(x@/!)" "|" "DONE(d!)" "CANCELLED(c@)")
                           (sequence "TASK(f)" "|" "DONE(d!)")
                           (sequence "MAYBE(m)" "|" "DONE(d!)" "CANCELLED(c@)")
                           (sequence "RISK(r)" "|" "MITIGATED(i@)")))
                       '(org-todo-keyword-faces
                         '(("TODO" . (:foreground "DarkOrange" :weight bold))
+                          ("NEXT" . (:foreground "yellow" :weight bold))
                           ("STARTED" . (:foreground "DarkOrange" :weight bold))
                           ("WAITING" . (:foreground "gold" :weight bold))
                           ("MAYBE" . (:foreground "spring green"))
@@ -275,6 +276,67 @@ This can be 0 for immediate, or a floating point value.")
   :after org
   :commands (org-drill))
 
+;; Agenda
+(use-package org-super-agenda
+  :bind ("C-c a" . jme:org-agenda-all)
+  :config
+  (defun jme:org-agenda-all ()
+    "Show the full agenda with special view."
+    (interactive)
+    (org-agenda nil "z"))
+  (setq org-agenda-custom-commands
+      '(("z" "Full agenda super view"
+         ((agenda "" ((org-agenda-span 'day)
+                      (org-super-agenda-groups
+                       '((:name "Today"
+                                :time-grid t
+                                :date today
+                                :scheduled today
+                                :order 1)))))
+          (alltodo "" ((org-agenda-overriding-header "")
+                       (org-super-agenda-groups
+                        '((:name "Inbox"
+                                 :category "Inbox"
+                                 :order 1)
+                          (:name "Overdue"
+                                 :deadline past
+                                 :order 2)
+                          (:name "Due Today"
+                                 :deadline today
+                                 :order 3)
+                          (:name "Next to do"
+                                 :todo "NEXT"
+                                 :order 11)
+                          (:name "Due Soon"
+                                 :deadline future
+                                 :order 12)
+                          (:name "Important"
+                                 :priority "A"
+                                 :order 13)
+                          (:name "Stalled"
+                                 :todo "STALLED"
+                                 :order 20)
+                          (:name "Risks"
+                                 :todo "RISK"
+                                 :order 30)
+                          (:name "Started"
+                                 :todo "STARTED"
+                                 :order 40)
+                          (:name "Tasks"
+                                 :todo "TASK"
+                                 :order 50)
+                          (:name "Maybe"
+                                 :todo "MAYBE"
+                                 :order 60)
+                          (:name "Waiting"
+                                 :todo "WAITING"
+                                 :order 70)
+                          (:name "Projects"
+                                 :children todo
+                                 :order 80)
+                          (:discard (:tag ("meeting")))))))))))
+  (org-super-agenda-mode))
+
 ;; Visual Tweaks
 
 ;;; Style org buffers for readability
@@ -299,7 +361,6 @@ This can be 0 for immediate, or a floating point value.")
 ;; Global
 (bind-key "C-c l" 'org-store-link)
 (bind-key "C-c L" 'org-insert-link-global)
-(bind-key "C-c a" 'org-agenda)
 (bind-key "C-c c" 'counsel-org-capture)
 
 ;;; orgmode.el ends here
