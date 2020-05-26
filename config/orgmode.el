@@ -164,16 +164,16 @@
   (if (equal "emacs-capture" (frame-parameter nil 'name))
       (delete-frame)))
 
-(use-package org-bullets
-  :commands (org-bullets-mode)
+(use-package org-superstar
+  :commands (org-superstar-mode)
   :custom
-  (org-bullets-bullet-list
+  (org-superstar-headline-bullets-list
    `(,(all-the-icons-faicon "circle")
      ,(all-the-icons-faicon "chevron-circle-right")
      ,(all-the-icons-faicon "arrow-circle-right")
      ,(all-the-icons-faicon "arrow-right")
      ,(all-the-icons-faicon "hand-o-right")))
-  :hook (org-mode . (lambda () (org-bullets-mode 1))))
+  :hook (org-mode . (lambda () (org-superstar-mode 1))))
 
 (use-package org-fancy-priorities
   :hook
