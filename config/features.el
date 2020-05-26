@@ -116,4 +116,6 @@
   :straight (:host github :repo "jethrokuan/company-org-roam")
   :config
   (push 'company-org-roam company-backends))
+
+(use-package fontawesome)
 ;;; features.el ends here
