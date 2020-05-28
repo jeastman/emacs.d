@@ -60,7 +60,7 @@
   (ivy-rich-mode))
 
 (use-package all-the-icons-ivy-rich
-  :after (ivy counsel ivy-rich)
+  :after ivy-rich
   :config
   (all-the-icons-ivy-rich-mode 1))
 
@@ -116,6 +116,11 @@
   :straight (:host github :repo "jethrokuan/company-org-roam")
   :config
   (push 'company-org-roam company-backends))
+
+(use-package org-roam-bibtex
+  :hook (org-roam-mode . org-roam-bibtex-mode)
+  :bind (:map org-mode-map
+              (("C-c n a" . orb-note-actions))))
 
 (use-package fontawesome)
 ;;; features.el ends here
