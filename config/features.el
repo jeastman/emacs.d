@@ -68,6 +68,17 @@
   :after ivy
   :bind ("C-s" . swiper-isearch))
 
+;; Sorting and filtering
+(use-package prescient
+  :after counsel
+  :config
+  (prescient-persist-mode 1))
+;; ivy support for prescient
+(use-package ivy-prescient
+  :after prescient
+  :config
+  (ivy-prescient-mode 1))
+
 ;; Add limit of line length to optimize for large files (logs)
 ;; See https://oremacs.com/2018/03/05/grep-exclude/
 (use-package counsel
