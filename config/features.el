@@ -133,5 +133,23 @@
   :bind (:map org-mode-map
               (("C-c n a" . orb-note-actions))))
 
+(use-package org-noter
+  :after org)
+
+(use-package org-pdftools
+  :after org
+  :hook (org-load . org-pdftools-setup-link))
+
+(use-package pdf-tools
+  :after org-noter
+  :config
+  (pdf-loader-install))
+
+(use-package org-noter-pdftools
+  :after pdf-tools
+  :config
+  (with-eval-after-load 'pdf-annot
+    (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
+
 (use-package fontawesome)
 ;;; features.el ends here
