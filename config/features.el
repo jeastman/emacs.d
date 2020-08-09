@@ -129,6 +129,7 @@
   (push 'company-org-roam company-backends))
 
 (use-package org-roam-bibtex
+  :after org-roam
   :hook (org-roam-mode . org-roam-bibtex-mode)
   :bind (:map org-mode-map
               (("C-c n a" . orb-note-actions))))
