@@ -87,11 +87,6 @@
       (setq exec-path-from-shell-arguments '("-l")))
     (exec-path-from-shell-initialize)))
 
-;; we need to load diminish early so that it can catch the other modes
-;(use-package diminish)
-(use-package delight
-  :demand t)
-
 (use-package auto-compile
   :demand t
   :config
