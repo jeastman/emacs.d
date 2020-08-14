@@ -78,4 +78,10 @@
 (load (concat jme:config-dir "/java.el"))
 (load (concat jme:config-dir "/python.el"))
 
+(use-package rustic
+  :config
+  (setq rustic-lsp-server 'rust-analyzer)
+  (setq lsp-rust-analyzer-server-command '("~/.cargo/bin/rust-analyzer")))
+
+
 ;;; prog-modes.el ends here
