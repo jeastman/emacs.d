@@ -23,7 +23,14 @@
 ;;
 
 ;;; Code:
-(use-package eglot
-  :commands (eglot))
+(use-package lsp-mode
+  :hook ((rustic-mode . lsp))
+  :config
+  (setq gc-cons-threshold 100000000)
+  (setq read-process-output-max (* 1024 1024))
+  (setq lsp-idle-delay 0.500)
+  :commands lsp)
 
+(use-package lsp-ui :commands lsp-ui-mode)
+(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 ;;; lsp.el ends here
