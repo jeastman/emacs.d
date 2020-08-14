@@ -85,6 +85,18 @@
                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                ("\\paragraph{%s}" . "\\paragraph*{%s}")
                ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
+(add-to-list 'org-latex-classes
+             '("zimbraorgspec" "\\documentclass[10pt,oneside,article]{zimbraorgspec}"
+               ("\\chapter{%s}" . "\\chapter*{%s}")
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
+(setq  org-latex-pdf-process
+       '("latexmk -shell-escape -bibtex -pdf %f"))
+
+(require 'ox-bibtex)
 
 ;; TODO Keywords
 
@@ -270,7 +282,9 @@ This can be 0 for immediate, or a floating point value.")
              org-web-tools-archive-attach
              org-web-tools-archive-view))
 
-(use-package org-ref)
+(use-package org-ref
+  :init
+  (setq org-ref-completion 'org-ref-ivy-cite))
 
 (use-package org-drill
   :after org
