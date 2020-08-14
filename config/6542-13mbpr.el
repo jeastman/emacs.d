@@ -38,9 +38,11 @@
  '(org-refile-targets '((org-agenda-files :maxlevel . 5)
                         (("~/Documents/org/task_archive.txt") :maxlevel . 5)
                         (nil :maxlevel . 5)))
+ '(bibtex-dialect 'biblatex)
+ '(bibtex-completion-bibliography '("~/Documents/Bibliography/refs.bib"))
  '(reftex-default-bibliography "~/Documents/Bibliography/refs.bib")
  '(org-ref-bibliography-notes "~/Documents/org/notes.org")
- '(org-ref-default-bibliography "~/Documents/Bibliography/refs.bib")
+ '(org-ref-default-bibliography '("~/Documents/Bibliography/refs.bib"))
  '(org-ref-pdf-directory "~/Documents/Bibliography/bibtex-pdfs/")
  )
 
