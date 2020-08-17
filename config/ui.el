@@ -39,8 +39,8 @@
     (scroll-bar-mode -1))            ; disable the scrollbar
 (if (fboundp 'blink-cursor-mode)
     (blink-cursor-mode 0))           ; don't blink the cursor
-(if (fboundp 'global-hl-line-mode)
-    (global-hl-line-mode t))         ; highlight current line
+;(if (fboundp 'global-hl-line-mode)
+;    (global-hl-line-mode t))         ; highlight current line
 (if (fboundp 'show-paren-mode)
     (show-paren-mode t))             ; highlight matching parens
 (if (fboundp 'fringe-mode)
