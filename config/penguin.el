@@ -27,14 +27,19 @@
 (load (expand-file-name "~/.roswell/helper.el"))
 
 (custom-set-variables
+ '(bibtex-files '("/home/johneastman/Bibliography/refs.bib"))
  '(org-directory "~/org")
  '(org-roam-directory "~/Projects/n/notes")
  '(deft-directory "~/Projects/n/notes")
- '(reftex-default-bibliography "~/Bibliography/refs.bib")
+ '(reftex-default-bibliography '("~/Bibliography/refs.bib"))
  '(org-ref-bibliography-notes "~/org/notes.org")
- '(org-ref-default-bibliography "~/Bibliography/refs.bib")
+ '(org-ref-default-bibliography '("~/Bibliography/refs.bib"))
  '(org-ref-pdf-directory "~/Bibliography/bibtex-pdfs/"))
 
 (setq org-directory "~/org")
+
+(use-package emoji-fontset
+  :config
+  (emoji-fontset-enable "Noto Emoji"))
 
 ;;; penguin.el ends here
