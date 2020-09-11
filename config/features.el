@@ -123,11 +123,6 @@
   :custom-face
   (org-roam-link ((t (:inherit org-link :foreground "#C991E1")))))
 
-(use-package company-org-roam
-  :straight (:host github :repo "jethrokuan/company-org-roam")
-  :config
-  (push 'company-org-roam company-backends))
-
 (use-package org-roam-bibtex
   :after org-roam
   :hook (org-roam-mode . org-roam-bibtex-mode)
