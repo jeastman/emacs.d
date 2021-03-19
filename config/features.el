@@ -139,6 +139,7 @@
 (use-package pdf-tools
   :after org-noter
   :config
+  (setq pdf-info-epdinfo-program "/usr/local/epdinfo")
   (pdf-loader-install))
 
 (use-package org-noter-pdftools
