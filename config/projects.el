@@ -29,9 +29,10 @@
   :custom
   (projectile-cache-file (concat metafiles-dir "/projectile.cache"))
   (projectile-known-projects-file (concat metafiles-dir "/projectile-bookmarks.eld"))
-  (projectile-keymap-prefix (kbd "C-c p"))
   (projectile-enable-caching t)
   (projectile-completion-system 'ivy)
+  :bind-keymap
+  ("C-c p" . projectile-command-map)
   :config
   (projectile-mode)
   (projectile-register-project-type 'poetry '("pyproject.toml")
