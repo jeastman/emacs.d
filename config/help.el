@@ -35,14 +35,15 @@
   (which-key-mode 1))
 
 (use-package helpful
+  :commands (helpful-at-point helpful-callable helpful-variable helpful-command helpful-key)
   :custom
   (counsel-describe-variable-function #'helpful-variable)
-  (counsel-describe-function-function #'helpful-function)
+  (counsel-describe-function-function #'helpful-callable)
   :bind (("C-h f" . helpful-callable)
-         ("C-h v" . counsel-describe-variable)
-         ("C-h k" . helpful-key)
-         ("C-h F" . counsel-describe-function)
-         ("C-h C" . helpful-command)
+         ([remap describe-variable] . counsel-describe-variable)
+         ([remap describe-key] . helpful-key)
+         ([remap describe-function] . counsel-describe-function)
+         ([remap describe-command] . helpful-command)
          ("C-c C-d" . helpful-at-point)))
 
 ;;; help.el ends here
