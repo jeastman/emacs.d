@@ -50,6 +50,16 @@
   (concat (expand-file-name user-emacs-directory) "config")
   "Custom configuration directory.")
 
+;; Monitor startup time.
+(defun jme:display-startup-time ()
+  "Disply the configuration startup time."
+  (message "Emacs loaded in %s with %d garbage collections."
+           (format "%.2f seconds"
+                   (float-time
+                    (time-subtract after-init-time before-init-time)))
+           gcs-done))
+(add-hook 'emacs-startup-hook #'jme:display-startup-time)
+
 ;; Ensure newest files are loaded
 (setq load-prefer-newer t)
 
