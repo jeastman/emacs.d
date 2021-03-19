@@ -179,12 +179,7 @@
 (use-package org-superstar
   :commands (org-superstar-mode)
   :custom
-  (org-superstar-headline-bullets-list
-   `(,(all-the-icons-faicon "circle")
-     ,(all-the-icons-faicon "chevron-circle-right")
-     ,(all-the-icons-faicon "arrow-circle-right")
-     ,(all-the-icons-faicon "arrow-right")
-     ,(all-the-icons-faicon "hand-o-right")))
+  (org-superstar-headline--bullet-list '("◉" "○" "●" "○" "●" "○" "●"))
   :hook (org-mode . (lambda () (org-superstar-mode 1))))
 
 (use-package org-fancy-priorities
@@ -359,6 +354,16 @@ This can be 0 for immediate, or a floating point value.")
 (font-lock-add-keywords 'org-mode
                         '(("^ *\\([-]\\) "
                            (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+;; Center org buffers
+(defun jme:org-visual-fill ()
+  (setq visual-fill-column-width 100
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :config (advice-add 'text-scale-adjust :after #'visual-fill-column-adjust)
+  :hook (org-mode . jme:org-visual-fill))
 
 (defun jme:style-org ()
   "Apply customized styling to org."
