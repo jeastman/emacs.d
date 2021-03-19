@@ -59,6 +59,9 @@
 ;; Seetings for inital frame
 (add-to-list 'initial-frame-alist '(height . 48))
 (add-to-list 'initial-frame-alist '(width . 160))
+;; Frame transparency
+(set-frame-parameter (selected-frame) 'alpha '(95 . 95))
+(add-to-list 'default-frame-alist `(alpha . (95 . 95)))
 ;; Settings for new frames
 (add-to-list 'default-frame-alist '(height . 48))
 (add-to-list 'default-frame-alist '(width . 80))
@@ -100,25 +103,34 @@
      `(org-level-6 ((t (:inherit 'outline-6 ,@variable-tuple))))
      `(org-level-5 ((t (:inherit 'outline-5 ,@variable-tuple))))
      `(org-level-4 ((t (:inherit 'outline-4 ,@variable-tuple :height 1.0))))
-     `(org-level-3 ((t (:inherit 'outline-3 ,@variable-tuple :height 1.1))))
-     `(org-level-2 ((t (:inherit 'outline-2 ,@variable-tuple :height 1.25))))
-     `(org-level-1 ((t (:inherit 'outline-1 ,@variable-tuple :height 1.3))))
+     `(org-level-3 ((t (:inherit 'outline-3 ,@variable-tuple :height 1.05))))
+     `(org-level-2 ((t (:inherit 'outline-2 ,@variable-tuple :height 1.1))))
+     `(org-level-1 ((t (:inherit 'outline-1 ,@variable-tuple :height 1.2))))
      `(org-document-title ((t (:inherit org-level-1 :weight normal :height 1.75 :underline nil))))
      `(org-done ((t (:inherit 'org-headline-done :bold 'inherit :strike-through t))))))
   (mapc
    (lambda (face)
      (set-face-attribute face nil :inherit 'fixed-pitch))
-   (list 'org-code
-         'org-block
-         'org-table
-         'org-tag
-         'org-verbatim
+   (list 'org-block
          'org-block-begin-line
          'org-block-end-line
-         'org-meta-line
+         'org-checkbox
+         'org-document-info-keyword
          'org-property-value
-         'org-special-keyword
-         'org-document-info-keyword)))
+         'line-number
+         'line-number-current-line
+         'org-tag))
+  (mapc
+   (lambda (face)
+     (set-face-attribute face nil :inherit '(shadow fixed-pitch)))
+   (list 'org-code
+         'org-table
+         'org-verbatim))
+  (mapc
+   (lambda (face)
+     (set-face-attribute face nil :inherit '(font-lock-comment-face fixed-pitch)))
+   (list 'org-meta-line
+         'org-special-keyword)))
 
 ;; (use-package material-theme)
 (use-package doom-themes
