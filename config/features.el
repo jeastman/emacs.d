@@ -39,7 +39,11 @@
          ("C-x B" . ivy-switch-buffer-other-window)
          ("C-c v p" . ivy-push-view)
          ("C-c v s" . ivy-switch-view)
-         ("C-c v d" . ivy-pop-view))
+         ("C-c v d" . ivy-pop-view)
+         :map ivy-minibuffer-map
+         ("C-l" . ivy-immediate-done)
+         :map ivy-switch-buffer-map
+         ("C-l" . ivy-immediate-done))
   :custom
   (ivy-count-format "(%d/%d) ")
   (ivy-display-style 'fancy)
