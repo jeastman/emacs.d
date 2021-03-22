@@ -29,12 +29,13 @@
 (size-indication-mode 1)
 
 (use-package doom-modeline
-  :defer t
-  :commands (doom-modeline-init)
-  :config
-  (setq doom-modeline-major-mode-color-icon t)
-  (setq doom-modeline-minor-modes t)
-  (setq doom-modeline-github t)
+  :custom
+  (doom-modeline-height 15)
+  (doom-modeline-bar-width 6)
+  (doom-modeline-lsp t)
+  (doom-modeline-github t)
+  (doom-modeline-major-mode-color-icon t)
+  (doom-modeline-minor-modes t)
   :hook (after-init . doom-modeline-mode))
 
 (use-package minions
