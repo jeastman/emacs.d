@@ -28,7 +28,7 @@
 ;;; Code:
 
 ;; Font configuration
-(defvar jme:default-font-scale 120 "Default font scale.")
+(defvar jme:default-font-scale 170 "Default font scale.")
 (defvar jme:default-font-family "Hack" "Default font to use.")
 (defvar jme:variable-font-family "Noto Sans" "Font for variable pitch use.")
 
@@ -74,6 +74,16 @@
                       '(mouse-wheel-scroll-amount '(1 ((shift) . 1))) ; one line at a time
                       '(mouse-wheel-progressive-speed nil)            ; don't accelerate scrolling
                       '(mouse-wheel-follow-mouse 't))                 ; scroll window under mouse
+
+;; line numbers
+(dolist (mode '(text-mode-hook
+                prog-mode-hook
+                conf-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 1))))
+
+;; Override modes which may be derived from the above
+(dolist (mode '(org-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (use-package rainbow-delimiters
   :defer t
@@ -137,7 +147,7 @@
   :config
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
-  (load-theme 'doom-one t)
+  (load-theme 'doom-palenight t)
   (doom-themes-org-config)
   (jme:customize-theme))
 
@@ -151,11 +161,11 @@
   (cond
    ((find-font (font-spec :family jme:default-font-family))
     (progn
-      (set-face-attribute 'default nil :family jme:default-font-family :height size)
-      (set-face-attribute 'fixed-pitch nil :family jme:default-font-family :inherit 'default)))
-   ((find-font (font-spec :family jme:variable-font-family))
+      (set-face-attribute 'default nil :family jme:default-font-family :weight 'light :height size)
+      (set-face-attribute 'fixed-pitch nil :family jme:default-font-family :inherit 'default))))
+   (cond
+    ((find-font (font-spec :family jme:variable-font-family))
     (progn
-      (set-face-attribute 'default nil :family jme:variable-font-family :weight 'light :height size)
       (set-face-attribute 'variable-pitch nil :family jme:variable-font-family :inherit 'default)))))
 
 (defun jme:reset-font-scale ()
