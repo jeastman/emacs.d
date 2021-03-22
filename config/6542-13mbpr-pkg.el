@@ -260,6 +260,7 @@ To use this, set `gnus-blocked-images' to this function."
   (mu4e-change-filenames-when-moving t) ; needed for mbsync
   (mu4e-compose-dont-reply-to-self t)
   (mu4e-compose-format-flowed t)
+  (mu4e-completing-read-function #'ivy-completing-read)
   (mu4e-confirm-quit nil)
   (mu4e-headers-auto-update t)
   (mu4e-headers-include-related t)
@@ -338,6 +339,12 @@ preserved. The simple use cases here are as follows:
   (if (functionp 'jme:mu4e-private-config)
       (jme:mu4e-private-config)))
 
+(use-package mu4e-alert
+  :after mu4e
+  :custom (mu4e-alert-notify-repeated-mails nil)
+  :config
+  (mu4e-alert-set-default-style 'notifier)
+  (mu4e-alert-enable-notifications))
 
 (use-package org-msg
   :after (mu4e)
@@ -367,14 +374,14 @@ m:832-721-5255
 --
 #+begin_export html
 <div>
-<div>John Eastman |&nbsp; VP Client Solutions</div>
+<div>John Eastman |&nbsp; VP Business Development</div>
 <div>+1.713.590.2753 | <a href=\"mailto:john.eastman@synacor.com\" style=\"color:rgb( 31 , 73 , 125 );text-decoration:none\">john.eastman@synacor.com</a></div>
 <div><strong><span style=\"background-color:rgb( 252 , 253 , 254 );color:rgb( 192 , 0 , 0 )\">Synacor Inc.</span></strong></div>
 <div><a href=\"https://www.synacor.com\" style=\"color:rgb( 31 , 73 , 125 );text-decoration:none\">www.synacor.com</a></div>
 </div>
 #+end_export
 #+begin_export ascii
-John Eastman | VP Client Solutions
+John Eastman | VP Business Development
 +1.713.590.2753 | john.eastman@synacor.com
 https://www.synacor.com
 #+end_export
