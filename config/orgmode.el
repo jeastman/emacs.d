@@ -179,7 +179,7 @@
 (use-package org-superstar
   :commands (org-superstar-mode)
   :custom
-  (org-superstar-headline--bullet-list '("◉" "○" "●" "○" "●" "○" "●"))
+  (org-superstar-headline-bullet-list '("◉" "○" "●" "○" "●" "○" "●"))
   :hook (org-mode . (lambda () (org-superstar-mode 1))))
 
 (use-package org-fancy-priorities
