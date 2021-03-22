@@ -37,6 +37,7 @@
                           (concat org-directory "/calendar.org")))
  '(org-default-notes-file (concat org-directory "/notes.org"))
  '(org-startup-folded nil)
+ '(org-hide-leading-stars t)
  '(org-hide-emphasis-markers t)
  '(org-catch-invisible-edits 'smart)
  '(org-src-fontify-natively t)
