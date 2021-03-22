@@ -37,6 +37,7 @@
                           (concat org-directory "/calendar.org")))
  '(org-default-notes-file (concat org-directory "/notes.org"))
  '(org-startup-folded nil)
+ '(org-ellipsis " ▾")
  '(org-hide-leading-stars t)
  '(org-hide-emphasis-markers t)
  '(org-catch-invisible-edits 'smart)
@@ -197,6 +198,10 @@
   :hook (org-mode . org-sticky-header-mode)
   :custom
   (org-sticky-header-full-path 'full "Show the full outline path."))
+
+;; toggle visibility of emphasis markers
+(use-package org-appear
+  :hook (org-mode-hook . org-appear-mode))
 
 ;; Support conversion of code blocks to HTML for export.
 (use-package htmlize)
