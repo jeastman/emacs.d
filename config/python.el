@@ -31,8 +31,8 @@
   :init
   (add-to-list 'exec-path "~/.pyenv/shims")
   (setenv "WORKON_HOME" "~/.pyenv/versions/")
+  :hook (python-mode-hook . pyenv-mode)
   :config
-  (pyenv-mode)
   (let ((global-pyenv
          (replace-regexp-in-string "\n" ""
                                    (shell-command-to-string "pyenv global"))))
