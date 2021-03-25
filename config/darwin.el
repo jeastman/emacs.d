@@ -99,7 +99,7 @@ the TITLE and the TEXT are replaced with single quotes."
 (add-hook 'after-make-frame-functions 'jme:raise-emacs-with-frame)
 
 ;; Start the emacs server
-(when (and (functionp 'server-running-p) (not (server-running-p)))
+(unless server-process
   (progn
     (server-start)
     (require 'org-protocol)))
