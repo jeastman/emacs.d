@@ -114,8 +114,6 @@
 
 (use-package org-roam
   :after org
-  :commands (org-roam--build-cache)
-  :straight (:host github :repo "jethrokuan/org-roam")
   :hook
   (after-init . org-roam-mode)
   :bind (:map org-roam-mode-map
