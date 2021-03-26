@@ -98,6 +98,9 @@ the TITLE and the TEXT are replaced with single quotes."
 
 (add-hook 'after-make-frame-functions 'jme:raise-emacs-with-frame)
 
+;; Turn on composition mode (support for font ligatures)
+(mac-auto-operator-composition-mode)
+
 ;; Start the emacs server
 (unless (boundp 'server-process)
   (progn

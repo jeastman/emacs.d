@@ -29,7 +29,8 @@
 
 ;; Font configuration
 (defvar jme:default-font-scale 170 "Default font scale.")
-(defvar jme:default-font-family "Hack" "Default font to use.")
+(defvar jme:default-font-family "FiraCode Nerd Font" "Default font to use.")
+(defvar jme:backup-font-family "Hack" "Secondary font to use.")
 (defvar jme:variable-font-family "Noto Sans" "Font for variable pitch use.")
 
 ;; Basic items
@@ -162,7 +163,11 @@
    ((find-font (font-spec :family jme:default-font-family))
     (progn
       (set-face-attribute 'default nil :family jme:default-font-family :weight 'light :height size)
-      (set-face-attribute 'fixed-pitch nil :family jme:default-font-family :inherit 'default))))
+      (set-face-attribute 'fixed-pitch nil :family jme:default-font-family :inherit 'default)))
+   ((find-font (font-spac :family jme:backup-font-family))
+    (progn
+      (set-face-attribute 'default nil :family jme:backup-font-family :weight 'light :height size)
+      (set-face-attribute 'fixed-pitch nil :family jme:backup-font-family :inherit 'default))))
    (cond
     ((find-font (font-spec :family jme:variable-font-family))
     (progn
