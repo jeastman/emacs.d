@@ -201,7 +201,7 @@
 
 ;; toggle visibility of emphasis markers
 (use-package org-appear
-  :hook (org-mode-hook . org-appear-mode))
+  :hook (org-mode . org-appear-mode))
 
 ;; Support conversion of code blocks to HTML for export.
 (use-package htmlize)
