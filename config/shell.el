@@ -36,17 +36,54 @@
         eshell-hist-ignore-dups t
         eshell-scroll-to-bottom-on-input t))
 
+;; Adapted from
+;; http://www.howardism.org/Technical/Emacs/eshell-fun.html
+;;
+;; TODO: Check for existing buffer and switch to it
+(defun jme:eshell-window-popup ()
+      "Invokes eshell in directory for the current buffer."
+      (interactive)
+      (let* ((parent (if (buffer-file-name)
+                         (file-name-directory (buffer-file-name))
+                       default-directory))
+             (height (/ (window-total-height) 3))
+             (name   (car (last (split-string parent "/" t)))))
+        (split-window-vertically (- height))
+        (other-window 1)
+        (eshell "new")
+        (rename-buffer (concat "*eshell: " name "*"))))
+
+;; Adapted from
+;; https://github.com/wasamasa/dotemacs/blob/master/init.org#eshell
+;; https://github.com/howardabrams/dot-files/blob/master/emacs-eshell.org
+(defun jme:eshell-quit-or-delete-char (arg)
+    (interactive "p")
+    (if (and (eolp) (looking-back eshell-prompt-regexp))
+        (progn
+          (eshell-life-is-too-much)
+          (ignore-errors
+            (delete-window)))
+      (delete-forward-char arg)))
+
 (use-package eshell-git-prompt
   :after eshell
   :config
   (eshell-git-prompt-use-theme 'powerline))
 
+;; can't access eshell-mode-map before eshell is loaded, so cannot use it in :bind.
 (use-package eshell
-  :hook (eshell-first-time-mode . jme:configure-eshell)
+  :hook ((eshell-first-time-mode . jme:configure-eshell)
+         (eshell-mode . (lambda ()
+                          (bind-key "C-d" 'jme:eshell-quit-or-delete-char eshell-mode-map)
+                          (eshell/alias "ff" "find-file $1")
+                          (eshell/alias "fo" "find-file-other-window $1")
+                          (eshell/alias "d" "dired $1")
+                          (eshell/alias "ll" "lsd $1"))))
+  :bind (("C-!" . jme:eshell-window-popup))
   :config
   (with-eval-after-load 'esh-opt
     (setq eshell-visual-commands
-        '("less" "tmux" "top" "bash" "zsh"))
+        '("less" "tmux" "tail" "top" "bash" "zsh" "bat"))
     (setq eshell-visual-subcommands
           '(("git"
              "diff" "df" "dc"
