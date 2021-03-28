@@ -58,14 +58,14 @@
         (menu-bar-mode -1))))
 
 ;; Seetings for inital frame
-(add-to-list 'initial-frame-alist '(height . 48))
-(add-to-list 'initial-frame-alist '(width . 160))
+;;(add-to-list 'initial-frame-alist '(height . 48))
+;;(add-to-list 'initial-frame-alist '(width . 160))
 ;; Frame transparency
-(set-frame-parameter (selected-frame) 'alpha '(95 . 95))
-(add-to-list 'default-frame-alist `(alpha . (95 . 95)))
+;;(set-frame-parameter (selected-frame) 'alpha '(95 . 95))
+;;(add-to-list 'default-frame-alist `(alpha . (95 . 95)))
 ;; Settings for new frames
-(add-to-list 'default-frame-alist '(height . 48))
-(add-to-list 'default-frame-alist '(width . 80))
+;;(add-to-list 'default-frame-alist '(height . 48))
+;;(add-to-list 'default-frame-alist '(width . 80))
 
 
 (custom-set-variables '(indicate-empty-lines t))

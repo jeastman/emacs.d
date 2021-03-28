@@ -46,6 +46,11 @@
 
 ;;; Code:
 
+;; Some configuration moved to early-init, which is
+;; only supported with emacs 27+.
+(when (version< emacs-version "27")
+  (load (concat user-emacs-directory "early-init.el")))
+
 (defvar jme:config-dir
   (concat (expand-file-name user-emacs-directory) "config")
   "Custom configuration directory.")
@@ -60,14 +65,12 @@
            gcs-done))
 (add-hook 'emacs-startup-hook #'jme:display-startup-time)
 
-;; Ensure newest files are loaded
-(setq load-prefer-newer t)
-
 ;; straight bootstrap code (bootstrap-version 5)
 (setq straight-use-package-by-default t)
 (defvar boostrap-version)
 (let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory)))
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
         (url-retrieve-synchronously
@@ -77,13 +80,11 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-;; Hack to load org using straight
-;; MUST be done before any reference to Org
-(load (expand-file-name
-       (concat jme:config-dir "/org-hack.el") user-emacs-directory))
-
 ;; utilize use-package
 (straight-use-package 'use-package)
+
+;; Ensure org
+(straight-use-package '(org-plus-contrib :includes org))
 
 ;; Handle setting proper environment on Mac
 (use-package exec-path-from-shell
