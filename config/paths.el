@@ -47,9 +47,6 @@
 (defvar meta-saveplace (concat metafiles-dir "/places")
   "Name of the file that records save-place-alist.")
 
-(defvar meta-desktop (concat metafiles-dir "/desktop/")
-  "Name of the desktop save directory.")
-
 (defvar meta-bookmarks (concat metafiles-dir "/bookmarks")
   "Location for bookmarks file.")
 

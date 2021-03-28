@@ -42,8 +42,7 @@
   :config
   (savehist-mode t))
 
-(custom-set-variables '(save-place-file meta-saveplace)
-                      '(desktop-dirname meta-desktop))
+(custom-set-variables '(save-place-file meta-saveplace))
 
 (desktop-save-mode t)                ; maintain sessions across invocations
 (save-place-mode t)                  ; remember where you were in files
