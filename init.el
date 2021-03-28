@@ -119,6 +119,9 @@ that name exists, then load it."
      ((file-exists-p literate)      (org-babel-load-file literate))
      ((file-exists-p plain)         (load plain)))))
 
+;; Load theme configuration early to avoid ui flashing
+(jme:load jme:config-dir "uitheme")
+
 ;; load paths first to ensure emacs-user-directory stays clean
 (jme:load jme:config-dir "paths")
 
