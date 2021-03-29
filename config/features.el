@@ -114,8 +114,6 @@
 
 (use-package org-roam
   :after org
-  :hook
-  (after-init . org-roam-mode)
   :bind (:map org-roam-mode-map
               (("C-c n l" . org-roam)
                ("C-c n f" . org-roam-find-file)
@@ -123,32 +121,38 @@
               :map org-mode-map
               (("C-c n i" . org-roam-insert)))
   :custom-face
-  (org-roam-link ((t (:inherit org-link :foreground "#C991E1")))))
+  (org-roam-link ((t (:inherit org-link :foreground "#C991E1"))))
+  :config
+  (add-hook 'after-init-hook #'org-roam-mode))
+
 
 (use-package org-roam-bibtex
   :after org-roam
+  :commands (orb-note-actions)
   :hook (org-roam-mode . org-roam-bibtex-mode)
   :bind (:map org-mode-map
               (("C-c n a" . orb-note-actions))))
 
-(use-package org-noter
-  :after org)
+ (use-package org-noter
+   :after org)
 
-(use-package org-pdftools
-  :after org
-  :hook (org-load . org-pdftools-setup-link))
+ (use-package org-pdftools
+   :after org
+   :hook (org-mode . org-pdftools-setup-link))
 
-(use-package pdf-tools
-  :after org-noter
-  :config
-  (setq pdf-info-epdinfo-program "/usr/local/epdinfo")
-  (pdf-loader-install))
+ (use-package pdf-tools
+   :after org-noter
+   :magic ("%PDF" . pdf-view-mode)
+   :config
+   (setq pdf-info-epdfinfo-program "/usr/local/bin/epdfinfo")
+   (pdf-tools-install :no-query))
 
-(use-package org-noter-pdftools
-  :after pdf-tools
-  :config
-  (with-eval-after-load 'pdf-annot
-    (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
+ (use-package org-noter-pdftools
+   :after org-noter
+   :defer t
+   :config
+   (with-eval-after-load 'pdf-annot
+     (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
 
 (use-package fontawesome)
 ;;; features.el ends here

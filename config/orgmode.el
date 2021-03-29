@@ -284,6 +284,8 @@ This can be 0 for immediate, or a floating point value.")
              org-web-tools-archive-view))
 
 (use-package org-ref
+  :after org
+  :defer t
   :init
   (setq org-ref-completion 'org-ref-ivy-cite))
 
