@@ -69,6 +69,19 @@
 (dolist (mode '(org-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
+;; Center buffer
+(defun jme:visual-fill ()
+  "Visually center a buffer"
+  (interactive)
+  (setq visual-fill-column-width 100
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :config (advice-add 'text-scale-adjust :after #'visual-fill-column-adjust)
+  :hook ((org-mode . jme:visual-fill)
+         (eww-mode . jme:visual-fill)))
+
 (use-package rainbow-delimiters
   :defer t
   :commands (rainbow-delimiters-mode)
