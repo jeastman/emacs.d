@@ -80,7 +80,8 @@
 (use-package visual-fill-column
   :config (advice-add 'text-scale-adjust :after #'visual-fill-column-adjust)
   :hook ((org-mode . jme:visual-fill)
-         (eww-mode . jme:visual-fill)))
+         (eww-mode . jme:visual-fill)
+         (elfeed-show-mode . jme:visual-fill)))
 
 (use-package rainbow-delimiters
   :defer t

@@ -153,7 +153,8 @@ that name exists, then load it."
         "projects"
         "shell"
         "snippets"
-        "version-control"))
+        "version-control"
+        "elfeed-config"))
 
 ;; (jme:load jme:config-dir "backup")
 ;; (jme:load jme:config-dir "core")
