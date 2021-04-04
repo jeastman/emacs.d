@@ -86,6 +86,10 @@
 ;; Ensure org
 (straight-use-package '(org-plus-contrib :includes org))
 
+;; Garbage Collector Magic Hack
+;; Set to start in emacs-startup-hook once gc is reset.
+;; See early-init for additional details.
+(use-package gcmh)
 ;; Handle setting proper environment on Mac
 (use-package exec-path-from-shell
   :if (memq window-system '(mac ns x))
