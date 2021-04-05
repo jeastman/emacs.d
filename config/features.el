@@ -114,6 +114,8 @@
 
 (use-package org-roam
   :after org
+  :custom
+  (org-roam-compltion-system 'ivy)
   :bind (:map org-roam-mode-map
               (("C-c n l" . org-roam)
                ("C-c n f" . org-roam-find-file)
@@ -123,6 +125,16 @@
   :custom-face
   (org-roam-link ((t (:inherit org-link :foreground "#C991E1"))))
   :config
+  (setq org-roam-capture-templates
+        (
+         ("d"
+          "default"
+          plain
+          #'org-roam-capture--get-point
+          "%?"
+          :file-name "%<%Y%m%d%H%M%S>-${slug}"
+          :head "#+title: ${title}\n#+roam_tags:"
+          :unnarrowed t)))
   (add-hook 'after-init-hook #'org-roam-mode))
 
 
