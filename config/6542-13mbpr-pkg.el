@@ -346,6 +346,19 @@ preserved. The simple use cases here are as follows:
   (mu4e-alert-set-default-style 'notifier)
   (mu4e-alert-enable-notifications))
 
+(defun jme:choose-signature-advice (&rest _args)
+  "Advice for org-msg-post-setup to select signature."
+  (let ((formal (if (boundp 'jme:formal-signature)
+                    jme:formal-signature
+                  "#+begin_signature #+end_signature"))
+        (informal (if (boundp 'jme:informal-signature)
+                      jme:informal-signature
+                    "#+begin_signature #+end_signature")))
+    (let ((message-signature (mu4e-read-option "Signature:"
+                                               `(("formal". ,formal)
+                                                 ("informal" . ,informal)))))
+      (setq org-msg-signature message-signature))))
+
 (use-package org-msg
   :after (mu4e)
   :config
@@ -353,38 +366,9 @@ preserved. The simple use cases here are as follows:
         org-msg-startup "hidestars indent inlineimages"
         org-msg-greeting-fmt "\nHi %s,\n\n"
         org-msg-greeting-name-limit 3
-        org-msg-text-plain-alternative t
-        org-msg-startup "hidestars indent inlineimages"
-        org-msg-signature "
- #+begin_signature
---
-#+begin_export html
-<strong>John Eastman</strong><br/>
-john.eastman@synacor.com<br/>
-m:832-721-5255
-#+end_export
-#+begin_export ascii
-John Eastman
-john.eastman@synacor.comm
-m:832-721-5255
-#+end_export
-#+end_signature
-
-#begin_signature
---
-#+begin_export html
-<div>
-<div>John Eastman |&nbsp; VP Business Development</div>
-<div>+1.713.590.2753 | <a href=\"mailto:john.eastman@synacor.com\" style=\"color:rgb( 31 , 73 , 125 );text-decoration:none\">john.eastman@synacor.com</a></div>
-<div><strong><span style=\"background-color:rgb( 252 , 253 , 254 );color:rgb( 192 , 0 , 0 )\">Synacor Inc.</span></strong></div>
-<div><a href=\"https://www.synacor.com\" style=\"color:rgb( 31 , 73 , 125 );text-decoration:none\">www.synacor.com</a></div>
-</div>
-#+end_export
-#+begin_export ascii
-John Eastman | VP Business Development
-+1.713.590.2753 | john.eastman@synacor.com
-https://www.synacor.com
-#+end_export
-#+end_signature")
-  (org-msg-mode))
+        org-msg-default-alternatives '(html text)
+        org-msg-signature "")
+  (org-msg-mode)
+  (if (and (fboundp 'org-msg-post-setup) (fboundp 'jme:choose-signature-advice))
+      (advice-add 'org-msg-post-setup :before #'jme:choose-signature-advice)))
 ;;; 6542-13mbpr-pkg.el ends here
