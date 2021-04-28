@@ -126,15 +126,15 @@
   (org-roam-link ((t (:inherit org-link :foreground "#C991E1"))))
   :config
   (setq org-roam-capture-templates
-        (
-         ("d"
-          "default"
-          plain
-          #'org-roam-capture--get-point
-          "%?"
-          :file-name "%<%Y%m%d%H%M%S>-${slug}"
-          :head "#+title: ${title}\n#+roam_tags:"
-          :unnarrowed t)))
+        '(
+          ("d"
+           "default"
+           plain
+           #'org-roam-capture--get-point
+           "%?"
+           :file-name "%<%Y%m%d%H%M%S>-${slug}"
+           :head "#+title: ${title}\n#+roam_tags:"
+           :unnarrowed t)))
   (add-hook 'after-init-hook #'org-roam-mode))
 
 
