@@ -332,7 +332,7 @@ preserved. The simple use cases here are as follows:
   (use-package org-mu4e
     :straight (org-mu4e :type built-in)
     :custom
-    (org-mu4e-link-query-in-headers-mode nil) ; store links to message, not query
+    (mu4e-org-link-query-in-headers-mode nil) ; store links to message, not query
     :config
     (load (concat jme:config-dir "/mail-org.el")))
   ;; If private configuration has been added, call it.
