@@ -126,7 +126,8 @@
 (jme:load jme:config-dir "code-review")
 
 (let ((task-file (expand-file-name (concat org-directory "/tasks.org")))
-      (calendar-file (expand-file-name (concat org-directory "/calendar.org"))))
+      (calendar-file (expand-file-name (concat org-directory "/calendar.org")))
+      (notes-file (expand-file-name (concat org-directory "/notes.org"))))
   (setq org-capture-templates
         `(("t" "Task" entry (file+headline ,task-file "Inbox")
            "* TODO %^{What} %^g\n:PROPERTIES:\n:CREATED:  %U\n:END:\n\n" :immediate-finish t)
@@ -156,6 +157,8 @@
            "* TODO %^{What} %^g\nSCHEDULED: %^{When}T\n:PROPERTIES:\n:CATEGORY: %^{Type|Meeting|Event|Other}\n:END:\n" :immediate-finish t)
           ("p" "Protocol" entry (file+headline ,task-file "Inbox")
            "* %^{Title}\n:PROPERTIES:\n:CREATED:  %U\n:END:\nSource: %:annotation\n #+begin_quote\n%i\n#+end_quote\n\n%?")
+          ("x" "Protocol with url" entry (file+headline ,notes-file "Inbox")
+           "* %:description\n:PROPERTIES:\n:CREATED:  %U\n:END:\n\nLink: %l\n\n#+begin_quote\n%i\n#+end_quote\n\n%?")
           ("z" "Protocol no prompt" entry (file+headline ,task-file "Inbox")
            "* %:description\n:PROPERTIES:\n:CREATED:  %U\n:END:\n\n#+begin_quote\n%i\n#+end_quote\n\n%?")
           ("s" "Protocol to clock" plain (clock)
