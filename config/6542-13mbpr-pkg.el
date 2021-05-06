@@ -254,6 +254,29 @@ To use this, set `gnus-blocked-images' to this function."
       (gnus-block-private-groups group)
     "."))
 
+;; See http://cachestocaches.com/2017/3/complete-guide-email-emacs-using-mu-and-/
+;; Pitfalls and Additional Tweaks provides a solution for messages marked
+;; as "trashed" not synching. This happens when items are trashed through
+;; mu4e and moved to the trash folder.
+(defun jme:fix-mu4e-trash ()
+  "Fix trash handling for mu4e.
+
+Removes the '+T' from the flags applied to trashed messages."
+  (let* ((ttest '(lambda (trash element) (eq (car element) trash)))
+       (pos (cl-position 'trash mu4e-marks :test ttest))
+       (marks mu4e-marks))
+  (setq mu4e-marks (if (zerop pos)
+                       marks
+                     (let ((last (nthcdr (1- pos) marks)))
+                       (setcdr last (cddr last))
+                       marks)))
+  (add-to-list 'mu4e-marks
+               '(trash
+                 :char ("d" . "▼")
+                 :prompt "dtrash"
+                 :dyn-target (lambda (target msg) (mu4e-get-trash-folder msg))
+                 :action (lambda (docid msg target) (mu4e~proc-move docid (mu4e~mark-check-target target) "-N"))))))
+
 (use-package mu4e
   :straight (mu4e :type built-in)
   :custom
@@ -279,6 +302,7 @@ To use this, set `gnus-blocked-images' to this function."
   (gnus-blocked-images 'jme:gnus-block-images-group)
   :bind (("C-c m" . jme:mu4e-show))
   :config
+  (jme:fix-mu4e-trash)
   (setq mu4e-headers-draft-mark     `("D" . ,(all-the-icons-faicon "pencil-square-o"))
         mu4e-headers-flagged-mark   `("F" . ,(all-the-icons-faicon "flag"))
         mu4e-headers-new-mark       `("N" . ,(all-the-icons-faicon "check-circle"))
