@@ -84,7 +84,8 @@
 (straight-use-package 'use-package)
 
 ;; Ensure org
-(straight-use-package '(org-plus-contrib :includes org))
+(straight-use-package '(org))
+(straight-use-package '(org-contrib))
 
 ;; Garbage Collector Magic Hack
 ;; Set to start in emacs-startup-hook once gc is reset.
