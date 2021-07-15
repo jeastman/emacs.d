@@ -24,15 +24,53 @@
 
 ;;; Code:
 
+;; Utilities for enhancing company completion
+;; See: https://robert.kra.hn/posts/2021-02-07_rust-with-emacs/
+(defun company-yasnippet-or-completion ()
+  (interactive)
+  (or (do-yas-expand)
+      (company-complete-common)))
+
+(defun check-expansion ()
+  (save-excursion
+    (if (looking-at "\\_>") t
+      (backward-char 1)
+      (if (looking-at "\\.") t
+        (backward-char 1)
+        (if (looking-at "::") t nil)))))
+
+(defun do-yas-expand ()
+  (let ((yas/fallback-behavior 'return-nil))
+    (yas/expand)))
+
+(defun tab-indent-or-complete ()
+  (interactive)
+  (if (minibufferp)
+      (minibuffer-complete)
+    (if (or (not yas/minor-mode)
+            (null (do-yas-expand)))
+        (if (check-expansion)
+            (company-complete-common)
+          (indent-for-tab-command)))))
+
+
 (use-package company
   :delight
   :custom
-  (company-idle-delay 0.2)
+  (company-idle-delay 0.5)
   (company-minimum-prefix-length 2)
   (company-tooltip-align-annotations 't)
   :commands (company-mode global-company-mode company-complete
                           company-complete-common company-manual-begin
                           company-grab-line)
+  :bind (:map company-active-map
+          ("C-n". company-select-next)
+          ("C-p". company-select-previous)
+          ("M-<". company-select-first)
+          ("M->". company-select-last)
+          :map company-mode-map
+          ("<tab>". tab-indent-or-complete)
+          ("TAB". tab-indent-or-complete))
   :init
   (add-hook 'after-init-hook 'global-company-mode))
 

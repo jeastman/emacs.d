@@ -26,6 +26,8 @@
 
 (use-package yasnippet
   :delight yas-minor-mode
+  :config
+  (yas-reload-all)
   :hook (after-init . yas-global-mode))
 
 (use-package yasnippet-snippets
