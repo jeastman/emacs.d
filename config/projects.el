@@ -47,4 +47,6 @@
   :config
   (counsel-projectile-mode 1))
 
+(use-package project)
+
 ;;; projects.el ends here
