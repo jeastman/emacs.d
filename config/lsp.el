@@ -24,13 +24,23 @@
 
 ;;; Code:
 (use-package lsp-mode
+  :commands lsp
   :hook ((rustic-mode . lsp))
+  :custom
+  (lsp-rust-analyzer-cargo-watch-command "clippy")
+  (lsp-eldoc-render-all t)
+  (lsp-idle-delay 0.6)
+  (lsp-rust-analyzer-server-display-inlay-hints t)
   :config
-  (setq gc-cons-threshold 100000000)
+  ; (setq gc-cons-threshold 100000000)
   (setq read-process-output-max (* 1024 1024))
-  (setq lsp-idle-delay 0.500)
-  :commands lsp)
+  (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 
-(use-package lsp-ui :commands lsp-ui-mode)
+(use-package lsp-ui
+  :commands lsp-ui-mode
+  :custom
+  (lsp-ui-doc-enable t)
+  (lsp-ui-peek-always-show t)
+  (lsp-ui-sideline-show-hover t))
 (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
 ;;; lsp.el ends here
