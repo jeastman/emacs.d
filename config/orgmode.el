@@ -98,8 +98,6 @@
 (setq  org-latex-pdf-process
        '("latexmk -shell-escape -bibtex -pdf %f"))
 
-(require 'ox-bibtex)
-
 ;; TODO Keywords
 
 (custom-set-variables '(org-todo-keywords
