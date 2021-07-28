@@ -124,6 +124,12 @@
          ("C-c n i" . org-roam-node-insert)
          ("C-c n c" . org-roam-capture))
   :config
+  (add-to-list 'display-buffer-alist
+             '("\\*org-roam\\*"
+               (display-buffer-in-direction)
+               (direction . right)
+               (window-width . 0.33)
+               (window-height . fit-window-to-buffer)))
   (org-roam-setup))
 
  (use-package org-roam-bibtex
