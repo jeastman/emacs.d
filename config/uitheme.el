@@ -47,7 +47,7 @@
     (progn
       (set-face-attribute 'default nil :family jme:default-font-family :weight 'light :height size)
       (set-face-attribute 'fixed-pitch nil :family jme:default-font-family :inherit 'default)))
-   ((find-font (font-spac :family jme:backup-font-family))
+   ((find-font (font-spec :family jme:backup-font-family))
     (progn
       (set-face-attribute 'default nil :family jme:backup-font-family :weight 'light :height size)
       (set-face-attribute 'fixed-pitch nil :family jme:backup-font-family :inherit 'default))))
@@ -115,12 +115,14 @@
    (list 'org-meta-line
          'org-special-keyword)))
 
-;; (use-package material-theme)
+;; TODO: Provide function to switch dark/light theme.
+;; dark theme: (load-theme 'doom-palenight t)
+
 (use-package doom-themes
   :config
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
-  (load-theme 'doom-palenight t)
+  (load-theme 'doom-tomorrow-day t)
   (add-hook 'window-setup-hook (lambda ()
                                  (progn
                                    (doom-themes-org-config)
