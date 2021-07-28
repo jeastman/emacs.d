@@ -130,6 +130,7 @@
                (direction . right)
                (window-width . 0.33)
                (window-height . fit-window-to-buffer)))
+  (require 'org-roam-protocol)
   (org-roam-setup))
 
  (use-package org-roam-bibtex
