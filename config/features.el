@@ -114,36 +114,28 @@
 
 (use-package org-roam
   :after org
-  :custom
-  (org-roam-compltion-system 'ivy)
-  :bind (:map org-roam-mode-map
-              (("C-c n l" . org-roam)
-               ("C-c n f" . org-roam-find-file)
-               ("C-c n g" . org-roam-show-graph))
-              :map org-mode-map
-              (("C-c n i" . org-roam-insert)))
-  :custom-face
-  (org-roam-link ((t (:inherit org-link :foreground "#C991E1"))))
+  :init
+  (setq org-roam-v2-ack t)
+;;   :custom-face
+;;   (org-roam-link ((t (:inherit org-link :foreground "#C991E1"))))
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n g" . org-roam-graph)
+         ("C-c n i" . org-roam-node-insert)
+         ("C-c n c" . org-roam-capture))
   :config
-  (setq org-roam-capture-templates
-        '(
-          ("d"
-           "default"
-           plain
-           #'org-roam-capture--get-point
-           "%?"
-           :file-name "%<%Y%m%d%H%M%S>-${slug}"
-           :head "#+title: ${title}\n#+roam_tags:"
-           :unnarrowed t)))
-  (add-hook 'after-init-hook #'org-roam-mode))
+  (org-roam-setup))
 
-
-(use-package org-roam-bibtex
-  :after org-roam
-  :commands (orb-note-actions)
-  :hook (org-roam-mode . org-roam-bibtex-mode)
-  :bind (:map org-mode-map
-              (("C-c n a" . orb-note-actions))))
+ (use-package org-roam-bibtex
+   :after org-roam
+   :commands (orb-note-actions)
+   :hook (org-roam-mode . org-roam-bibtex-mode)
+   :custom
+   (org-note-actions-interface 'ivy)
+   :config
+   (require 'org-ref)
+   :bind (:map org-mode-map
+               (("C-c n a" . orb-note-actions))))
 
  (use-package org-noter
    :after org)
