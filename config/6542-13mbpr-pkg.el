@@ -291,6 +291,7 @@ Removes the '+T' from the flags applied to trashed messages."
   (mu4e-headers-time-format "%H:%M")
   (mu4e-sent-messages-behavior 'sent)
   (mu4e-show-images t)
+  (shr-use-fonts nil) ; fixes color override
   (mu4e-update-interval (* 60 5)) ; update every 5 mins
   (mu4e-use-fancy-chars t)
   (mu4e-view-prefer-html t)
