@@ -31,6 +31,7 @@
   (lsp-eldoc-render-all t)
   (lsp-idle-delay 0.6)
   (lsp-rust-analyzer-server-display-inlay-hints t)
+  (lsp-rust-analyzer-proc-macro-enable t)
   :config
   ; (setq gc-cons-threshold 100000000)
   (setq read-process-output-max (* 1024 1024))
@@ -39,7 +40,7 @@
 (use-package lsp-ui
   :commands lsp-ui-mode
   :custom
-  (lsp-ui-doc-enable t)
+  (lsp-ui-doc-enable nil)
   (lsp-ui-peek-always-show t)
   (lsp-ui-sideline-show-hover t))
 (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
