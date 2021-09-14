@@ -24,6 +24,12 @@
 
 ;;; Code:
 
+(defvar jme:agenda-files (list "/calendar.org" "/tasks.org" "/notes.org"))
+
+(defun jme:agenda-files ()
+  "Construct list of files for org agenda."
+  (mapcar (lambda(file) (concat org-directory file)) jme:agenda-files))
+
 ;; Original value of org-modules
 ;; (org-w3m org-bbdb org-bibtex org-docview org-gnus org-info org-irc org-mhe org-rmail org-eww)
 (custom-set-variables
@@ -32,9 +38,7 @@
                  org-eww
                  org-list
                  org-drill))
- '(org-agenda-files (list (concat org-directory "/tasks.org")
-                          (concat org-directory "/notes.org")
-                          (concat org-directory "/calendar.org")))
+ '(org-agenda-files jme:agenda-files)
  '(org-default-notes-file (concat org-directory "/notes.org"))
  '(org-startup-folded nil)
  '(org-ellipsis " ▾")
@@ -189,7 +193,7 @@
   :hook
   (org-mode . org-fancy-priorities-mode)
   :custom
-  (org-priority-faces (quote ((65 . "red") (66 . "yellow") (67 . "orange"))))
+  (org-priority-faces (quote ((65 . "red") (66 . "orange") (67 . "orange"))))
   (org-fancy-priorities-list `(,(all-the-icons-faicon "bell")
                                ,(all-the-icons-faicon "bell-o")
                                ,(all-the-icons-faicon "bell-slash-o"))))
