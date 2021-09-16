@@ -71,7 +71,7 @@
 
 ;; Center buffer
 (defun jme:visual-fill ()
-  "Visually center a buffer"
+  "Visually center a buffer."
   (interactive)
   (setq visual-fill-column-width 100
         visual-fill-column-center-text t)
