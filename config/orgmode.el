@@ -34,10 +34,8 @@
 ;; (org-w3m org-bbdb org-bibtex org-docview org-gnus org-info org-irc org-mhe org-rmail org-eww)
 (custom-set-variables
  '(org-modules '(org-annotate-file
-                 org-bibtex
-                 org-eww
-                 org-list
-                 org-drill))
+                 ol-bibtex
+                 ol-eww))
  '(org-agenda-files jme:agenda-files)
  '(org-default-notes-file (concat org-directory "/notes.org"))
  '(org-startup-folded nil)
