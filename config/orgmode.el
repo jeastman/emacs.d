@@ -106,19 +106,7 @@
                         '((sequence "TODO(t)" "NEXT(n!)" "STARTED(s!)" "WAITING(w@/!)" "STALLED(x@/!)" "|" "DONE(d!)" "CANCELLED(c@)")
                           (sequence "TASK(f)" "|" "DONE(d!)")
                           (sequence "MAYBE(m)" "|" "DONE(d!)" "CANCELLED(c@)")
-                          (sequence "RISK(r)" "|" "MITIGATED(i@)")))
-                      '(org-todo-keyword-faces
-                        '(("TODO" . (:foreground "DarkOrange" :weight bold))
-                          ("NEXT" . (:foreground "yellow" :weight bold))
-                          ("STARTED" . (:foreground "DarkOrange" :weight bold))
-                          ("WAITING" . (:foreground "gold" :weight bold))
-                          ("MAYBE" . (:foreground "spring green"))
-                          ("DONE" . (:foreground "dark sea green"))
-                          ("STALLED" . (:foreground "slate grey"))
-                          ("CANCELLED" . (:foreground "slate grey"))
-                          ("TASK" . (:foreground "DeepSkyBlue"))
-                          ("RISK" . (:foreground "white" :background "orange red"))
-                          ("MITIGATED" . (:foreground "white" :background "dark green")))))
+                          (sequence "RISK(r)" "|" "MITIGATED(i@)"))))
 
 ;; Setup for capture
 

@@ -72,25 +72,6 @@
 (defun jme:customize-theme ()
   "Customize theme to my liking."
   (interactive)
-  (let* ((variable-tuple
-          (cond ((find-font (font-spec :family jme:variable-font-family)) `(:font ,jme:variable-font-family))
-                ((find-font (font-spec :family "Source Sans Pro")) '(:font "Source Sans Pro"))
-                ((find-font (font-spec :family "Lucida Grande")) '(:font "Lucida Grande"))
-                ((find-font (font-spec :family "Verdana")) '(:font "Verdana" ))
-                ((find-font (font-spec :family "Sans Serif")) '(:font "Sans Serif"))
-                (nil (warn "Cannot find an appropriate variable font.")))))
-    (custom-theme-set-faces
-     'user
-     `(org-level-8 ((t (:inherit 'outline-8 ,@variable-tuple))))
-     `(org-level-7 ((t (:inherit 'outline-7 ,@variable-tuple))))
-     `(org-level-6 ((t (:inherit 'outline-6 ,@variable-tuple))))
-     `(org-level-5 ((t (:inherit 'outline-5 ,@variable-tuple))))
-     `(org-level-4 ((t (:inherit 'outline-4 ,@variable-tuple :height 1.0))))
-     `(org-level-3 ((t (:inherit 'outline-3 ,@variable-tuple :height 1.05))))
-     `(org-level-2 ((t (:inherit 'outline-2 ,@variable-tuple :height 1.1))))
-     `(org-level-1 ((t (:inherit 'outline-1 ,@variable-tuple :height 1.2))))
-     `(org-document-title ((t (:inherit org-level-1 :weight normal :height 1.75 :underline nil))))
-     `(org-done ((t (:inherit 'org-headline-done :bold 'inherit :strike-through t))))))
   (mapc
    (lambda (face)
      (set-face-attribute face nil :inherit 'fixed-pitch))
@@ -119,9 +100,6 @@
   :config
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
-  ;; load but do not enable themes
-  (load-theme 'doom-palenight t t)
-  (load-theme 'doom-tomorrow-day t t)
 
   (defun jme:toggle-ui-theme ()
     "Toggle color theme between light/dark theme.
@@ -129,15 +107,19 @@ Utilizes `state' property of the function to track state."
     (interactive)
     (if (get 'jme:toggle-ui-theme 'state)
         (progn
+          (disable-theme 'override-light)
           (disable-theme 'doom-tomorrow-day)
           (enable-theme 'doom-palenight)
+          (enable-theme 'override-dark)
           (jme:customize-theme)
           (when (display-graphic-p)
             (set-mouse-color "#69bdd2"))
           (put 'jme:toggle-ui-theme 'state nil))
       (progn
+        (disable-theme 'override-dark)
         (disable-theme 'doom-palenight)
         (enable-theme 'doom-tomorrow-day)
+        (enable-theme 'override-light)
         (jme:customize-theme)
         (when (display-graphic-p)
           (set-mouse-color "#042f66"))
@@ -145,6 +127,11 @@ Utilizes `state' property of the function to track state."
 
   (add-hook 'window-setup-hook (lambda ()
                                  (progn
+                                   ;; load but do not enable themes
+                                   (load-theme 'doom-palenight t t)
+                                   (load-theme 'doom-tomorrow-day t t)
+                                   (load-theme 'override-dark t t)
+                                   (load-theme 'override-light t t)
                                    (doom-themes-org-config)
                                    (jme:toggle-ui-theme)))))
 
