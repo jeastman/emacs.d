@@ -115,21 +115,37 @@
    (list 'org-meta-line
          'org-special-keyword)))
 
-;; TODO: Provide function to switch dark/light theme.
-;; dark theme: (load-theme 'doom-palenight t)
-
 (use-package doom-themes
   :config
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
-  (load-theme 'doom-tomorrow-day t)
+  ;; load but do not enable themes
+  (load-theme 'doom-palenight t t)
+  (load-theme 'doom-tomorrow-day t t)
+
+  (defun jme:toggle-ui-theme ()
+    "Toggle color theme between light/dark theme.
+Utilizes `state' property of the function to track state."
+    (interactive)
+    (if (get 'jme:toggle-ui-theme 'state)
+        (progn
+          (disable-theme 'doom-tomorrow-day)
+          (enable-theme 'doom-palenight)
+          (jme:customize-theme)
+          (when (display-graphic-p)
+            (set-mouse-color "#69bdd2"))
+          (put 'jme:toggle-ui-theme 'state nil))
+      (progn
+        (disable-theme 'doom-palenight)
+        (enable-theme 'doom-tomorrow-day)
+        (jme:customize-theme)
+        (when (display-graphic-p)
+          (set-mouse-color "#042f66"))
+        (put 'jme:toggle-ui-theme 'state t))))
+
   (add-hook 'window-setup-hook (lambda ()
                                  (progn
                                    (doom-themes-org-config)
-                                   (jme:customize-theme)
-                                   ))))
-
-(when (display-graphic-p)
-  (set-mouse-color "#51afef"))
+                                   (jme:toggle-ui-theme)))))
 
 ;;; uitheme.el ends here
