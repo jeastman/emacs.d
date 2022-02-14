@@ -97,8 +97,33 @@
                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                ("\\paragraph{%s}" . "\\paragraph*{%s}")
                ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
+(add-to-list 'org-latex-classes
+             '("jme-org-article" "\\documentclass[11pt,a4paper]{article}
+\\usepackage[T1]{fontenc}
+\\usepackage{fontspec}
+\\usepackage{graphicx}
+\\defaultfontfeatures{Mapping=tex-text}
+\\setromanfont{Noto Serif}
+\\setromanfont [BoldFont={Noto Serif Bold},
+                ItalicFont={Noto Serif Italic}]{Noto Serif}
+\\setsansfont{Noto Sans}
+\\setmonofont[Scale=0.8]{Noto Mono}
+\\usepackage{geometry}
+\\geometry{a4paper, textwidth=6.5in, textheight=10in,
+            marginparsep=7pt, marginparwidth=.6in}
+\\pagestyle{empty}"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 (setq  org-latex-pdf-process
        '("latexmk -shell-escape -bibtex -pdf %f"))
+
+;; (setq org-latex-pdf-process
+;;   '("xelatex -interaction nonstopmode %f"
+;;      "xelatex -interaction nonstopmode %f")) ;; for multiple passes
+
 
 ;; TODO Keywords
 
@@ -220,6 +245,7 @@ This can be 0 for immediate, or a floating point value.")
     (message "No")))
 
 (defun jme:org-archive-done-tasks ()
+  "Look for completed tasks in the current buffer and archive them."
   (interactive)
   (save-excursion
     (goto-char (point-min))
@@ -250,6 +276,24 @@ This can be 0 for immediate, or a floating point value.")
   (interactive)
   (archive-done-tasks)
   (org-html-export-to-html))
+
+;; Handy function to remove org links from the buffer.
+;; This is particularly handy when composing email (using org-msg)
+;; and need to remove links to local content from copied text.
+;; Inspired by (and largely copied from) stackexchange answer by Andrew Swann
+;; https://emacs.stackexchange.com/questions/10707/in-org-mode-how-to-remove-a-link
+(defun jme:org-replace-links-by-description (&optional start end)
+  "Look for all org links in the current buffer and replace with their description, optionally using region defined by START and END."
+  (interactive
+   (if (use-region-p) (list (region-beginning) (region-end))
+     (list (point-min) (point-max))))
+  (save-excursion
+    (save-restriction
+      (narrow-to-region start end)
+      (goto-char (point-min))
+      (while (re-search-forward org-link-bracket-re nil t)
+        (replace-match (match-string-no-properties
+                        (if (match-end 2) 2 1)))))))
 
 ;; Clocking
 
