@@ -131,11 +131,14 @@ This can be 0 for immediate, or a floating point value."
 
 (defun jme-org-agenda-files ()
   "Construct list of files for org agenda."
+  (defvar org-directory)
   (mapcar (lambda (file)
             (concat org-directory "/" file)) jme-org-agenda-files))
 
 (defun jme-org--configure-latex ()
   "Configue support for LaTeX documents."
+  (defvar org-latex-classes)
+  (defvar org-latex-pdf-process)
   (require 'ox-latex)
   (add-to-list 'org-latex-classes
                '("synacororgspec" "\\documentclass[10pt,oneside,article]{synacororgspec}"
@@ -158,6 +161,8 @@ This can be 0 for immediate, or a floating point value."
 
 (defun jme-org--configure-capture ()
   "Org capture configuration."
+  (defvar org-directory)
+  (defvar org-capture-templates)
   (let ((task-file (expand-file-name (concat org-directory "/tasks.org")))
         (calendar-file (expand-file-name (concat org-directory "/calendar.org")))
         (notes-file (expand-file-name (concat org-directory "/notes.org"))))
@@ -202,6 +207,9 @@ This can be 0 for immediate, or a floating point value."
 
 (defun jme-org-archive-p (p)
   "Determine if the headline at point P needs to be archived."
+  (declare-function org-entry-properties "org" (&optional POM WHICH))
+  (declare-function org-parse-time-string "org" (S &optional NODEFAULT))
+  (declare-function time-to-number-of-days "time-date" (TIME))
   (let* ((props (org-entry-properties p))
          (closed (assoc "CLOSED" props)))
     (if closed
@@ -221,13 +229,13 @@ This can be 0 for immediate, or a floating point value."
 (defun jme-org-archive-done-tasks ()
   "Archive tasks which are done."
   (interactive)
+  (defvar org-done-keywords)
+  (declare-function outline-next-heading "outline" ())
+  (declare-function org-archive-subtree "org-archive" (&optional FIND-DONE))
   (save-excursion
     (goto-char (point-min))
     (let ((done-regexp
-           (concat "\\* \\(" (regexp-opt org-done-keywords) "\\) "))
-          (state-regexp
-           (concat "- State \"\\(" (regexp-opt org-done-keywords)
-                   "\\)\"\\s-*\\[\\([^]\n]+\\)\\]")))
+           (concat "\\* \\(" (regexp-opt org-done-keywords) "\\) ")))
       (while (re-search-forward done-regexp nil t)
         (let ((end (save-excursion
                      (outline-next-heading)
@@ -243,6 +251,9 @@ This can be 0 for immediate, or a floating point value."
 (defun jme-org-archive-and-publish ()
   "Archive old tasks and publish as html."
   (interactive)
+  (declare-function org-html-export-to-html
+                    "ox-html"
+                    (&optional ASYNC SUBTREEP VISIBLE-ONLY BODY-ONLY EXT-PLIST))
   (jme-org-archive-done-tasks)
   (org-html-export-to-html))
 
@@ -334,12 +345,16 @@ This can be 0 for immediate, or a floating point value."
   (add-hook 'org-mode-hook #'jme-org--superstar-mode-function)
 
   ;; Org mode
+  (defvar org-mode-map)
+  (declare-function org-time-stamp-inactive "org" (ARG))
   (define-key org-mode-map (kbd "C-c t") #'org-time-stamp-inactive)
 
   ;; Global
+  (declare-function org-store-link "ol" (ARG &optional INTERACTIVE))
+  (declare-function org-insert-link-global "ol" ())
   (global-set-key (kbd "C-c l") #'org-store-link)
   (global-set-key (kbd "C-c L") #'org-insert-link-global)
-  (global-set-key (kbd "C-c c") #'counsel-org-capture))
+  (global-set-key (kbd "C-c c") #'org-capture))
 
 (defun jme-org--disable ()
   "Disable org configuration."
@@ -351,7 +366,7 @@ This can be 0 for immediate, or a floating point value."
   "Unload org configuration."
   (jme-org--disable))
 
-(jme-common-defconfiguration jme-org "Orgmode configuration")
+(jme-common-defconfiguration jme-org "Org-mode configuration")
 
 (provide 'jme-org)
 ;;; jme-org.el ends here.
