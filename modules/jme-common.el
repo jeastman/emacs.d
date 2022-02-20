@@ -28,12 +28,33 @@
   "Personal customizations."
   :group 'emacs)
 
-(defun jme-common--config-docstrung (doc pretty-name getter)
+(defun jme-common--config-var-docstring (pretty-name)
+  "Generate docstring for configuration variable.
+PRETTY-NAME is the formatted name."
+  (format "Non-nil if %s is enabled.
+
+See the `%s' command for a description of the configuration.
+Setting this varibale directly does not take effect;
+either customize it (see the info mode 'Easy Cusomization')
+or call the function `%s'." pretty-name pretty-name pretty-name))
+
+(defun jme-common--config-fn-docstring (pretty-name getter)
   "Generate docstring for configuration.
-DOC is the documentation string.
 PRETTY-NAME is the fomatted name.
-GETTER is the getter."
-  (let ((doc (or doc (format "Toggle configuration %s on or off." pretty-name))))))
+GETTER is the symbol to evaluate to retrieve the state of the
+configuration."
+  (format "Toggle configuration %s on or off.
+
+This is a configuration.  If called interactively, toggle the %s
+configuration.  If the prefix argument is positive, enable the
+configuration, and if it is zero or negative, disable the configuration.
+
+If called from Lisp, toggle the mode if ARG is `toggle'.  Enable the
+configuration if ARG is nil, omitted, or is a positive number.  Disable
+the configuration if ARG is a negative number.
+
+To check whether the configuration is enabled, evaluate `%s'."
+          pretty-name pretty-name getter))
 
 (defmacro jme-common-defconfiguration (config doc &optional body)
   "Define a new configuration CONFIG.
@@ -89,45 +110,35 @@ named CONFIG--disable is checked for and executed."
           (setq disable (intern (format "%s--disable" config)))
         (setq disable #'jme-common--default-disable)))
     `(progn
-       ,(let ((base-doc-string "Non-nil if %s is enabled.
-See the `%s' command for a description of the configuration.
-Setting this varibale directly does not take effect;
-either customize it (see the info mode 'Easy Cusomization')
-or call the function `%s'."))
-          `(defcustom ,config ,init-value
-             ,(concat doc "\n\n" (format base-doc-string pretty-name config config))
-             :initialize #'custom-initialize-default
-             :type 'boolean
-             :group 'jme-customizations))
-          (defun ,configfun (&optional arg)
-             ,(format "Toggle configuration %s on or off." config)
-             (interactive (list (if current-prefix-arg
-                                    (prefix-numeric-value current-prefix-arg)
-                                  'toggle)))
-             (let ((last-message (current-message)))
-               (if (setq-default ,config
-                (cond ((eq arg 'toggle)
-                       (not (default-value ',config)))
-                      ((and (numberp arg)
-                            (< arg 1))
-                       nil)
-                      (t t)))
-                   (,enable)
-                 (,disable))
-               (if (called-interactively-p 'any)
-                   (progn
-                     (customize-mark-as-set ',config)
-                     (unless (and (current-message)
-                                  (not (equal last-message
-                                              (current-message))))
-                       (message ,(format "%s %%sabled" pretty-name)
-                                  (if (default-value ',config) "en" "dis"))))
-               (default-value ',config))
-               )
-             )
-          )
-       )
-    )
+       (defcustom ,config ,init-value
+         ,(concat doc "\n\n" (jme-common--config-var-docstring pretty-name))
+         :initialize #'custom-initialize-default
+         :type 'boolean
+         :group 'jme-customizations)
+       (defun ,configfun (&optional arg)
+         ,(jme-common--config-fn-docstring config config)
+         (interactive (list (if current-prefix-arg
+                                (prefix-numeric-value current-prefix-arg)
+                              'toggle)))
+         (let ((last-message (current-message)))
+           (if (setq-default ,config
+                             (cond ((eq arg 'toggle)
+                                    (not (default-value ',config)))
+                                   ((and (numberp arg)
+                                         (< arg 1))
+                                    nil)
+                                   (t t)))
+               (,enable)
+             (,disable))
+           (if (called-interactively-p 'any)
+               (progn
+                 (customize-mark-as-set ',config)
+                 (unless (and (current-message)
+                              (not (equal last-message
+                                          (current-message))))
+                   (message ,(format "%s %%sabled" pretty-name)
+                            (if (default-value ',config) "en" "dis"))))
+             (default-value ',config)))))))
 
 (defun jme-common--default-enable ()
   "Fallback configuration enable."
