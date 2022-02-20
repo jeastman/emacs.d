@@ -1,7 +1,7 @@
 ;;; init.el --- Emacs configuration file -*- lexical-binding: t -*-
 
 ;; Author: John Eastman
-;; Created: 06 Jan 2019
+;; Created: 12 Feb 2022
 
 ;; This file is not part of GNU Emacs.
 
@@ -20,29 +20,9 @@
 ;; <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;;
-;; I moved my Emacs configuration to a literate format in 2013 and
-;; have been using that since.  While literate code, expecially for a
-;; configuration file, seems like a great idea and would lead to a
-;; wonderful experience, it has not.  I find that as I hack on my
-;; configuration, the added literate verbiage seems contrived.  Most of
-;; the time, the code speaks for itself and the addition of literate
-;; text is just redundant.  While this may not be true for some of the
-;; larger components (org for example), most of the time it is
-;; sufficient.
-;;
-;; My new plan is to revert back to plain elisp code and add in
-;; documentation comments as necessary.  That is the point of code
-;; comments anyway.
-;;
-;; I've decided to do this by re-creating my configuration from the
-;; ground up.  It's always good to do on occasion.  There are plenty of
-;; new packages that I was either not taking advantage of or not using
-;; properly.  This iteration of refresh is intended to make use of
-;; those things, as well as weed out the cruft.
-;;
-;; Since I am starting all over, I have decided to give straight
-;; (https://github.com/raxod502/straight.el) a try.
+;; This configuration was developed using Emacs 28. Some measures have been
+;; taken to make it compatible with previous versions, but I have not tested
+;; this.  Expect issues to be present if running Emacs version < 28;
 
 ;;; Code:
 
@@ -51,23 +31,24 @@
 (when (version< emacs-version "27")
   (load (concat user-emacs-directory "early-init.el")))
 
-(defvar jme:config-dir
-  (concat (expand-file-name user-emacs-directory) "config")
-  "Custom configuration directory.")
-
 ;; Monitor startup time.
-(defun jme:display-startup-time ()
-  "Disply the configuration startup time."
-  (message "Emacs loaded in %s with %d garbage collections."
-           (format "%.2f seconds"
-                   (float-time
-                    (time-subtract after-init-time before-init-time)))
-           gcs-done))
-(add-hook 'emacs-startup-hook #'jme:display-startup-time)
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "Emacs loaded in %s with %d garbage collections."
+                     (format "%.2f seconds"
+                             (float-time
+                              (time-subtract after-init-time before-init-time)))
+                     gcs-done)))
+
+;; Set the default value for various coding systems to UTF-8
+(set-default-coding-systems 'utf-8)
+(prefer-coding-system 'utf-8)
+
+;; Add local modules directory to the load path
+(add-to-list 'load-path (expand-file-name "modules/" user-emacs-directory))
 
 ;; straight bootstrap code (bootstrap-version 5)
-(setq straight-use-package-by-default t)
-(defvar boostrap-version)
+(defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
       (bootstrap-version 5))
@@ -80,120 +61,73 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+(require 'straight)
+
 ;; utilize use-package
-(straight-use-package 'use-package)
+;;(straight-use-package 'use-package)
 
 ;; Ensure org
-(straight-use-package '(org))
-(straight-use-package '(org-contrib))
+;; TODO - Move out of init, since we are not loading literate
+;;(straight-use-package '(org))
+;;(straight-use-package '(org-contrib))
 
 ;; Garbage Collector Magic Hack
 ;; Set to start in emacs-startup-hook once gc is reset.
 ;; See early-init for additional details.
-(use-package gcmh)
+(straight-use-package 'gcmh)
+(require 'gcmh nil 'noerror)
+
 ;; Handle setting proper environment on Mac
-(use-package exec-path-from-shell
-  :if (memq window-system '(mac ns x))
-  :config
-  (progn
-    (when (string-match-p "/zsh$" (getenv "SHELL"))
-      ;; Use a non-interactive login shell to ensure
-      ;; zsh path is loaded properly from .zprofile
-      ;; which only loads with a login shell.
-      (setq exec-path-from-shell-arguments '("-l")))
-    (exec-path-from-shell-initialize)))
+;; (use-package exec-path-from-shell
+;;   :if (memq window-system '(mac ns x))
+;;   :config
+;;   (progn
+;;     (when (string-match-p "/zsh$" (getenv "SHELL"))
+;;       ;; Use a non-interactive login shell to ensure
+;;       ;; zsh path is loaded properly from .zprofile
+;;       ;; which only loads with a login shell.
+;;       (setq exec-path-from-shell-arguments '("-l")))
+;;     (exec-path-from-shell-initialize)))
 
-(use-package auto-compile
-  :demand t
-  :config
-  (auto-compile-on-load 1)
-  (auto-compile-on-save-mode 1))
+;; Control the creation of files in Emacs directory.
+(straight-use-package 'no-littering)
+(setq auto-save-file-name-transforms
+      `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+(require 'no-littering nil 'noerror)
 
-(defun jme:load (directory base)
-  "Look for files located in DIRECTORY whose base name is BASE.
+;; Load a color theme
+;;(load-theme 'modus-operandi)
 
-Check the base name against several extensions.  If a file with
-that name exists, then load it."
-  (let ((literate      (expand-file-name (concat base ".org") directory))
-        (encrypted-org (expand-file-name (concat base ".org.gpg") directory))
-        (plain         (expand-file-name (concat base ".el") directory))
-        (encrypted-el  (expand-file-name (concat base ".el.gpg") directory)))
-    (cond
-     ((file-exists-p encrypted-org) (org-babel-load-file encrypted-org))
-     ((file-exists-p encrypted-el)  (load encrypted-el))
-     ((file-exists-p literate)      (org-babel-load-file literate))
-     ((file-exists-p plain)         (load plain)))))
+(require 'jme-defaults)
+(require 'jme-window)
+(require 'jme-themes)
+(require 'jme-modeline)
+(require 'jme-history)
+(require 'jme-fonts)
+(require 'jme-buffers)
+(require 'jme-editor)
+(require 'jme-completion)
+(require 'jme-org)
+(require 'jme-dired)
+(require 'jme-vc)
+(require 'jme-shell)
 
-;; Load theme configuration early to avoid ui flashing
-(jme:load jme:config-dir "uitheme")
-
-;; load paths first to ensure emacs-user-directory stays clean
-(jme:load jme:config-dir "paths")
-
-;; load os-specific settings - should be limitied to path setup
-(let* ((system-type-name (symbol-name system-type))
-       (base-name (replace-regexp-in-string "/" "-" system-type-name)))
-  (jme:load jme:config-dir base-name))
-
-;; load system specific file - should be limited to path setup
-(let ((host-name-base (car (split-string (system-name) "\\."))))
-  (jme:load jme:config-dir host-name-base))
-
-;; load configuration files
-(mapc (lambda (f) (jme:load jme:config-dir f))
-      '("backup"
-        "core"
-        "features"
-        "modeline"
-        "ui"
-        "dired"
-        "completion"
-        "editor"
-        "help"
-        "history"
-        "lint"
-        "orgmode"
-        "prog-modes"
-        "lsp"
-        "projects"
-        "shell"
-        "snippets"
-        "version-control"
-        "elfeed-config"))
-
-;; (jme:load jme:config-dir "backup")
-;; (jme:load jme:config-dir "core")
-;; (jme:load jme:config-dir "features")
-;; (jme:load jme:config-dir "modeline")
-;; (jme:load jme:config-dir "ui")
-;; (jme:load jme:config-dir "dired")
-;; (jme:load jme:config-dir "completion")
-;; (jme:load jme:config-dir "editor")
-;; (jme:load jme:config-dir "help")
-;; (jme:load jme:config-dir "history")
-;; (jme:load jme:config-dir "lint")
-;; (jme:load jme:config-dir "orgmode")
-;; (jme:load jme:config-dir "prog-modes")
-;; (jme:load jme:config-dir "lsp")
-;; (jme:load jme:config-dir "projects")
-;; (jme:load jme:config-dir "shell")
-;; (jme:load jme:config-dir "snippets")
-;; (jme:load jme:config-dir "version-control")
-
-;; load host specific packages
-(let ((host-name-base (car (split-string (system-name) "\\."))))
-  (jme:load jme:config-dir (concat host-name-base "-pkg")))
+(jme-defaults 1)
+(jme-window 1)
+(jme-themes 1)
+(jme-modeline 1)
+(jme-history 1)
+(jme-fonts 1)
+(jme-buffers 1)
+(jme-editor 1)
+(jme-completion 1)
+(jme-org 1)
+(jme-dired 1)
+(jme-vc 1)
+(jme-shell 1)
 
 ;; load customization file
 (setq custom-file
       (concat (file-name-directory user-init-file) "custom.el"))
-(when (file-exists-p custom-file)
-  (load custom-file))
-
-;; User specific settings
-(jme:load jme:config-dir user-login-name)
-
-;; private settings
-(jme:load user-emacs-directory ".private")
-
-;;; init.el ends here
+;; (when (file-exists-p custom-file)
+;;   (load custom-file))
