@@ -37,7 +37,7 @@
   (add-hook 'dired-mode-hook #'diff-hl-dired-mode)
   (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)
 
-  (jme-enable-mode global-diff-hl-mode))
+  (jme-common-enable-mode global-diff-hl-mode))
 
 (defun jme-vc--disable ()
   "Revert configuration change."
