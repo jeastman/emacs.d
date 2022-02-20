@@ -28,6 +28,7 @@
 (straight-use-package 'org)
 (straight-use-package 'org-contrib)
 (straight-use-package 'htmlize)
+(straight-use-package 'org-superstar)
 
 (defun jme-org--superstar-mode-function ()
   "Hook function to enable `superstar-mode'."
