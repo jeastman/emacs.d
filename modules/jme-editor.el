@@ -22,6 +22,7 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'straight)
 (require 'jme-common)
 
 ;; linting and error support
@@ -76,6 +77,7 @@ derived from modes which are included in
 
   ;; flycheck
   (custom-set-variables
+   '(flycheck-emacs-lisp-load-path 'inherit)
    '(flycheck-display-errors-function
      #'flycheck-pos-tip-error-messages))
   (require 'flycheck)
