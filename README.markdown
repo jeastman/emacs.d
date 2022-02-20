@@ -31,10 +31,16 @@ occurs when a package is loaded as a dependency of another, before I
 explicitly load it. The explicit ordering og the files prevents these
 warnings.
 
-Simply running Emacs with this configuration should correctly setup all
-files and packages, with the following exceptions:
+News
+----
+I am, once again, rewriting my configuration. I am comfortable with the
+configuration presented here, but there are certain things which have
+annoyed me for some time. I aim to fix those things with a fresh look.
+I will continue to use this configuration until the new one is "usable enough"
+to start using. As my daily workflows are dependent on using Emacs, I
+can't really afford to have "partially" working configuration.
 
- * Org - (not completely supported by straight yet)
+You can find my current progress in the `modular` branch.
 
 Additional Directories
 ---------------------
