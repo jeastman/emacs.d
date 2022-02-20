@@ -88,9 +88,8 @@ named CONFIG--enable is checked for and executed.
 
 If the disable keyword is not specified, a function
 named CONFIG--disable is checked for and executed."
-  (let ((config-name (symbol-name config))
+  (let ((pretty-name (symbol-name config))
         (init-value nil)
-        (pretty-name config)
         (enable nil)
         (disable nil)
         (keyw nil)
