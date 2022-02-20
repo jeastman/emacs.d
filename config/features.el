@@ -245,7 +245,7 @@
    :commands (orb-note-actions)
    :hook (org-roam-mode . org-roam-bibtex-mode)
    :custom
-   (org-note-actions-interface 'ivy)
+   (orb-note-actions-interface 'ivy)
    :config
    (require 'org-ref)
    :bind (:map org-mode-map
