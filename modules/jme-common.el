@@ -88,6 +88,8 @@ named CONFIG--enable is checked for and executed.
 
 If the disable keyword is not specified, a function
 named CONFIG--disable is checked for and executed."
+  (declare (debug (symbolp string &optional form))
+           (indent fun))
   (let ((pretty-name (symbol-name config))
         (init-value nil)
         (enable nil)
@@ -169,19 +171,22 @@ If a default value cannot be found for a symbol, it is skipped."
   "Autoload FUN for PACKAGE.
 
 Ensures function FUN is not alreay bound."
-  (declare (indent 1))
+  (declare (debug (symbolp symbolp))
+           (indent 1))
   `(unless (fboundp ',fun)
      (autoload #',fun ,package nil t)))
 
 (defmacro jme-common-enable-mode (mode)
   "Enable the specied MODE."
-  (declare (indent 1))
+  (declare (debug (symbolp))
+           (indent 1))
   `(if (fboundp ',mode)
        (,mode 1)))
 
 (defmacro jme-common-disable-mode (mode)
   "Disable the specified MODE."
-  (declare (indent 1))
+  (declare (debug (symbolp))
+           (indent 1))
   `(if (fboundp ',mode)
        (,mode -1)))
 
