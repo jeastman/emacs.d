@@ -53,7 +53,7 @@
 (defun jme-completion--corfu-enable-in-eshell ()
   "Enable Corfu in eshell."
   (setq-local corfu-auto nil) ; Do not enable auto-completion
-  (jme-common-enable corfu-mode))
+  (jme-common-enable-mode corfu-mode))
 
 (defun jme-completion--corfu-enable-always-in-minibuffer ()
   "Enable Corfu in the minibuffer if Vertico is not active."
