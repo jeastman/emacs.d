@@ -38,6 +38,8 @@
 (straight-use-package 'rainbow-mode)
 ;; Match parens and more
 (straight-use-package 'smartparens)
+;; simple environment for writing
+(straight-use-package 'olivetti)
 
 ;;; Customization options
 
