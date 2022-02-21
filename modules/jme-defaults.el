@@ -38,6 +38,7 @@
 
   ;; Security defaults
   ;; Use gnutls for checks
+  (defvar gnutls-verify-error)
   (setq gnutls-verify-error t))
 
 (defun jme-defaults--revert-to-system-defaults ()
