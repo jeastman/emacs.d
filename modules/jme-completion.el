@@ -48,7 +48,7 @@
   "Enable Corfu in the minibuffer if `completion-at-point' is bound."
   (when (where-is-internal #'completion-at-point (list (current-local-map)))
     (setq-local corfu-auto t) ; Enable auto-completion
-    (jme-common-enable-mode 1)))
+    (jme-common-enable-mode confu-mode)))
 
 (defun jme-completion--corfu-enable-in-eshell ()
   "Enable Corfu in eshell."
@@ -88,6 +88,11 @@
 
   ;; Configure vertico directory extension.
   (require 'vertico-directory)
+  (defvar vertico-map)
+  (declare-function vertico-directory-enter "vertico-directory" ())
+  (declare-function vertico-directory-delete-char "vertico-directory" ())
+  (declare-function vertico-directory-delete-word "vertico-directory" ())
+  (declare-function vertico-directory-tidy "vertico-directory" ())
   (define-key vertico-map (kbd "RET") #'vertico-directory-enter)
   (define-key vertico-map (kbd "DEL") #'vertico-directory-delete-char)
   (define-key vertico-map (kbd "M-DEL") #'vertico-directory-delete-word)
@@ -97,14 +102,18 @@
   ;; Add data to minibuffer completions
   (require 'marginalia)
   (jme-common-enable-mode marginalia-mode)
+  (declare-function marginalia-cycle "marginalia" ())
   (define-key minibuffer-local-map (kbd "M-A") #'marginalia-cycle)
 
   ;; Support actions
   (require 'embark)
   ;; use embark to show bindings in key-prefix with C-h
+  (declare-function embark-bindings "embark" (NO-GLOBAL))
   (setq prefix-help-command #'embark-bindings)
 
+  (declare-function embark-act "embark" (&optional ARG))
   (global-set-key (kbd "C-.") #'embark-act)
+  (declare-function embark-dwim "embark" (&optional ARG))
   (global-set-key (kbd "M-.") #'embark-dwim)
   ;; (global-set-key (kbd "C-h B") #'embark-bindings)
   (global-set-key [remap describe-bindings] #'embark-bindings)
@@ -115,45 +124,68 @@
   (require 'consult)
   (add-hook 'completion-list-mode-hook 'consult-preview-at-point-mode)
   ;; C-c bindings (mode-specific-map)
+  (declare-function consult-mode-command "consult" (&rest MODES))
   (global-set-key (kbd "C-c m") #'consult-mode-command)
   ;; C-s bindings
+  (declare-function consult-line "consult" (&optional INITIAL START))
   (global-set-key (kbd "C-s") #'consult-line)
   ;; C-x bindings (ctl-x-map)
+  (declare-function consult-buffer "consult" (&optional SOURCES))
   (global-set-key (kbd "C-x b") #'consult-buffer)
+  (declare-function consult-buffer-other-window "consult" ())
   (global-set-key (kbd "C-x B") #'consult-buffer-other-window)
   (global-set-key (kbd "C-x 4 b") #'consult-buffer-other-window)
+  (declare-function consult-buffer-other-frame "consult" ())
   (global-set-key (kbd "C-x 5 b") #'consult-buffer-other-frame)
   ;; M-g bindings (goto-map)
+  (declare-function consult-goto-line "consult" (&optional ARG))
   (global-set-key (kbd "M-g M-g") #'consult-goto-line)
+  (declare-function consult-outline "consult" ())
   (global-set-key (kbd "M-g o") #'consult-outline)
+  (declare-function consult-mark "consult" (&optional MARKERS))
   (global-set-key (kbd "M-g m") #'consult-mark)
+  (declare-function consult-global-mark "consult" (&optional MARKERS))
   (global-set-key (kbd "M-g k") #'consult-global-mark)
   ;; M-s bindings (search-map)
+  (declare-function consult-find "consult" (&optional DIR INITIAL))
   (global-set-key (kbd "M-s d") #'consult-find)
+  (declare-function consult-locate "consult" (&optional INITIAL))
   (global-set-key (kbd "M-s D") #'consult-locate)
+  (declare-function consult-grep "consult" (&optional DIR INITIAL))
   (global-set-key (kbd "M-s g") #'consult-grep)
+  (declare-function consult-git-grep "consult" (&optional DIR INITIAL))
   (global-set-key (kbd "M-s G") #'consult-git-grep)
+  (declare-function consult-ripgrep "consult" (&optional DIR INITIAL))
   (global-set-key (kbd "M-s r") #'consult-ripgrep)
   (global-set-key (kbd "M-s l") #'consult-line)
+  (declare-function consult-line-multi "consult" (&optional INITIAL))
   (global-set-key (kbd "M-s L") #'consult-line-multi)
+  (declare-function consult-multi-occur "consult" (BUFS REGEXP &optional NLINES))
   (global-set-key (kbd "M-s m") #'consult-multi-occur)
+  (declare-function consult-keep-lines "consult" (&optional FILTER INITIAL))
   (global-set-key (kbd "M-s k") #'consult-keep-lines)
+  (declare-function consult-focus-lines "consult" (&optional SHOW FILTER INITIAL))
   (global-set-key (kbd "M-s u") #'consult-focus-lines)
   ;; Minibuffer
+  (declare-function consult-history "consult" (&optional HISTORY))
   (define-key minibuffer-local-map (kbd "C-r") #'consult-history)
 
   (require 'embark-consult)
+  (declare-function consult-preview-at-point-mode "consult" (&optional ARG))
   (add-hook 'embark-collect-mode #'consult-preview-at-point-mode)
 
   (require 'corfu)
+  (custom-set-variables '(corfu-auto t))
   (jme-common-enable-mode corfu-global-mode)
   (add-hook 'minibuffer-setup-hook #'jme-completion--corfu-enable-always-in-minibuffer 1)
   (add-hook 'minibuffer-setup-hook #'jme-completion--corfu-enable-in-minibuffer)
-  (add-hook 'eshell-mode-hook #'jme-completion--corfu-enable-in)
+  (add-hook 'eshell-mode-hook #'jme-completion--corfu-enable-in-eshell)
 
   ;; Icons for completion kinds
   (custom-set-variables '(kind-icon-default-face 'corfu-default))
   (require 'kind-icon)
+  (defvar corfu-margin-formatters)
+  (declare-function kind-icon-margin-formatter "kind-icon" (METADATA))
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
 
   ;; pcomplete extension for eshell
@@ -167,9 +199,13 @@
   ;;(advice-add 'pcomplete-completions-at-point :around #'cape-wrap-purify)
 
   ;; Cape
+  (declare-function cape-file "cape" (&optional INTERACTIVE))
   (add-to-list 'completion-at-point-functions #'cape-file)
+  (declare-function cape-tex "cape" (&optional INTERACTIVE))
   (add-to-list 'completion-at-point-functions #'cape-tex)
+  (declare-function cape-symbol "cape" (&optional INTERACTIVE))
   (add-to-list 'completion-at-point-functions #'cape-symbol)
+  (declare-function cape-keyword "cape" (&optional INTERACTIVE))
   (add-to-list 'completion-at-point-functions #'cape-keyword)
 
   )
@@ -181,7 +217,7 @@
   (jme-common-remove-from-list 'completion-at-point-functions #'cape-symbol)
   (jme-common-remove-from-list 'completion-at-point-functions #'cape-keyword)
   ;; clean up eshell hook
-  (remove-hook 'eshell-mode-hook #'jme-completion--corfu-enable-in)
+  (remove-hook 'eshell-mode-hook #'jme-completion--corfu-enable-in-eshell)
   ;; clean up minibuffer hook
   (remove-hook 'minibuffer-setup-hook #'jme-completion--corfu-enable-in-minibuffer)
   (remove-hook 'minibuffer-setup-hook #'jme-completion--corfu-enable-always-in-minibuffer)
@@ -203,34 +239,34 @@
   ;; marginalia cycle in minimap
   (define-key minibuffer-local-map (kbd "M-A") nil)
   ;; Embark
-  (global-uset-key (kbd "C-."))
+  (global-unset-key (kbd "C-."))
   (global-set-key (kbd "M-.") #'xref-find-definitions)
-  (global-uset-key (kbd "C-h B"))
+  (global-unset-key (kbd "C-h B"))
   ;; C-c bindings (mode-specific-map)
   (global-unset-key (kbd "C-c m"))
   ;; C-s bindings
   (global-set-key (kbd "C-s") #'isearch-forward)
   ;; C-x bindings (ctl-x-map)
   (global-set-key (kbd "C-x b") #'switch-to-buffer)
-  (global-uset-key (kbd "C-x B"))
+  (global-unset-key (kbd "C-x B"))
   (global-set-key (kbd "C-x 4 b") #'switch-to-buffer-other-window)
   (global-set-key (kbd "C-x 5 b") #'switch-to-buffer-other-frame)
   ;; M-g bindings (goto-map)
   (global-set-key (kbd "M-g M-g") #'goto-line)
-  (global-uset-key (kbd "M-g o"))
-  (global-uset-key (kbd "M-g m"))
-  (global-uset-key (kbd "M-g k"))
+  (global-unset-key (kbd "M-g o"))
+  (global-unset-key (kbd "M-g m"))
+  (global-unset-key (kbd "M-g k"))
   ;; M-s bindings (search-map)
-  (global-uset-key (kbd "M-s d"))
-  (global-uset-key (kbd "M-s D"))
-  (global-uset-key (kbd "M-s g"))
-  (global-uset-key (kbd "M-s G"))
-  (global-uset-key (kbd "M-s r"))
-  (global-uset-key (kbd "M-s l"))
-  (global-uset-key (kbd "M-s L"))
-  (global-uset-key (kbd "M-s m"))
-  (global-uset-key (kbd "M-s k"))
-  (global-uset-key (kbd "M-s u"))
+  (global-unset-key (kbd "M-s d"))
+  (global-unset-key (kbd "M-s D"))
+  (global-unset-key (kbd "M-s g"))
+  (global-unset-key (kbd "M-s G"))
+  (global-unset-key (kbd "M-s r"))
+  (global-unset-key (kbd "M-s l"))
+  (global-unset-key (kbd "M-s L"))
+  (global-unset-key (kbd "M-s m"))
+  (global-unset-key (kbd "M-s k"))
+  (global-unset-key (kbd "M-s u"))
 
   (jme-common-revert-symbols '(read-extended-command-predicate
                                completion-styles
