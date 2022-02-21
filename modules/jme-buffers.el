@@ -31,8 +31,10 @@
   "Enable auto-revert mode."
   ;; Both files and buffers should be reverted by
   ;; Global Auto-Revert Mode.
+  (defvar global-auto-revert-non-file-buffers)
   (setq global-auto-revert-non-file-buffers t)
   ;; Silence auto-revert notifications
+  (defvar auto-revert-verbose)
   (setq auto-revert-verbose nil)
 
   ;; Turn on global auto-revert mode
@@ -40,7 +42,7 @@
 
 (defun jme-buffers--disable-auto-revert ()
   "Disable auto-revert, setting back to defaults."
-  (jme-revert-symbols '(global-auto-revert-non-file-buffers
+  (jme-common-revert-symbols '(global-auto-revert-non-file-buffers
                         auto-revert-verbose))
   (global-auto-revert-mode -1))
 
@@ -62,6 +64,9 @@
 
 (defun jme-buffers--enable ()
   "Apply buffers configuration."
+  ;; Replace suspend frame if in graphical mode
+  (when (display-graphic-p)
+    (global-set-key (kbd "C-z") #'bury-buffer))
   (jme-buffers--enable-auto-revert)
   (jme-buffers--config-uniquify))
 
