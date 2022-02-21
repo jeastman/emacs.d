@@ -107,12 +107,14 @@
 (defcustom jme-org-agenda-files '( "calendar.org" "tasks.org" "notes.org")
   "Files always added to the agenda."
   :type 'list
+  :tag "Agenda Files"
   :group 'jme-customizations)
 
 (defcustom jme-org-archive-expiry-days 14
   "The number of days after which a completed task should be auto-archived.
 This can be 0 for immediate, or a floating point value."
   :type 'integer
+  :tag "Completed Task Expiry Days"
   :group 'jme-customizations)
 
 ;;; See the following - friendly handling of capture-specific frame
@@ -359,6 +361,13 @@ This can be 0 for immediate, or a floating point value."
 (defun jme-org--disable ()
   "Disable org configuration."
   ;; TODO
+  (custom-set-variables
+   '(safe-local-variable-values nil)
+   '((sequence "TODO" "DONE")))
+  (define-key org-mode-map (kbd ("C-c t")) nil)
+  (global-unset-key (kbd ("C-c l")))
+  (glibal-unset-key (kbd ("C-c L")))
+  (global-unset-key (kbd ("C-c c")))
   (remove-hook 'org-mode-hook #'jme-org-style-org)
   (remove-hook 'org-mode-hook #'jme-org--superstar-mode-function))
 
