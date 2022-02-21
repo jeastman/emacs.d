@@ -34,7 +34,7 @@
 
   ;; File backup settings
   (setq version-control t     ; Control use of version numbers for backup files
-        ketp-new-versions 2   ; Number of newest versions to keep
+        kept-new-versions 2   ; Number of newest versions to keep
         kept-old-versions 2   ; Number of oldest versions to keep
         delete-old-versions t ; Delete excess backup versions silently
         backup-by-copying-when-linked t)
