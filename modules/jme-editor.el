@@ -87,27 +87,23 @@ derived from modes which are included in
   (jme-common-enable-mode global-flycheck-mode)
 
   ;; Help bindings
-  (jme-common-autoload helpful-at-point "helpful")
-  (jme-common-autoload helpful-function "helpful")
-  (jme-common-autoload helpful-command "helpful")
-  (jme-common-autoload helpful-callable "helpful")
-  (jme-common-autoload helpful-key "helpful")
-  (jme-common-autoload helpful-symbol "helpful")
-  (jme-common-autoload helpful-variable "helpful")
+  (declare-function helpful-at-point "helpful" ())
   (global-set-key (kbd "C-c C-d") #'helpful-at-point)
+  (declare-function helpful-function "helpful" (SYMBOL))
   (global-set-key (kbd "C-h F") #'helpful-function)
+  (declare-function helpful-command "helpful" (SYMBOL))
   (global-set-key (kbd "C-h x") #'helpful-command)
+  (declare-function helpful-callable "helpful" (SYMBOL))
   (global-set-key (kbd "C-h f") #'helpful-callable)
+  (declare-function helpful-key "helpful" (KEY-SEQUENCE))
   (global-set-key (kbd "C-h k") #'helpful-key)
+  (declare-function helpful-symbol "helpful" (SYMBOL))
   (global-set-key (kbd "C-h o") #'helpful-symbol)
+  (declare-function helpful-variable "helpful" (SYMBOL))
   (global-set-key (kbd "C-h v") #'helpful-variable)
 
-  ;; rainbow delimiters
-  (jme-common-autoload rainbow-delimiters-mode
-    "rainbow-delimiters")
-
   ;; expand region
-  (jme-common-autoload er/expand-region "expand-region")
+  (declare-function er/expand-region "expand-region" (ARG))
   (global-set-key (kbd "C-=") #'er/expand-region)
 
   ;; (use-package visual-fill-column
@@ -137,8 +133,10 @@ and `jme-editor-line-number-disabled-modes'."
   ;; Whitespace cleanup
   (add-hook 'before-save-hook
             #'jme-editor-cleanup-buffer-safe)
+  (declare-function rainbow-delimiters-mode "rainbow-delimiters" (&optional ARG))
   (add-hook 'prog-mode-hook
             #'rainbow-delimiters-mode)
+  (declare-function smartparens-global-mode "smartparens" (&optional ARG))
   (add-hook 'after-init-hook
             #'smartparens-global-mode))
 
