@@ -192,30 +192,26 @@
   (require 'pcmpl-args)
   ;; The following avices are recommended by Corfu docs.
   ;; Silence the pcomplete capf, no errors or messages!
-  ;;(advice-add 'pcomplete-completions-at-point :around #'cape-wrap-silent)
+  (declare-function cape-wrap-silent "cape" (CAPF))
+  (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-silent)
 
   ;; Ensure that pcomplete does not write to the buffer
   ;; and behaves as a pure `completion-at-point-function'.
-  ;;(advice-add 'pcomplete-completions-at-point :around #'cape-wrap-purify)
+  (declare-function cape-wrap-purify "cape" (CAPF))
+  (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-purify)
 
   ;; Cape
-  (declare-function cape-file "cape" (&optional INTERACTIVE))
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  (declare-function cape-tex "cape" (&optional INTERACTIVE))
-  (add-to-list 'completion-at-point-functions #'cape-tex)
-  (declare-function cape-symbol "cape" (&optional INTERACTIVE))
-  (add-to-list 'completion-at-point-functions #'cape-symbol)
-  (declare-function cape-keyword "cape" (&optional INTERACTIVE))
-  (add-to-list 'completion-at-point-functions #'cape-keyword)
-
-  )
+  (dolist (capefn '(cape-file
+                    cape-symbol
+                    cape-keyword
+                    cape-dabbrev
+                    cape-tex))
+    (add-to-list 'completion-at-point-functions capefn)))
 
 (defun jme-completion--disable ()
   "Revert completion system configuration."
-  (jme-common-remove-from-list 'completion-at-point-functions #'cape-file)
-  (jme-common-remove-from-list 'completion-at-point-functions #'cape-tex)
-  (jme-common-remove-from-list 'completion-at-point-functions #'cape-symbol)
-  (jme-common-remove-from-list 'completion-at-point-functions #'cape-keyword)
+  (dolist (capefn '(cape-file cape-tex cape-symbol cape-keyword cape-dabbrev))
+    (jme-common-remove-from-list 'completion-at-point-functions capefn))
   ;; clean up eshell hook
   (remove-hook 'eshell-mode-hook #'jme-completion--corfu-enable-in-eshell)
   ;; clean up minibuffer hook
