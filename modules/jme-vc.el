@@ -20,6 +20,7 @@
 ;; <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
+(require 'straight)
 (require 'jme-common)
 
 (straight-use-package 'magit)
@@ -30,11 +31,15 @@
 (defun jme-vc--enable ()
   "Configure version control."
   ;; Magit
+  (declare-function magit-status "magit-status" (&optional DIRECTORY CACHE))
   (global-set-key (kbd "C-x d") #'magit-status)
   ;; magit-gitflow
+  (declare-function turn-on-magit-gitflow "magit-gitflow" ())
   (add-hook 'magit-mode-hook #'turn-on-magit-gitflow)
   ;; diff-hl
+  (declare-function diff-hl-dired-mode "diff-hl-dired" (&optional ARG))
   (add-hook 'dired-mode-hook #'diff-hl-dired-mode)
+  (declare-function diff-hl-magit-post-refresh "diff-hl" ())
   (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)
 
   (jme-common-enable-mode global-diff-hl-mode))
