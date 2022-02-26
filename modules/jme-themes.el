@@ -30,7 +30,11 @@
 (defun jme-themes--window-setup-function ()
   "Load theme and toggle theme on."
   (progn
+    (defvar doom-themes-enable-bold)
+    (defvar doom-themes-enable-italic)
     (require 'doom-themes)
+    (declare-function doom-themes-org-config "doom-themes-ext-org" ())
+    (declare-function doom-themes-visual-bell-config "doom-themes-ext-visual-bell" ())
     (setq doom-themes-enable-bold t
           doom-themes-enable-italic t)
     ;; load but do not enable themes
@@ -54,6 +58,7 @@
 
 (defun jme-themes--customize-theme ()
   "Customize theme with personal preferences."
+  ;; ensure specific faces are set as fixed-pitch face
   (mapc
    (lambda (face)
      (if (facep face)
@@ -67,6 +72,7 @@
          'line-number
          'line-number-current-line
          'org-tag))
+  ;; ensure specific faces iherit from fixed-pitch shadow face
   (mapc
    (lambda (face)
      (if (facep face)
@@ -74,6 +80,7 @@
    (list 'org-code
          'org-table
          'org-verbatim))
+  ;; ensure specific faces inherit from fixed-pitch font-lock-comment face
   (mapc
    (lambda (face)
      (if (facep face)
