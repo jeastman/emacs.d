@@ -210,5 +210,13 @@ the FEATURE is forcefully unloaded."
   (dolist (feature feature-list)
     (jme-common-safe-unload-feature feature)))
 
+(defun jme-common-auto-save-on-compilation ()
+  "Auto-save when compiling without prompt.
+This function is intended to be used as a hook in
+appropriate programming modes.  `compliation-ask-about-save'
+is set such that it will save files without prompt."
+  (when buffer-file-name
+    (setq-local compilation-ask-about-save nil)))
+
 (provide 'jme-common)
 ;;; jme-common.el ends here.
