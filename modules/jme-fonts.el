@@ -36,19 +36,19 @@
                  :fixed-pitch-weight normal
                  :variable-pitch-family "Noto Sans"
                  :variable-pitch-height 170
-                 :variable-pitch-weight light))
+                 :variable-pitch-weight regular))
     (alternate . ( :fixed-pitch-family "Hack"
                    :fixed-pitch-height 170
                    :fixed-pitch-weight normal
                    :variable-pitch-family "Noto Sans"
                    :variable-pitch-height 170
-                   :variable-pitch-weight light))
+                   :variable-pitch-weight regular))
     (presentation . ( :fixed-pitch-family "FiraCode Nerd Font"
                       :fixed-pitch-height 170
                       :fixed-pitch-weight normal
                       :variable-pitch-family "Noto Sans"
                       :variable-pitch-height 170
-                      :variable-pitch-weight light)))
+                      :variable-pitch-weight regular)))
   "Alist of typefaces which can be applied.
 
 The car of each cons cell is the intended configuration for
