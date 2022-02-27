@@ -66,16 +66,13 @@
 ;; utilize use-package
 ;;(straight-use-package 'use-package)
 
-;; Ensure org
-;; TODO - Move out of init, since we are not loading literate
-;;(straight-use-package '(org))
-;;(straight-use-package '(org-contrib))
-
 ;; Garbage Collector Magic Hack
 ;; Set to start in emacs-startup-hook once gc is reset.
 ;; See early-init for additional details.
-(straight-use-package 'gcmh)
-(require 'gcmh nil 'noerror)
+;; With Emacs 28.1, this seems to have a negative effect
+;; TODO: investigate GC issues.
+;;(straight-use-package 'gcmh)
+;;(require 'gcmh nil 'noerror)
 
 ;; Handle setting proper environment on Mac
 ;; (use-package exec-path-from-shell

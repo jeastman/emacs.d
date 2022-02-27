@@ -40,12 +40,15 @@
 ;; values once startup is finished.
 ;; See https://akrl.sdf.org/ for details on Garbage Collector Magic Hack
 (add-hook 'emacs-startup-hook
-  (lambda ()
-    (setq gc-cons-threshold 16777216 ; 16mb
-          gc-cons-percentage 0.1)
-    ;; Garbage Collector Magic Hack
-    ;; GCMH managed with use-pacakge in init.el.
-    (gcmh-mode 1)))
+          (lambda ()
+            (setq gc-cons-threshold (* 2 1000 1000)
+            gc-cons-percentage 0.1)
+            ;; Garbage Collector Magic Hack
+            ;; GCMH managed with use-pacakge in init.el.
+            ;; With Emacs 28.1, this seems to have a negative effect
+            ;; TODO: investigate GC issues.
+            ;;(gcmh-mode 1)))
+            ))
 
 ;; prevent package.el loading packages prior to init-file loading
 ;; since using straight.el
@@ -60,22 +63,28 @@
 (when (featurep 'native-compile)
   ;; Set compilation to max optimization level.
   ;; 2 is max optimization level fully adherent to the language semantic.
+  (defvar native-comp-speed)
   (setq native-comp-speed 2)
   ;; Compiler verbosity.
   ;; Intended for debugging compiler itself.
   ;; 0 is no logging.
+  (defvar native-comp-verbose)
   (setq native-comp-verbose 0)
   ;; Default number of subprocesses used for async native compilation.
   ;; 0 means to use half the number of CPU's execution units.
+  (defvar native-comp-async-jobs-number)
   (setq native-comp-async-jobs-number 0)
   ;; Compile loaded .elc files asynchronously
   (setq native-comp-deferred-compilation t)
   ;; Whether to report warnings and errors from async native compliation.
   ;; `silent' logs warnings, but does not pop up buffer
+  (defvar native-comp-async-report-warnings-errors)
   (setq native-comp-async-report-warnings-errors 'silent)
   ;; Whether to query the user about killing async compile on exit.
+  (defvar native-comp-async-query-on-exit)
   (setq native-comp-async-query-on-exit nil)
   ;; Emit a warning if byte-code file being loaded has no source file.
+  (defvar native-comp-warning-on-missing-source)
   (setq native-comp-warning-on-missing-source t))
 
 ;;; Pre-configure frame items so that UI does not flash
