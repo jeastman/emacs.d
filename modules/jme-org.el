@@ -28,79 +28,7 @@
 (straight-use-package 'org)
 (straight-use-package 'org-contrib)
 (straight-use-package 'htmlize)
-(straight-use-package 'org-superstar)
-
-(defun jme-org--superstar-mode-function ()
-  "Hook function to enable `superstar-mode'."
-  (jme-common-enable-mode org-superstar-mode))
-
-;; (use-package org-ref
-;;   :after org
-;;   :defer t
-;;   :init
-;;   (setq org-ref-completion 'org-ref-ivy-cite))
-
-;; Agenda
-;; (use-package org-super-agenda
-;;   :bind ("C-c a" . jme:org-agenda-all)
-;;   :config
-;;   (defun jme:org-agenda-all ()
-;;     "Show the full agenda with special view."
-;;     (interactive)
-;;     (org-agenda nil "z"))
-;;   (setq org-agenda-custom-commands
-;;       '(("z" "Full agenda super view"
-;;          ((agenda "" ((org-agenda-span 'day)
-;;                       (org-super-agenda-groups
-;;                        '((:name "Today"
-;;                                 :time-grid t
-;;                                 :date today
-;;                                 :scheduled today
-;;                                 :order 1)))))
-;;           (alltodo "" ((org-agenda-overriding-header "")
-;;                        (org-super-agenda-groups
-;;                         '((:name "Inbox"
-;;                                  :category "Inbox"
-;;                                  :order 1)
-;;                           (:name "Overdue"
-;;                                  :deadline past
-;;                                  :order 2)
-;;                           (:name "Due Today"
-;;                                  :deadline today
-;;                                  :order 3)
-;;                           (:name "Next to do"
-;;                                  :todo "NEXT"
-;;                                  :order 11)
-;;                           (:name "Due Soon"
-;;                                  :deadline future
-;;                                  :order 12)
-;;                           (:name "Important"
-;;                                  :priority "A"
-;;                                  :order 13)
-;;                           (:name "Stalled"
-;;                                  :todo "STALLED"
-;;                                  :order 20)
-;;                           (:name "Risks"
-;;                                  :todo "RISK"
-;;                                  :order 30)
-;;                           (:name "Started"
-;;                                  :todo "STARTED"
-;;                                  :order 40)
-;;                           (:name "Tasks"
-;;                                  :todo "TASK"
-;;                                  :order 50)
-;;                           (:name "Maybe"
-;;                                  :todo "MAYBE"
-;;                                  :order 60)
-;;                           (:name "Waiting"
-;;                                  :todo "WAITING"
-;;                                  :order 70)
-;;                           (:name "Projects"
-;;                                  :children todo
-;;                                  :order 80)
-;;                           (:discard (:tag ("meeting")))))))))))
-;;   (org-super-agenda-mode))
-
+(straight-use-package '(org-modern :type git :host github :repo "minad/org-modern"))
 
 (defalias 'archive-done-tasks 'jme-org-archive-done-tasks)
 
@@ -259,11 +187,13 @@ This can be 0 for immediate, or a floating point value."
   (jme-org-archive-done-tasks)
   (org-html-export-to-html))
 
-(defun jme-org-style-org ()
-  "Apply customized styling to org."
-;  (setq line-spacing 0.2)
-  (jme-common-enable-mode variable-pitch-mode)
-  (jme-common-enable-mode visual-line-mode))
+ (defun jme-org-style-org ()
+   "Apply customized styling to org."
+   (setq line-spacing 0.2)
+   (jme-common-enable-mode variable-pitch-mode)
+   (jme-common-enable-mode visual-line-mode)
+   (jme-common-enable-mode org-modern-mode)
+   (jme-common-enable-mode olivetti-mode))
 
 (defun jme-org--enable ()
   "Configure org mode."
@@ -280,7 +210,8 @@ This can be 0 for immediate, or a floating point value."
    ;; The ellipsis to use in org
    '(org-ellipsis " ▾")
    ;; Hide leading stars for headlines
-   '(org-hide-leading-stars t)
+   ;; handled by org-modern now
+   ;; '(org-hide-leading-stars t)
    ;; Hide markup when viewing
    '(org-hide-emphasis-markers t)
    ;; Check invisible regions before editing
@@ -298,11 +229,11 @@ This can be 0 for immediate, or a floating point value."
    ;; Allow creation of headlines when refiling
    '(org-refile-allow-creating-parent-nodes 'confirm)
    ;; How much to display in overview
-   '(org-agenda-span 'day)
+;;   '(org-agenda-span 'day)
    ;; Restore window configuration after exiting agenda
-   '(org-agenda-restore-windows-after-quit t)
+;;   '(org-agenda-restore-windows-after-quit t)
    ;; Use log mode by default in agenda
-   '(org-agenda-start-with-log-mode t)
+;;   '(org-agenda-start-with-log-mode t)
    ;; Record time when an item is done
    '(org-log-done 'time)
    ;; Drawer to log info into
@@ -340,11 +271,9 @@ This can be 0 for immediate, or a floating point value."
 
   (add-hook 'org-mode-hook #'jme-org-style-org)
 
-  ;; superstars
+  ;; Org-modern customization
   (custom-set-variables
-   '(org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●")))
-
-  (add-hook 'org-mode-hook #'jme-org--superstar-mode-function)
+   '(org-modern-star '["◉" "○" "●" "○" "●" "○" "●"]))
 
   ;; Org mode
   (defvar org-mode-map)
@@ -364,12 +293,12 @@ This can be 0 for immediate, or a floating point value."
   (custom-set-variables
    '(safe-local-variable-values nil)
    '((sequence "TODO" "DONE")))
-  (define-key org-mode-map (kbd ("C-c t")) nil)
-  (global-unset-key (kbd ("C-c l")))
-  (glibal-unset-key (kbd ("C-c L")))
-  (global-unset-key (kbd ("C-c c")))
-  (remove-hook 'org-mode-hook #'jme-org-style-org)
-  (remove-hook 'org-mode-hook #'jme-org--superstar-mode-function))
+  (defvar org-mode-map)
+  (define-key org-mode-map (kbd "C-c t") nil)
+  (global-unset-key (kbd "C-c l"))
+  (global-unset-key (kbd "C-c L"))
+  (global-unset-key (kbd "C-c c"))
+  (remove-hook 'org-mode-hook #'jme-org-style-org))
 
 (defun jme-org-unload-function ()
   "Unload org configuration."
