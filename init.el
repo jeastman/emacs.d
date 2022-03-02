@@ -108,6 +108,20 @@
 (require 'jme-dired)
 (require 'jme-vc)
 (require 'jme-shell)
+(require 'jme-org-roam)
+
+;; Specify a custom file
+(setq custom-file
+      (concat (file-name-directory user-init-file) "custom.el"))
+
+;; Load machine dependent configuration
+(load
+ (expand-file-name
+  (concat
+   user-emacs-directory
+   "conf/"
+   (car (split-string (system-name)  "\\."))))
+ 'noerror)
 
 (jme-defaults 1)
 (jme-window 1)
@@ -122,9 +136,11 @@
 (jme-dired 1)
 (jme-vc 1)
 (jme-shell 1)
+(jme-org-roam 1)
+
+(when (fboundp 'jme-local-machine-config)
+  (jme-local-machine-config))
 
 ;; load customization file
-(setq custom-file
-      (concat (file-name-directory user-init-file) "custom.el"))
 ;; (when (file-exists-p custom-file)
 ;;   (load custom-file))
