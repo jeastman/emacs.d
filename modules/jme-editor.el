@@ -28,6 +28,8 @@
 ;; linting and error support
 (straight-use-package 'flycheck)
 (straight-use-package 'flycheck-pos-tip)
+;; LSP client
+(straight-use-package 'eglot)
 ;; Alternative to built-in help which provides more information
 (straight-use-package 'helpful)
 ;; Color delimiters, like parens, in paris
