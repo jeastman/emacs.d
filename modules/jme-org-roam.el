@@ -24,8 +24,24 @@
 ;; See: https://youtube.com/watch?v=CUkuyW6hr18
 
 ;;; Code:
-(require 'use-package)
-(require 'jme-org)
+(require 'straight)
+(require 'jme-common)
+
+(straight-use-package 'org-roam)
+
+(require 'org-roam)
+(require 'org-roam-dailies)
+(require 'org-roam-capture)
+;;(require 'org-roam-node)
+(defvar org-roam-v2-ack)
+(defvar org-agenda-files)
+(defvar org-note-abort)
+(defvar org-state)
+(defvar org-after-todo-state-change-hook)
+(declare-function jme-org-agenda-files "jme-org" ())
+(declare-function org-refile "org-refile" (&optional ARG DEFAULT-BUFFER RFLOC MSG))
+(declare-function org-capture-get "org-capture" (PROPERTY &optional LOCAL))
+(declare-function org-roam-capture "org-capture" (&optional GOTO KEYS &key FILTER-FN TEMPLATES INFO))
 
 (defun jme-org-roam--filter-by-tag (tag-name)
   "Filter `org-roam' files based on TAG-NAME."
@@ -48,7 +64,8 @@
                           (jme-org-roam--list-notes-by-tag "Project"))))
 
 (defun jme-org-roam--project-finalize-hook ()
-  "Add the captured project file to `org-agenda-files' if the capture was not aborted."
+  "Add the captured project file to `org-agenda-files'.
+Does not add if the capture was aborted."
   (remove-hook 'org-capture-after-finalize-hook
                #'jme-org-roam--project-finalize-hook)
 
@@ -81,14 +98,14 @@
 (defun jme-org-roam-capture-project-task ()
   "Capture task to a project."
   (interactive)
-  (add-hook 'org-capture-after-finalize-hook #'jme-org--roam-project-finalize-hook)
-  (org-roam-captiure- :node (org-roam-node-read
-                             nil
-                             (jme-org-roam--filter-by-tag "Project"))
-                      :templates '(("p" "project" plain "* Overview\n\n%?\n\n* Goals\n\n* Tasks\n:PROPERTIES:\n:CATEGORY: tasks\n:END:\n\n* Meetings\n:PROPERTIES:\n:CATEGORY: Meeting\n:END:\n\n* Dates\n\n"
-                                    :if-new (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
-                                                           "#+title: ${title}\n#+category: ${title}\n#+filetags: Project"
-                                                           ("Tasks"))))))
+  (add-hook 'org-capture-after-finalize-hook #'jme-org-roam--project-finalize-hook)
+  (org-roam-capture- :node (org-roam-node-read
+                            nil
+                            (jme-org-roam--filter-by-tag "Project"))
+                     :templates '(("p" "project" plain "* Overview\n\n%?\n\n* Goals\n\n* Tasks\n:PROPERTIES:\n:CATEGORY: tasks\n:END:\n\n* Meetings\n:PROPERTIES:\n:CATEGORY: Meeting\n:END:\n\n* Dates\n\n"
+                                   :if-new (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
+                                                          "#+title: ${title}\n#+category: ${title}\n#+filetags: Project"
+                                                          ("Tasks"))))))
 
 (defun jme-org-roam-copy-todo-to-today ()
   "Refiles todo items to today's daily when completed."
@@ -116,64 +133,60 @@ Intendend to be called from `org-after-todo-state-change-hook'."
   (when (equal org-state "DONE")
     (jme-org-roam-copy-todo-to-today)))
 
+(defun jme-org-roam--bind-keys ()
+  "Key definitions for `org-roam'."
+  (global-set-key (kbd "C-c n b") #'jme-org-roam-capture-inbox)
+  (global-set-key (kbd "C-c n c") #'org-roam-capture)
+  (global-set-key (kbd "C-c n f") #'org-roam-node-find)
+  (global-set-key (kbd "C-c n i") #'org-roam-node-insert)
+  (global-set-key (kbd "C-c n l") #'org-roam-buffer-toggle)
+  (global-set-key (kbd "C-c n p") #'jme-org-roam-find-project)
+  (global-set-key (kbd "C-c n t") #'jme-org-roam-capture-project-task)
+  (define-key org-roam-dailies-map (kbd "Y") #'org-roam-dailies-capture-yesterday)
+  (define-key org-roam-dailies-map (kbd "T") #'org-roam-dailies-capture-tomorrow))
+
+(defun jme-org-roam--unbind-keys ()
+  "Revert key bindings."
+  (global-unset-key (kbd "C-c n b"))
+  (global-unset-key (kbd "C-c n c"))
+  (global-unset-key (kbd "C-c n f"))
+  (global-unset-key (kbd "C-c n i"))
+  (global-unset-key (kbd "C-c n l"))
+  (global-unset-key (kbd "C-c n p"))
+  (global-unset-key (kbd "C-c n t"))
+  (define-key org-roam-dailies-map (kbd "Y") nil)
+  (define-key org-roam-dailies-map (kbd "T") nil))
+
 (defun jme-org-roam--enable ()
   "Configure org-roam."
+  (setq org-roam-v2-ack t)
+  (with-eval-after-load "org"
+        (custom-set-variables '(org-roam-capture-templates
+                                '(("d" "default" plain
+                                   "%?"
+                                   :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
+                                   :unnarrowed t)
+                                  ("p" "project" plain "* Overview\n\n%?\n\n* Goals\n\n* Tasks\n:PROPERTIES:\n:CATEGORY: tasks\n:END:\n\n* Meetings\n:PROPERTIES:\n:CATEGORY: Meeting\n:END:\n\n* Dates\n\n"
+                                   :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: ${title}\n#+filetags: Project")
+                                   :unnarrowed t))))
+        (add-to-list 'display-buffer-alist
+                     '("\\*org-roam\\*"
+                       (display-buffer-in-direction)
+                       (direction . right)
+                       (window-width . 0.33)
+                       (window-height . fit-window-to-buffer)))
+        (require 'org-roam-protocol)
+        (require 'org-roam-dailies)
+        (org-roam-db-autosync-enable)
+        (jme-org-roam-refresh-agenda-list)
+        (add-to-list 'org-after-todo-state-change-hook
+                     'jme-org-roam--after-todo-state-change-function)
 
-  (use-package org-roam
-    :after org
-    :init
-    (setq org-roam-v2-ack t)
-    ;;   :custom-face
-    ;;   (org-roam-link ((t (:inherit org-link :foreground "#C991E1"))))
-    :bind (("C-c n l" . org-roam-buffer-toggle)
-           ("C-c n f" . org-roam-node-find)
-           ("C-c n g" . org-roam-graph)
-           ("C-c n i" . org-roam-node-insert)
-           ("C-c n c" . org-roam-capture)
-           ("C-c n b" . jme-org-roam-capture-inbox)
-           ("C-c n t" . jme-org-roam-capture-project-task)
-           ("C-c n p" . jme-org-roam-find-project)
-           :map org-roam-dailies-map
-           ("Y" . org-roam-dailies-capture-yesterday)
-           ("T" . org-roam-dailies-capture-tomorrow))
-    :bind-keymap
-    ("C-c n d" . org-roam-dailies-map)
-    :custom
-    (org-roam-capture-templates
-     '(("d" "default" plain
-        "%?"
-        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+date: %U\n")
-        :unnarrowed t)
-       ("p" "project" plain "* Overview\n\n%?\n\n* Goals\n\n* Tasks\n:PROPERTIES:\n:CATEGORY: tasks\n:END:\n\n* Meetings\n:PROPERTIES:\n:CATEGORY: Meeting\n:END:\n\n* Dates\n\n"
-        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: ${title}\n#+filetags: Project")
-        :unnarrowed t)))
-    :config
-    (add-to-list 'display-buffer-alist
-                 '("\\*org-roam\\*"
-                   (display-buffer-in-direction)
-                   (direction . right)
-                   (window-width . 0.33)
-                   (window-height . fit-window-to-buffer)))
-    (require 'org-roam-protocol)
-    (require 'org-roam-dailies)
-    (org-roam-db-autosync-enable)
-    (jme-org-roam-refresh-agenda-list)
-    (add-to-list 'org-after-todo-state-change-hook
-                 'jme-org-roam--after-todo-state-change-function))
-
-  (use-package org-roam-bibtex
-    :after org-roam
-    :commands (orb-note-actions)
-    :hook (org-roam-mode . org-roam-bibtex-mode)
-    :custom
-    (orb-note-actions-interface 'default)
-    :config
-    (require 'org-ref)
-    :bind (:map org-mode-map
-                (("C-c n a" . orb-note-actions)))))
+        (jme-org-roam--bind-keys)))
 
 (defun jme-org-roam--disable ()
   "Disable `org-roam' configuration."
+  (jme-org-roam--unbind-keys)
   (remove-hook 'org-after-todo-state-change-hook
                'jme-org-roam--after-todo-state-change-function)
   (jme-common-disable-mode org-roam-db-autosync-mode))
@@ -181,10 +194,11 @@ Intendend to be called from `org-after-todo-state-change-hook'."
 (defun jme-org-roam-unload-function ()
   "Remove org-roam configuration."
   (jme-org-roam--disable)
-  (jme-common-safe-unload-features '(org-roam-bibtex
-                                     org-roam-dailies
+  (jme-common-safe-unload-features '(org-roam-dailies
                                      org-roam-protocol
                                      org-roam)))
+
+(jme-common-defconfiguration jme-org-roam "Configuration for org-roam")
 
 (provide 'jme-org-roam)
 ;;; jme-org-roam.el ends here.
