@@ -25,7 +25,22 @@
 (require 'straight)
 (require 'jme-common)
 (straight-use-package 'eshell-syntax-highlighting)
-(defvar eshell-mode-map)
+(declare-function eshell-life-is-too-much "esh-mode" ())
+(declare-function eshell-syntax-highlighting-global-mode
+                  "eshell-syntax-highlighting" (&optional ARG))
+(declare-function eshell-save-some-history "em-hist" ())
+(declare-function eshell-truncate-buffer "esh-mode" ())
+(declare-function eshell/alias "em-alias" (&optional ALIAS &rest DEFINITION))
+(eval-when-compile
+  (defvar eshell-mode-map)
+  (defvar eshell-prompt-regexp)
+  (defvar eshell-visual-commands)
+  (defvar eshell-visual-subcommands)
+  (defvar eshell-history-size)
+  (defvar eshell-buffer-maximum-lines)
+  (defvar eshell-scroll-to-bottom-on-input)
+  (defvar eshell-output-filter-functions))
+
 
 ;; Adapted from
 ;; http://www.howardism.org/Technical/Emacs/eshell-fun.html
@@ -52,8 +67,6 @@
 If characters exsit in front of point, detele them,
 if not terminate the shell."
   (interactive "p")
-  (defvar eshell-prompt-regexp)
-  (declare-function eshell-life-is-too-much "esh-mode" ())
   ;; TODO: possible speed up by passing non-nill to looking-back
   (if (and (eolp) (looking-back eshell-prompt-regexp nil))
       (progn
@@ -64,11 +77,6 @@ if not terminate the shell."
 
 (defun jme-shell--configure-eshell ()
   "Initial configuration of eshell."
-  (defvar eshell-visual-commands)
-  (defvar eshell-visual-subcommands)
-  (defvar eshell-history-size)
-  (defvar eshell-buffer-maximum-lines)
-  (defvar eshell-scroll-to-bottom-on-input)
   (setq eshell-history-size         10000  ; Size of input history ring
         eshell-buffer-maximum-lines 10000  ; Size in lines for buffers
         eshell-scroll-to-bottom-on-input t) ; input causses scroll
@@ -83,17 +91,12 @@ if not terminate the shell."
 
 (defun jme-shell--enable ()
   "Configure eshell and related."
-  (declare-function eshell-syntax-highlighting-global-mode
-                    "eshell-syntax-highlighting" (&optional ARG))
   ;; save comman history
   (add-hook 'eshell-first-time-mode-hook #'jme-shell--configure-eshell)
 
   ;; Save the history for shell before commands
-  (declare-function eshell-save-some-history "em-hist" ())
   (add-hook 'eshell-pre-command-hook #'eshell-save-some-history)
   ;; Truncate buffer for performance
-  (defvar eshell-output-filter-functions)
-  (declare-function eshell-truncate-buffer "esh-mode" ())
   (add-to-list 'eshell-output-filter-functions #'eshell-truncate-buffer)
 
   ;; Keybindings
@@ -102,7 +105,6 @@ if not terminate the shell."
   (define-key eshell-mode-map (kbd "C-d") #'jme-shell-quit-or-delete-char)
 
   ;; Aliases
-  (declare-function eshell/alias "em-alias" (&optional ALIAS &rest DEFINITION))
   (eshell/alias "ff" "find-file $1")
   (eshell/alias "fo" "find-file-other-window $1")
   (eshell/alias "d" "dired $1")
