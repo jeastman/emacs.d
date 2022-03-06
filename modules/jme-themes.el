@@ -26,6 +26,7 @@
 (require 'jme-common)
 
 (straight-use-package 'doom-themes)
+(straight-use-package 'solaire-mode)
 
 (defun jme-themes--window-setup-function ()
   "Load theme and toggle theme on."
@@ -50,7 +51,8 @@
 (defun jme-themes--enable ()
   "Configure theme settings."
   ;; Doom theme configuration
-  (add-hook 'window-setup-hook #'jme-themes--window-setup-function))
+  (add-hook 'window-setup-hook #'jme-themes--window-setup-function)
+  (jme-common-enable-mode solaire-global-mode))
 
 (defun jme-themes--disable ()
   "Disable the theme configuration."
