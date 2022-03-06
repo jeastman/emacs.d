@@ -190,6 +190,11 @@ Ensures function FUN is not alreay bound."
   `(if (fboundp ',mode)
        (,mode -1)))
 
+(defmacro jme-common-with-face (string &rest properties)
+  "Add face PROPERTIES to STRING."
+  (declare (indent 1))
+  `(propertize ,string 'face (list ,@properties)))
+
 (defun jme-common-remove-from-list (list element)
   "Remove from LIST the specified ELEMENT (destructive)."
   (setq list (delete element list)))
