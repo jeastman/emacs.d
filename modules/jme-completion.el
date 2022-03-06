@@ -40,6 +40,42 @@
 (straight-use-package 'pcmpl-args)
 (straight-use-package 'cape)
 
+(declare-function cape-wrap-purify "cape" (CAPF))
+(declare-function cape-wrap-silent "cape" (CAPF))
+(declare-function consult-buffer "consult" (&optional SOURCES))
+(declare-function consult-buffer-other-frame "consult" ())
+(declare-function consult-buffer-other-window "consult" ())
+(declare-function consult-find "consult" (&optional DIR INITIAL))
+(declare-function consult-focus-lines "consult" (&optional SHOW FILTER INITIAL))
+(declare-function consult-git-grep "consult" (&optional DIR INITIAL))
+(declare-function consult-global-mark "consult" (&optional MARKERS))
+(declare-function consult-goto-line "consult" (&optional ARG))
+(declare-function consult-grep "consult" (&optional DIR INITIAL))
+(declare-function consult-history "consult" (&optional HISTORY))
+(declare-function consult-keep-lines "consult" (&optional FILTER INITIAL))
+(declare-function consult-line "consult" (&optional INITIAL START))
+(declare-function consult-line-multi "consult" (&optional INITIAL))
+(declare-function consult-locate "consult" (&optional INITIAL))
+(declare-function consult-mark "consult" (&optional MARKERS))
+(declare-function consult-mode-command "consult" (&rest MODES))
+(declare-function consult-multi-occur "consult" (BUFS REGEXP &optional NLINES))
+(declare-function consult-outline "consult" ())
+(declare-function consult-preview-at-point-mode "consult" (&optional ARG))
+(declare-function consult-ripgrep "consult" (&optional DIR INITIAL))
+(declare-function embark-act "embark" (&optional ARG))
+(declare-function embark-bindings "embark" (NO-GLOBAL))
+(declare-function embark-dwim "embark" (&optional ARG))
+(declare-function kind-icon-margin-formatter "kind-icon" (METADATA))
+(declare-function marginalia-cycle "marginalia" ())
+(declare-function vertico-directory-enter "vertico-directory" ())
+(declare-function vertico-directory-delete-char "vertico-directory" ())
+(declare-function vertico-directory-delete-word "vertico-directory" ())
+(declare-function vertico-directory-tidy "vertico-directory" ())
+
+(eval-when-compile
+  (defvar corfu-margin-formatters)
+  (defvar vertico-map))
+
 ;; From corfu documentaton, see:
 ;; https://github.com/minad/corfu
 ;; This enables completion in minibuffer for things like
@@ -88,11 +124,6 @@
 
   ;; Configure vertico directory extension.
   (require 'vertico-directory)
-  (defvar vertico-map)
-  (declare-function vertico-directory-enter "vertico-directory" ())
-  (declare-function vertico-directory-delete-char "vertico-directory" ())
-  (declare-function vertico-directory-delete-word "vertico-directory" ())
-  (declare-function vertico-directory-tidy "vertico-directory" ())
   (define-key vertico-map (kbd "RET") #'vertico-directory-enter)
   (define-key vertico-map (kbd "DEL") #'vertico-directory-delete-char)
   (define-key vertico-map (kbd "M-DEL") #'vertico-directory-delete-word)
@@ -102,18 +133,14 @@
   ;; Add data to minibuffer completions
   (require 'marginalia)
   (jme-common-enable-mode marginalia-mode)
-  (declare-function marginalia-cycle "marginalia" ())
   (define-key minibuffer-local-map (kbd "M-A") #'marginalia-cycle)
 
   ;; Support actions
   (require 'embark)
   ;; use embark to show bindings in key-prefix with C-h
-  (declare-function embark-bindings "embark" (NO-GLOBAL))
   (setq prefix-help-command #'embark-bindings)
 
-  (declare-function embark-act "embark" (&optional ARG))
   (global-set-key (kbd "C-.") #'embark-act)
-  (declare-function embark-dwim "embark" (&optional ARG))
   (global-set-key (kbd "M-.") #'embark-dwim)
   ;; (global-set-key (kbd "C-h B") #'embark-bindings)
   (global-set-key [remap describe-bindings] #'embark-bindings)
@@ -124,54 +151,34 @@
   (require 'consult)
   (add-hook 'completion-list-mode-hook 'consult-preview-at-point-mode)
   ;; C-c bindings (mode-specific-map)
-  (declare-function consult-mode-command "consult" (&rest MODES))
   (global-set-key (kbd "C-c m") #'consult-mode-command)
   ;; C-s bindings
-  (declare-function consult-line "consult" (&optional INITIAL START))
   (global-set-key (kbd "C-s") #'consult-line)
   ;; C-x bindings (ctl-x-map)
-  (declare-function consult-buffer "consult" (&optional SOURCES))
   (global-set-key (kbd "C-x b") #'consult-buffer)
-  (declare-function consult-buffer-other-window "consult" ())
   (global-set-key (kbd "C-x B") #'consult-buffer-other-window)
   (global-set-key (kbd "C-x 4 b") #'consult-buffer-other-window)
-  (declare-function consult-buffer-other-frame "consult" ())
   (global-set-key (kbd "C-x 5 b") #'consult-buffer-other-frame)
   ;; M-g bindings (goto-map)
-  (declare-function consult-goto-line "consult" (&optional ARG))
   (global-set-key (kbd "M-g M-g") #'consult-goto-line)
-  (declare-function consult-outline "consult" ())
   (global-set-key (kbd "M-g o") #'consult-outline)
-  (declare-function consult-mark "consult" (&optional MARKERS))
   (global-set-key (kbd "M-g m") #'consult-mark)
-  (declare-function consult-global-mark "consult" (&optional MARKERS))
   (global-set-key (kbd "M-g k") #'consult-global-mark)
   ;; M-s bindings (search-map)
-  (declare-function consult-find "consult" (&optional DIR INITIAL))
   (global-set-key (kbd "M-s d") #'consult-find)
-  (declare-function consult-locate "consult" (&optional INITIAL))
   (global-set-key (kbd "M-s D") #'consult-locate)
-  (declare-function consult-grep "consult" (&optional DIR INITIAL))
   (global-set-key (kbd "M-s g") #'consult-grep)
-  (declare-function consult-git-grep "consult" (&optional DIR INITIAL))
   (global-set-key (kbd "M-s G") #'consult-git-grep)
-  (declare-function consult-ripgrep "consult" (&optional DIR INITIAL))
   (global-set-key (kbd "M-s r") #'consult-ripgrep)
   (global-set-key (kbd "M-s l") #'consult-line)
-  (declare-function consult-line-multi "consult" (&optional INITIAL))
   (global-set-key (kbd "M-s L") #'consult-line-multi)
-  (declare-function consult-multi-occur "consult" (BUFS REGEXP &optional NLINES))
   (global-set-key (kbd "M-s m") #'consult-multi-occur)
-  (declare-function consult-keep-lines "consult" (&optional FILTER INITIAL))
   (global-set-key (kbd "M-s k") #'consult-keep-lines)
-  (declare-function consult-focus-lines "consult" (&optional SHOW FILTER INITIAL))
   (global-set-key (kbd "M-s u") #'consult-focus-lines)
   ;; Minibuffer
-  (declare-function consult-history "consult" (&optional HISTORY))
   (define-key minibuffer-local-map (kbd "C-r") #'consult-history)
 
   (require 'embark-consult)
-  (declare-function consult-preview-at-point-mode "consult" (&optional ARG))
   (add-hook 'embark-collect-mode #'consult-preview-at-point-mode)
 
   (require 'corfu)
@@ -184,20 +191,16 @@
   ;; Icons for completion kinds
   (custom-set-variables '(kind-icon-default-face 'corfu-default))
   (require 'kind-icon)
-  (defvar corfu-margin-formatters)
-  (declare-function kind-icon-margin-formatter "kind-icon" (METADATA))
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
 
   ;; pcomplete extension for eshell
   (require 'pcmpl-args)
   ;; The following avices are recommended by Corfu docs.
   ;; Silence the pcomplete capf, no errors or messages!
-  (declare-function cape-wrap-silent "cape" (CAPF))
   (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-silent)
 
   ;; Ensure that pcomplete does not write to the buffer
   ;; and behaves as a pure `completion-at-point-function'.
-  (declare-function cape-wrap-purify "cape" (CAPF))
   (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-purify)
 
   ;; Cape
