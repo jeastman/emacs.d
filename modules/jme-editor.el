@@ -28,6 +28,7 @@
 ;; linting and error support
 (straight-use-package 'flycheck)
 (straight-use-package 'flycheck-pos-tip)
+(straight-use-package 'consult-flycheck)
 ;; LSP client
 (straight-use-package 'eglot)
 ;; Alternative to built-in help which provides more information
