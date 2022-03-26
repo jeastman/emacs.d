@@ -113,7 +113,7 @@ or if start-time is nil, an empty string is returned."
    (with-output-to-string
      (with-current-buffer standard-output
        (process-file "git" nil '(t nil) nil
-                     "-C" (expand-file-name (cdr (project-current)))
+                     "-C" (expand-file-name (caddr (project-current)))
                      "status"
                      "--branch"
                      "--ignore-submodules=dirty"
@@ -193,11 +193,11 @@ output of git status."
         (status (jme-shell--current-vc-status))
         (prompt (if (= (user-uid) 0) "# " "> "))
         (last-status (if (> eshell-last-command-status 0)
-                         (jme-common-with-face "✘ " 'jme-shell-prompt-exit-fail)
-                       (jme-common-with-face "✔ " 'jme-shell-prompt-exit-success))))
+                         (jme-common-with-face "✘" 'jme-shell-prompt-exit-fail)
+                       (jme-common-with-face " " 'jme-shell-prompt-exit-success))))
     (concat dir " " status duration "\n" last-status prompt)))
 
-(defconst jme-shell--prompt-regexp "^[^$\n]*[✘✔]?> ")
+(defconst jme-shell--prompt-regexp "^[^$\n]*[✘]?> ")
 
 ;; Adapted from
 ;; http://www.howardism.org/Technical/Emacs/eshell-fun.html
@@ -256,19 +256,19 @@ if not terminate the shell."
   (add-hook 'eshell-pre-command-hook #'eshell-save-some-history)
   ;; update the command time.
   (add-hook 'eshell-pre-command-hook #'jme-shell--pre-command-function)
-  ;; Truncate buffer for performance
-  (add-to-list 'eshell-output-filter-functions #'eshell-truncate-buffer)
+  (with-eval-after-load 'eshell
+    ;; Truncate buffer for performance
+    (add-to-list 'eshell-output-filter-functions #'eshell-truncate-buffer)
+    (define-key eshell-mode-map (kbd "C-d") #'jme-shell-quit-or-delete-char)
+
+    ;; Aliases
+    (eshell/alias "ff" "find-file $1")
+    (eshell/alias "fo" "find-file-other-window $1")
+    (eshell/alias "d" "dired $1")
+    (eshell/alias "ll" "lsd $1"))
 
   ;; Keybindings
   (global-set-key (kbd "C-!") 'jme-shell-window-popup)
-
-  (define-key eshell-mode-map (kbd "C-d") #'jme-shell-quit-or-delete-char)
-
-  ;; Aliases
-  (eshell/alias "ff" "find-file $1")
-  (eshell/alias "fo" "find-file-other-window $1")
-  (eshell/alias "d" "dired $1")
-  (eshell/alias "ll" "lsd $1")
 
   (eshell-syntax-highlighting-global-mode 1)
 
@@ -281,7 +281,7 @@ if not terminate the shell."
   (remove-hook 'eshell-pre-command-hook #'eshell-save-some-history)
   (remove-hook 'eshell-pre-command-hook #'jme-shell--pre-command-function)
   (remove-hook 'eshell-first-time-mode-hook #'jme-shell--configure-eshell)
-  (jme-common-remove-from-list 'eshell-output-filter-functions 'eshell-truncate-buffer)
+  (jme-common-remove-from-list eshell-output-filter-functions 'eshell-truncate-buffer)
   ;; (setq eshell-output-filter-functions
   ;;       (delete 'eshell-truncate-buffer
   ;;               eshell-output-filter-functions))
