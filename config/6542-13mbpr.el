@@ -59,7 +59,7 @@
           (concat (getenv "CLASSPATH") ":" lsp-jar)))
 
 
-(load (expand-file-name "~/.roswell/helper.el"))
+;; (load (expand-file-name "~/.roswell/helper.el"))
 
 ;; Export org to confluence
 (require 'ox-confluence)
