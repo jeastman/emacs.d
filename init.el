@@ -114,6 +114,21 @@
 (setq custom-file
       (concat (file-name-directory user-init-file) "custom.el"))
 
+;; Load OS dependent configuration
+(load
+ (expand-file-name
+  (concat
+   user-emacs-directory
+   "modules/jme-"
+   (symbol-name system-type)
+   ".el"))
+ 'noerror)
+
+;; Call the module
+(when (fboundp
+       (intern (concat "jme-" (symbol-name system-type))))
+  (funcall (intern (concat "jme-" (symbol-name system-type))) 1))
+
 ;; Load machine dependent configuration
 (load
  (expand-file-name
