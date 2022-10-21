@@ -63,9 +63,6 @@
 
 (require 'straight)
 
-;; utilize use-package
-;;(straight-use-package 'use-package)
-
 ;; Garbage Collector Magic Hack
 ;; Set to start in emacs-startup-hook once gc is reset.
 ;; See early-init for additional details.
@@ -92,8 +89,14 @@
       `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
 (require 'no-littering nil 'noerror)
 
-;; Load a color theme
-;;(load-theme 'modus-operandi)
+;; Load machine dependent configuration
+(load
+ (expand-file-name
+  (concat
+   user-emacs-directory
+   "conf/"
+   (car (split-string (system-name)  "\\."))))
+ 'noerror)
 
 (require 'jme-defaults)
 (require 'jme-window)
@@ -106,6 +109,7 @@
 (require 'jme-python)
 (require 'jme-completion)
 (require 'jme-org)
+(require 'jme-org-agenda)
 (require 'jme-dired)
 (require 'jme-vc)
 (require 'jme-shell)
@@ -130,15 +134,6 @@
        (intern (concat "jme-" (symbol-name system-type))))
   (funcall (intern (concat "jme-" (symbol-name system-type))) 1))
 
-;; Load machine dependent configuration
-(load
- (expand-file-name
-  (concat
-   user-emacs-directory
-   "conf/"
-   (car (split-string (system-name)  "\\."))))
- 'noerror)
-
 (jme-defaults 1)
 (jme-window 1)
 (jme-themes 1)
@@ -150,6 +145,7 @@
 (jme-python 1)
 (jme-completion 1)
 (jme-org 1)
+(jme-org-agenda 1)
 (jme-dired 1)
 (jme-vc 1)
 (jme-shell 1)

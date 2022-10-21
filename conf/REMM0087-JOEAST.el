@@ -1,7 +1,7 @@
-;;; 6542-13mbpr.el --- Configuration for laptop -*- lexical-binding: t; -*-
+;;; REMM0087-JOEAST.el --- Configuration for laptop -*- lexical-binding: t; -*-
 
 ;; Author: John Eastman
-;; Created: 06 Jan 2019
+;; Created: 25 Aug 2022
 
 ;; This file is not part of GNU Emacs.
 
@@ -52,5 +52,5 @@
 
 (setq org-roam-v2-ack t)
 
-(provide '6542-13mbpr)
-;;; 6542-13mbpr.el ends here
+(provide 'REMM0087-JOEAST)
+;;; REMM0087-JOEAST.el ends here
