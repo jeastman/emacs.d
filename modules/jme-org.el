@@ -32,12 +32,6 @@
 
 (defalias 'archive-done-tasks 'jme-org-archive-done-tasks)
 
-(defcustom jme-org-agenda-files '( "calendar.org" "tasks.org" "notes.org")
-  "Files always added to the agenda."
-  :type 'list
-  :tag "Agenda Files"
-  :group 'jme-customizations)
-
 (defcustom jme-org-archive-expiry-days 14
   "The number of days after which a completed task should be auto-archived.
 This can be 0 for immediate, or a floating point value."
@@ -58,12 +52,6 @@ This can be 0 for immediate, or a floating point value."
   "Advise capture to close the frame when done."
   (if (equal "emacs-capture" (frame-parameter nil 'name))
       (delete-frame)))
-
-(defun jme-org-agenda-files ()
-  "Construct list of files for org agenda."
-  (defvar org-directory)
-  (mapcar (lambda (file)
-            (concat org-directory "/" file)) jme-org-agenda-files))
 
 (defun jme-org--configure-latex ()
   "Configue support for LaTeX documents."
@@ -198,46 +186,47 @@ This can be 0 for immediate, or a floating point value."
 (defun jme-org--enable ()
   "Configure org mode."
   (custom-set-variables
-   '(org-modules '(org-annotate-file
-                   ol-bibtex
-                   ol-eww))
-   ;; Initial set of agenda files
-   '(org-agenda-files jme-org-agenda-files)
+   ;; Adapt indentation to outline node level
+   '(org-adapt-indentation t)
+   ;; Don't keep tags aligned (for org-modern)
+   '(org-auto-align-tags nil)
+   ;; Check invisible regions before editing
+   '(org-catch-invisible-edits 'show-and-error)
    ;; Fall-back file for org-capture
    '(org-default-notes-file (concat org-directory "/notes.org"))
-   ;; Don't switch to overview when loading org files
-   '(org-startup-folded nil)
    ;; The ellipsis to use in org
    '(org-ellipsis " ▾")
-   ;; Hide leading stars for headlines
-   ;; handled by org-modern now
-   ;; '(org-hide-leading-stars t)
-   ;; Hide markup when viewing
+   ;; Hide markup when viewing (for org-modern)
    '(org-hide-emphasis-markers t)
-   ;; Check invisible regions before editing
-   '(org-catch-invisible-edits 'smart)
-   ;; Fontify code in source blocks
-   '(org-src-fontify-natively t)
-   ;; Use the native language tabs in code blocks
-   '(org-src-tab-acts-natively t)
-   ;; limit refiling to agenda files
-   '(org-refile-targets '((org-agenda-files . (:maxlevel . 5))))
-   ;; Provide refile targets as paths
-   '(org-refile-use-outline-path 'file)
-   ;; Handle outline path in one step
-   '(org-outline-path-complete-in-steps nil)
-   ;; Allow creation of headlines when refiling
-   '(org-refile-allow-creating-parent-nodes 'confirm)
-   ;; How much to display in overview
-;;   '(org-agenda-span 'day)
-   ;; Restore window configuration after exiting agenda
-;;   '(org-agenda-restore-windows-after-quit t)
-   ;; Use log mode by default in agenda
-;;   '(org-agenda-start-with-log-mode t)
+   ;; Insert new headings after the current subtree
+   '(org-insert-heading-respect-content t)
    ;; Record time when an item is done
    '(org-log-done 'time)
    ;; Drawer to log info into
    '(org-log-into-drawer "LOGBOOK")
+   ;; Handle outline path in one step
+   '(org-outline-path-complete-in-steps nil)
+   ;; Show entities as UTF-8 characters
+   '(org-pretty-entities t)
+   ;; Allow creation of headlines when refiling
+   '(org-refile-allow-creating-parent-nodes 'confirm)
+   ;; limit refiling to agenda files
+   '(org-refile-targets '((org-agenda-files . (:maxlevel . 5))))
+   ;; Provide refile targets as paths
+   '(org-refile-use-outline-path 'file)
+   ;; Make ctrl-a/ctrl-e headline aware
+   '(org-special-ctrl-a/e t)
+   ;; Fontify code in source blocks
+   '(org-src-fontify-natively t)
+   ;; Use the native language tabs in code blocks
+   '(org-src-tab-acts-natively t)
+   ;; Don't switch to overview when loading org files
+   '(org-startup-folded nil)
+   ;; Column for tags (for org-modern)
+   '(org-tags-column 0)
+   '(org-modules '(org-annotate-file
+                   ol-bibtex
+                   ol-eww))
    ;; Languages to use for babel
    '(org-babel-load-languages
      '((emacs-lisp . t)
