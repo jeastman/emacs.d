@@ -27,7 +27,7 @@
 (eval-when-compile
   (defvar org-agenda-category-icon-alist)
   (defvar org-agenda-redo-command)
-)
+  )
 (straight-use-package 'org-super-agenda)
 
 (defcustom jme-org-agenda-files '( "calendar.org" "tasks.org" "notes.org")

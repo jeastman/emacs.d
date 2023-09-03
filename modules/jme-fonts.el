@@ -28,7 +28,12 @@
 ;;; Code:
 
 ;;; Customization options
+(require 'straight)
 (require 'jme-common)
+(straight-use-package 'nerd-icons)
+(when (display-graphic-p)
+  (straight-use-package 'all-the-icons)
+  (require 'all-the-icons))
 
 (defcustom jme-fonts-typeface-config-alist
   '((default . ( :fixed-pitch-family "FiraCode Nerd Font"
