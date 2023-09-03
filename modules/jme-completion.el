@@ -39,6 +39,7 @@
 (straight-use-package 'kind-icon)
 (straight-use-package 'pcmpl-args)
 (straight-use-package 'cape)
+(straight-use-package 'nerd-icons-completion)
 
 (declare-function cape-wrap-purify "cape" (CAPF))
 (declare-function cape-wrap-silent "cape" (CAPF))
@@ -67,6 +68,7 @@
 (declare-function embark-dwim "embark" (&optional ARG))
 (declare-function kind-icon-margin-formatter "kind-icon" (METADATA))
 (declare-function marginalia-cycle "marginalia" ())
+(declare-function nerd-icons-completion-marginalia-setup "nerd-icons-completion" ())
 (declare-function vertico-directory-enter "vertico-directory" ())
 (declare-function vertico-directory-delete-char "vertico-directory" ())
 (declare-function vertico-directory-delete-word "vertico-directory" ())
@@ -135,6 +137,11 @@
   (jme-common-enable-mode marginalia-mode)
   (define-key minibuffer-local-map (kbd "M-A") #'marginalia-cycle)
 
+  ;; Icons using Nerd Font
+  (require 'nerd-icons-completion)
+  (jme-common-enable-mode nerd-icons-completion-mode)
+  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup)
+
   ;; Support actions
   (require 'embark)
   ;; use embark to show bindings in key-prefix with C-h
@@ -182,7 +189,9 @@
   (add-hook 'embark-collect-mode #'consult-preview-at-point-mode)
 
   (require 'corfu)
-  (custom-set-variables '(corfu-auto t))
+  (custom-set-variables '(corfu-auto t)
+                        '(corfu-auto-delay 0.0)
+                        '(corfu-echo-completion-documentation 0.25))
   (jme-common-enable-mode corfu-global-mode)
   (add-hook 'minibuffer-setup-hook #'jme-completion--corfu-enable-always-in-minibuffer 1)
   (add-hook 'minibuffer-setup-hook #'jme-completion--corfu-enable-in-minibuffer)
@@ -220,6 +229,8 @@
   ;; clean up minibuffer hook
   (remove-hook 'minibuffer-setup-hook #'jme-completion--corfu-enable-in-minibuffer)
   (remove-hook 'minibuffer-setup-hook #'jme-completion--corfu-enable-always-in-minibuffer)
+  ;; clean up nerd-icons-completion marginalia hook
+  (remove-hook 'marginalia-mode-hool #'nerd-icons-completion-marginalia-setup)
   ;; clean up directory hook
   (remove-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
   ;; clean up embark-consult hooks
@@ -229,6 +240,8 @@
   (jme-common-disable-mode corfu-global-mode)
   ;; turn off vertico-mode to clean it up
   (jme-common-disable-mode vertico-mode)
+  ;; turn off nerd-icons-completion
+  (jme-common-disable-mode nerd-icons-completion-mode)
   ;; turn off marginalia
   (jme-common-disable-mode marginalia-mode)
 
