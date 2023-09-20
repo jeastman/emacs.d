@@ -16,3 +16,7 @@ custom.el
 straight
 .cask
 elpa
+eln-cache
+var
+etc
+org-persist

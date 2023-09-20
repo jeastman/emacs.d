@@ -1,7 +1,7 @@
-;;; 6542-13mbpr.el --- Machine Specific Configuration -*- lexical-binding: t -*-
+;;; REMM0087-JOEAST.el --- Configuration for laptop -*- lexical-binding: t; -*-
 
 ;; Author: John Eastman
-;; Created: 06 Jan 2019
+;; Created: 25 Aug 2022
 
 ;; This file is not part of GNU Emacs.
 
@@ -20,21 +20,14 @@
 ;; <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;;
+
+;; Machine-specific configuration.
 
 ;;; Code:
 
 (custom-set-variables
- '(plantuml-jar-path (car (file-expand-wildcards
-                           "/usr/local/Cellar/plantuml/*/libexec/plantuml.jar")))
- '(org-plantuml-jar-path (car (file-expand-wildcards
-                               "/usr/local/Cellar/plantuml/*/libexec/plantuml.jar")))
- '(org-ditaa-jar-path (car (file-expand-wildcards
-                            "/usr/local/Cellar/ditaa/*/libexec/ditaa-*-standalone.jar")))
- '(ob-mermaid-cli-path "/usr/local/bin/mmdc")
- '(org-directory "~/Documents/org")
  '(org-roam-directory "~/Documents/notes")
- '(deft-directory "~/Documents/notes")
+ '(org-directory "~/Documents/org")
  '(org-refile-targets '((org-agenda-files :maxlevel . 5)
                         (("~/Documents/org/task_archive.txt") :maxlevel . 5)
                         (nil :maxlevel . 5)))
@@ -44,23 +37,22 @@
  '(org-ref-bibliography-notes "~/Documents/org/notes.org")
  '(org-ref-default-bibliography '("~/Documents/Bibliography/refs.bib"))
  '(org-ref-pdf-directory "~/Documents/Bibliography/bibtex-pdfs/")
- )
+ '(plantuml-default-exec-mode 'executable)
+ '(plantuml-executable-path "/opt/homebrew/bin/plantuml"))
 
-(setq org-directory "~/Documents/org")
+(defun jme-local-machine-config ()
+  "Machine specific packages and configuration."
+  (when (fboundp 'imagemagick-register-types)
+    (imagemagick-register-types))
 
-;; CLASSPATH needs to include eclipse.jdt.ls jar in order for lsp to work.
-(let ((lsp-jar
-       (car
-        (file-expand-wildcards
-         (concat
-          jme:projects-dir
-          "e/eclipse.jdt.ls/org.eclipse.jdt.ls.product/target/repository/plugins/org.eclipse.equinox.launcher_*.jar")))))
-  (setenv "CLASSPATH"
-          (concat (getenv "CLASSPATH") ":" lsp-jar)))
+  ;; General Email settings
+  (setq message-kill-buffer-on-exit t)
+  ;;(setq mail-user-agent 'notmuch-user-agent)
+  (setq mail-user-agent 'mu4e-user-agent)
 
+  )
 
-;; (load (expand-file-name "~/.roswell/helper.el"))
+(setq org-roam-v2-ack t)
 
-;; Export org to confluence
-(require 'ox-confluence)
-;;; 6542-13mbpr.el ends here
+(provide 'REMM0087-JOEAST)
+;;; REMM0087-JOEAST.el ends here
