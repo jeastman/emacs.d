@@ -36,7 +36,9 @@
  '(reftex-default-bibliography "~/Documents/Bibliography/refs.bib")
  '(org-ref-bibliography-notes "~/Documents/org/notes.org")
  '(org-ref-default-bibliography '("~/Documents/Bibliography/refs.bib"))
- '(org-ref-pdf-directory "~/Documents/Bibliography/bibtex-pdfs/"))
+ '(org-ref-pdf-directory "~/Documents/Bibliography/bibtex-pdfs/")
+ '(plantuml-default-exec-mode 'executable)
+ '(plantuml-executable-path "/opt/homebrew/bin/plantuml"))
 
 (defun jme-local-machine-config ()
   "Machine specific packages and configuration."
