@@ -43,6 +43,8 @@
 (straight-use-package 'smartparens)
 ;; simple environment for writing
 (straight-use-package 'olivetti)
+;; support for editing mermaid diagrams
+(straight-use-package 'mermaid-mode)
 
 ;;; Customization options
 
@@ -88,6 +90,10 @@ derived from modes which are included in
   (require 'flycheck)
   (require 'flycheck-pos-tip)
   (jme-common-enable-mode global-flycheck-mode)
+
+  ;; Setup flyspell
+  (cond ((executable-find "enchant-2" (setq-default ispell-program-name "enchant-2"))
+         (executable-find "aspell"    (setq-default ispell-program-name "aspell"))))
 
   ;; Help bindings
   (declare-function helpful-at-point "helpful" ())

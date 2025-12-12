@@ -62,6 +62,8 @@
   (load bootstrap-file nil 'nomessage))
 
 (require 'straight)
+;; Ensure org is loaded as early as possible
+(straight-use-package 'org)
 
 ;; Garbage Collector Magic Hack
 ;; Set to start in emacs-startup-hook once gc is reset.
@@ -112,8 +114,10 @@
 (require 'jme-org-agenda)
 (require 'jme-dired)
 (require 'jme-vc)
-(require 'jme-shell)
+;(require 'jme-shell)
 (require 'jme-org-roam)
+(require 'jme-llm)
+(require 'jme-markdown)
 
 ;; Specify a custom file
 (setq custom-file
@@ -148,8 +152,10 @@
 (jme-org-agenda 1)
 (jme-dired 1)
 (jme-vc 1)
-(jme-shell 1)
+;(jme-shell 1)
 (jme-org-roam 1)
+(jme-llm 1)
+(jme-markdown 1)
 
 (when (fboundp 'jme-local-machine-config)
   (jme-local-machine-config))

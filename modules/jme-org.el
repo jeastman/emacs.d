@@ -24,11 +24,15 @@
 ;;; Code:
 (require 'straight)
 (require 'jme-common)
+(require 'jme-org-dashboard)
 
 (straight-use-package 'org)
 (straight-use-package 'org-contrib)
 (straight-use-package 'htmlize)
 (straight-use-package '(org-modern :type git :host github :repo "minad/org-modern"))
+(straight-use-package '(org-modern-indent :type git :host github :repo "jdtsmith/org-modern-indent"))
+(straight-use-package 'ob-mermaid)
+(require 'org-modern-indent)
 
 (defalias 'archive-done-tasks 'jme-org-archive-done-tasks)
 
@@ -85,7 +89,26 @@ This can be 0 for immediate, or a floating point value."
         (calendar-file (expand-file-name (concat org-directory "/calendar.org")))
         (notes-file (expand-file-name (concat org-directory "/notes.org"))))
     (setq org-capture-templates
-          `(("t" "Task" entry (file+headline ,task-file "Inbox")
+          `(("A" "Templates for agents")
+            ("Ab" "Agent.Ritual from Blueprint" entry
+             (file+headline "~/Documents/johnos/logs/agent-ritual-log.org" "Agent Logs")
+             "* %^{Agent Name} :ritual:agent:\nEntered on %U\n\n** Description\n%^{Description}\n\n** Intended Outcome\n%^{Outcome}\n\n** Prompts\n- %^{Prompt 1}\n- %^{Prompt 2}\n")
+            ("Aj" "JOHNOS Prompt Log" entry
+             (file+headline (expand-file-name "~/Documents/johnos/logs/prompt-log.org") "Prompt Runs")
+             "* %?\\nEntered on %U\\n\\n")
+            ("Af" "Agent.Friday – Weekly 5-15" entry
+             (file+headline (expand-file-name "~/Documents/johnos/logs/agent-ritual-log.org") "Agent Logs")
+             "* Agent.Friday Weekly Reflection\nEntered on %U\n\n%?")
+            ("Am" "Agent.Monday – Systems Check-In" entry
+             (file+headline (expand-file-name "~/Documents/johnos/logs/agent-ritual-log.org") "Agent Logs")
+             "* Agent.Monday Weekly Planning\nEntered on %U\n\n%?")
+            ("As" "Weekly Workflow Scorecard" entry
+             (file+datetree (expand-file-name "~/Documents/johnos/metrics/weekly.org"))
+             (file "~/Documents/org/templates/weekly-workflow-review.org") :empty-lines 1)
+            ("Ap" "New Prompt Draft" entry
+ (file+headline "~/Documents/johnos/data/prompt-drafts.org" "Drafted Prompts")
+ (file "~/Documents/org/templates/prompt-draft.org"))
+            ("t" "Task" entry (file+headline ,task-file "Inbox")
              "* TODO %^{What} %^g\n:PROPERTIES:\n:CREATED:  %U\n:END:\n\n" :immediate-finish t)
             ("e" "Task from Email" entry (file+headline ,task-file "Email")
              "* TODO [#A] %?\nSCHEDULED: %(org-insert-timestamp (org-read-date nil t \"+0d\"))\n%a\n")
@@ -188,6 +211,8 @@ This can be 0 for immediate, or a floating point value."
   (custom-set-variables
    ;; Adapt indentation to outline node level
    '(org-adapt-indentation t)
+   ;; Don't shift tags in agenda items (for org-modern)
+   '(org-agenda-tags-column 0)
    ;; Don't keep tags aligned (for org-modern)
    '(org-auto-align-tags nil)
    ;; Check invisible regions before editing
@@ -222,6 +247,8 @@ This can be 0 for immediate, or a floating point value."
    '(org-src-tab-acts-natively t)
    ;; Don't switch to overview when loading org files
    '(org-startup-folded nil)
+   ;; Activate org-indent-mode for org-modern-indent
+   '(org-startup-indented t)
    ;; Column for tags (for org-modern)
    '(org-tags-column 0)
    '(org-modules '(org-annotate-file
@@ -234,6 +261,7 @@ This can be 0 for immediate, or a floating point value."
        (dot . t)
        (gnuplot . t)
        (plantuml . t)
+       (mermaid . t)
        (python . t)
        (js . t)
        (lisp . t)
@@ -259,6 +287,7 @@ This can be 0 for immediate, or a floating point value."
   (org-clock-persistence-insinuate)  ; set clocks up to persist
 
   (add-hook 'org-mode-hook #'jme-org-style-org)
+  (add-hook 'org-mode-hook #'org-modern-indent-mode 90)
 
   ;; Org-modern customization
   (custom-set-variables
@@ -287,6 +316,7 @@ This can be 0 for immediate, or a floating point value."
   (global-unset-key (kbd "C-c l"))
   (global-unset-key (kbd "C-c L"))
   (global-unset-key (kbd "C-c c"))
+  (remove-hook 'org-mode-hool #'org-modern-indent-mode)
   (remove-hook 'org-mode-hook #'jme-org-style-org))
 
 (defun jme-org-unload-function ()

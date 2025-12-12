@@ -27,6 +27,7 @@
 
 (straight-use-package 'doom-themes)
 (straight-use-package 'solaire-mode)
+(straight-use-package 'catppuccin-theme)
 
 (defun jme-themes--window-setup-function ()
   "Load theme and toggle theme on."
@@ -38,9 +39,11 @@
     (declare-function doom-themes-visual-bell-config "doom-themes-ext-visual-bell" ())
     (setq doom-themes-enable-bold t
           doom-themes-enable-italic t)
+    (setq catpuccin-flavor 'mocha)
     ;; load but do not enable themes
     (load-theme 'doom-palenight t t)
     (load-theme 'doom-tomorrow-day t t)
+    (load-theme 'catppuccin t t)
 ;;    (load-theme 'override-dark t t)
 ;;    (load-theme 'override-light t t)
     (doom-themes-org-config)
@@ -71,6 +74,7 @@
          'org-checkbox
          'org-document-info-keyword
          'org-property-value
+         'org-table
          'line-number
          'line-number-current-line
          'org-tag))
@@ -80,7 +84,6 @@
      (if (facep face)
          (set-face-attribute face nil :inherit '(shadow fixed-pitch))))
    (list 'org-code
-         'org-table
          'org-verbatim))
   ;; ensure specific faces inherit from fixed-pitch font-lock-comment face
   (mapc
@@ -98,7 +101,8 @@ Utilizes `state' property of the function to track state."
         (progn
 ;;          (disable-theme 'override-light)
           (disable-theme 'doom-tomorrow-day)
-          (enable-theme 'doom-palenight)
+          (enable-theme 'catppuccin)
+;;          (enable-theme 'doom-palenight)
 ;;          (enable-theme 'override-dark)
           (jme-themes--customize-theme)
           (when (display-graphic-p)
@@ -106,7 +110,8 @@ Utilizes `state' property of the function to track state."
           (put 'jme-themes-toggle-theme 'state nil))
       (progn
 ;;        (disable-theme 'override-dark)
-        (disable-theme 'doom-palenight)
+;;        (disable-theme 'doom-palenight)
+        (disable-theme 'catppuccin)
         (enable-theme 'doom-tomorrow-day)
 ;;        (enable-theme 'override-light)
         (jme-themes--customize-theme)
@@ -120,7 +125,8 @@ Utilizes `state' property of the function to track state."
 ;;  (disable-theme 'override-dark)
 ;;  (disable-theme 'override-light)
   (disable-theme 'doom-tomorrow-day)
-  (disable-theme 'doom-palenight))
+  (disable-theme 'doom-palenight)
+  (disable-theme 'catppuccin))
 
 (defun jme-themes-unload-function ()
   "Unload `jme-themes' feature."

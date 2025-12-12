@@ -96,7 +96,9 @@
                                 :order 1)))))
           (alltodo "" ((org-agenda-overriding-header "")
                        (org-super-agenda-groups
-                        '((:name "Inbox"
+                        '((:discard
+                           (:category "Meeting"))
+                          (:name "Inbox"
                                  :category "Inbox"
                                  :order 1)
                           (:name "Overdue"
@@ -170,8 +172,8 @@
        ("Training" ,(list
                      (all-the-icons-material "directions_run"))
         nil nil :ascent center)
-       ("NIC" ,(list
-                (all-the-icons-material "cloud"))
+       ("Mainsail" ,(list
+                (all-the-icons-material "directions_boat"))
         nil nil :ascent center)
        ("Weekly" ,(list
                    (all-the-icons-material "view_week"))
@@ -188,11 +190,26 @@
        ("Customer" ,(list
                      (all-the-icons-material "account_circle"))
         nil nil :ascent center)
-       ("Synacor" ,(list
+       ("Apptega" ,(list
                     (all-the-icons-material "business"))
         nil nil :ascent center)
        ("Research" ,(list
                      (all-the-icons-material "whatshot"))
+        nil nil :ascent center)
+       ("Technology" ,(list
+                     (all-the-icons-material "build"))
+        nil nil :ascent center)
+       ("QA" ,(list
+                     (all-the-icons-material "high_quality"))
+        nil nil :ascent center)
+       ("Platform" ,(list
+                     (all-the-icons-material "widgets"))
+        nil nil :ascent center)
+       ("Finance" ,(list
+                     (all-the-icons-material "attach_money"))
+        nil nil :ascent center)
+       ("DevOps" ,(list
+                     (all-the-icons-material "developer_mode"))
         nil nil :ascent center)
        ("calendar" ,(list
                      (all-the-icons-material "today"))

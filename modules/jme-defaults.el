@@ -25,6 +25,14 @@
 ;;; Code:
 (require 'jme-common)
 
+(defun dont-kill-emacs ()
+  "Prevent accidental Emacs exit."
+  (interactive)
+  (error "To exit Emacs, use M-x kill-emacs"))
+
+(global-set-key (kbd "C-x C-c") 'dont-kill-emacs)
+
+
 (defun jme-defaults--enable ()
   "Apply defaults configuration."
   ;; Allow all commands to work normally

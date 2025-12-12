@@ -40,6 +40,7 @@
         backup-by-copying-when-linked t)
 
   (custom-set-variables
+   '(backup-directory-alist (quote ((".*" . "~/.emacs-meta/backups/"))))
    '(recentf-max-saved-items 100 "Save 100 recent items.")
    '(recentf-max-menu-items 15 "Maximum number of items in the recentf menu."))
 
