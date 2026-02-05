@@ -177,7 +177,7 @@ Intendend to be called from `org-after-todo-state-change-hook'."
                        (window-height . fit-window-to-buffer)))
         (require 'org-roam-protocol)
         (require 'org-roam-dailies)
-        (org-roam-db-autosync-enable)
+        (org-roam-db-autosync-mode)
         (jme-org-roam-refresh-agenda-list)
         (add-to-list 'org-after-todo-state-change-hook
                      'jme-org-roam--after-todo-state-change-function)
