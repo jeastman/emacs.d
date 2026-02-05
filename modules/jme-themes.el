@@ -25,29 +25,16 @@
 (require 'straight)
 (require 'jme-common)
 
-(straight-use-package 'doom-themes)
 (straight-use-package 'solaire-mode)
 (straight-use-package 'catppuccin-theme)
+(require 'catppuccin-theme)
 
 (defun jme-themes--window-setup-function ()
   "Load theme and toggle theme on."
   (progn
-    (defvar doom-themes-enable-bold)
-    (defvar doom-themes-enable-italic)
-    (require 'doom-themes)
-    (declare-function doom-themes-org-config "doom-themes-ext-org" ())
-    (declare-function doom-themes-visual-bell-config "doom-themes-ext-visual-bell" ())
-    (setq doom-themes-enable-bold t
-          doom-themes-enable-italic t)
-    (setq catpuccin-flavor 'mocha)
-    ;; load but do not enable themes
-    (load-theme 'doom-palenight t t)
-    (load-theme 'doom-tomorrow-day t t)
+    (setq catppuccin-flavor 'mocha)
     (load-theme 'catppuccin t t)
-;;    (load-theme 'override-dark t t)
-;;    (load-theme 'override-light t t)
-    (doom-themes-org-config)
-    (doom-themes-visual-bell-config)
+    (enable-theme 'catppuccin)
     (jme-themes-toggle-theme)))
 
 
@@ -99,33 +86,23 @@ Utilizes `state' property of the function to track state."
     (interactive)
     (if (get 'jme-themes-toggle-theme 'state)
         (progn
-;;          (disable-theme 'override-light)
-          (disable-theme 'doom-tomorrow-day)
-          (enable-theme 'catppuccin)
-;;          (enable-theme 'doom-palenight)
-;;          (enable-theme 'override-dark)
+          (setq catppuccin-flavor 'latte)
+          (catppuccin-reload)
           (jme-themes--customize-theme)
           (when (display-graphic-p)
-            (set-mouse-color "#69bdd2"))
+            (set-mouse-color "#042f66"))
           (put 'jme-themes-toggle-theme 'state nil))
       (progn
-;;        (disable-theme 'override-dark)
-;;        (disable-theme 'doom-palenight)
-        (disable-theme 'catppuccin)
-        (enable-theme 'doom-tomorrow-day)
-;;        (enable-theme 'override-light)
+        (setq catppuccin-flavor 'mocha)
+        (catppuccin-reload)
         (jme-themes--customize-theme)
         (when (display-graphic-p)
-          (set-mouse-color "#042f66"))
+          (set-mouse-color "#69bdd2"))
         (put 'jme-themes-toggle-theme 'state t))))
 
 (defun jme-themes-disable-themes ()
   "Disable theme configuration."
   (interactive)
-;;  (disable-theme 'override-dark)
-;;  (disable-theme 'override-light)
-  (disable-theme 'doom-tomorrow-day)
-  (disable-theme 'doom-palenight)
   (disable-theme 'catppuccin))
 
 (defun jme-themes-unload-function ()
