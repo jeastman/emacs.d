@@ -26,6 +26,95 @@
 ;; Auto-Revert.
 ;; For additional information see Info node `(emacs)Auto Revert'.
 (require 'jme-common)
+(require 'straight)
+(straight-use-package 'all-the-icons-ibuffer)
+(require 'all-the-icons-ibuffer)
+
+(defun jme-buffers--configure-ibuffer ()
+  (custom-set-variables
+   '(ibuffer-expert t)
+   '(ibuffer-display-summary nil)
+   '(ibuffer-use-other-window nil)
+   '(ibuffer-default-sorting-mode 'filename/process)
+   '(ibuffer-title-face 'font-lock-doc-face)
+   '(ibuffer-use-header-line t)
+   '(ibuffer-default-shrink-to-minimum-size nil)
+   '(ibuffer-formats
+        '((mark modified read-only locked " "
+                (name 30 30 :left :elide)
+                " "
+                (size 9 -1 :right)
+                " "
+                (mode 16 16 :left :elide)
+                " " filename-and-process)
+          (mark " "
+                (name 16 -1)
+                " " filename)))
+   '(ibuffer-saved-filter-groups
+        '(("Main"
+           ("Directories" (mode . dired-mode))
+           ("Markup" (or
+                   (mode . markdown-mode)
+                   (mode . adoc-mode)))
+           ("Python" (or
+                      (mode . python-ts-mode)
+                      (mode . c-mode)
+                      (mode . python-mode)))
+           ("Config" (or
+                      (mode . conf-mode)
+                      (mode . conf-toml-mode)
+                      (mode . toml-ts-mode)
+                      (mode . conf-windows-mode)
+                      (name . "^\\.clangd$")
+                      (name . "^\\.gitignore$")
+                      (name . "^Doxyfile$")
+                      (name . "^config\\.toml$")
+                      (mode . yaml-mode)))
+           ("Web" (or
+                   (mode . mhtml-mode)
+                   (mode . html-mode)
+                   (mode . web-mode)
+                   (mode . nxml-mode)))
+           ("CSS" (or
+                   (mode . css-mode)
+                   (mode . sass-mode)))
+           ("JS" (or
+                  (mode . js-mode)
+                  (mode . rjsx-mode)))
+           ("Org" (mode . org-mode))
+           ("LaTeX" (name . "\.tex$"))
+           ("Magit" (or
+                     (mode . magit-blame-mode)
+                     (mode . magit-cherry-mode)
+                     (mode . magit-diff-mode)
+                     (mode . magit-log-mode)
+                     (mode . magit-process-mode)
+                     (mode . magit-status-mode)))
+           ("Build" (or
+                     (mode . make-mode)
+                     (mode . makefile-gmake-mode)
+                     (name . "^Makefile$")
+                     (mode . change-log-mode)))
+           ("Scripts" (or
+                       (mode . shell-script-mode)
+                       (mode . shell-mode)
+                       (mode . sh-mode)
+                       (mode . lua-mode)
+                       (mode . bat-mode)))
+           ("Fundamental" (or
+                           (mode . fundamental-mode)
+                           (mode . text-mode)))
+           ("Emacs" (or
+                     (mode . emacs-lisp-mode)
+                     (name . "^\\*Help\\*$")
+                     (name . "^\\*Custom.*")
+                     (name . "^\\*Org Agenda\\*$")
+                     (name . "^\\*info\\*$")
+                     (name . "^\\*scratch\\*$")
+                     (name . "^\\*Backtrace\\*$")
+                     (name . "^\\*straight-process\\*$")
+                     (name . "^\\*Messages\\*$"))))))
+   ))
 
 (defun jme-buffers--enable-auto-revert ()
   "Enable auto-revert mode."
@@ -68,12 +157,16 @@
   (when (display-graphic-p)
     (global-set-key (kbd "C-z") #'bury-buffer))
   (jme-buffers--enable-auto-revert)
-  (jme-buffers--config-uniquify))
+  (jme-buffers--config-uniquify)
+  (jme-buffers--configure-ibuffer)
+  (add-hook 'ibuffer-mode-hook 'all-the-icons-ibuffer-mode)
+  (add-hook 'ibuffer-mode-hook #'(lambda () (ibuffer-switch-to-saved-filter-groups "Main"))))
 
 (defun jme-buffers--disable ()
   "Un-apply buffers configuration."
   (jme-buffers--disable-auto-revert)
-  (jme-buffers--revert-uniquify))
+  (jme-buffers--revert-uniquify)
+  (remove-hook 'ibuffer-mode-hook 'all-the-icons-ibuffer-mode))
 
 (defun jme-buffers-unload-function ()
   "Unload buffers feature."
