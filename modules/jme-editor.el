@@ -63,6 +63,16 @@ derived from modes which are included in
   :type 'list
   :group 'jme-customizations)
 
+(defun jme-unfill-paragraph ()
+  (interactive)
+  (let ((fill-column (point-max)))
+    (fill-paragraph nil)))
+
+(defun jme-unfill-region ()
+  (interactive)
+  (let ((fill-column (point-max)))
+    (fill-region (region-beginning) (region-end) nil)))
+
 (defun jme-editor--enable ()
   "Configure editor settings."
 
