@@ -33,6 +33,7 @@
 (straight-use-package '(org-modern-indent :type git :host github :repo "jdtsmith/org-modern-indent"))
 (straight-use-package 'ob-mermaid)
 (require 'org-modern-indent)
+(require 'org-id)
 
 (defalias 'archive-done-tasks 'jme-org-archive-done-tasks)
 
@@ -56,6 +57,11 @@ This can be 0 for immediate, or a floating point value."
   "Advise capture to close the frame when done."
   (if (equal "emacs-capture" (frame-parameter nil 'name))
       (delete-frame)))
+
+(defun jme-insert-uuid-at-point ()
+  "Insert a new UUID at the current point."
+  (interactive)
+  (insert(org-id-new)))
 
 (defun jme-org--configure-latex ()
   "Configue support for LaTeX documents."
@@ -303,7 +309,8 @@ This can be 0 for immediate, or a floating point value."
   (declare-function org-insert-link-global "ol" ())
   (global-set-key (kbd "C-c l") #'org-store-link)
   (global-set-key (kbd "C-c L") #'org-insert-link-global)
-  (global-set-key (kbd "C-c c") #'org-capture))
+  (global-set-key (kbd "C-c c") #'org-capture)
+  (global-set-key (kbd "C-c u i") 'jme-insert-uuid-at-point))
 
 (defun jme-org--disable ()
   "Disable org configuration."
@@ -316,6 +323,7 @@ This can be 0 for immediate, or a floating point value."
   (global-unset-key (kbd "C-c l"))
   (global-unset-key (kbd "C-c L"))
   (global-unset-key (kbd "C-c c"))
+  (global-unset-key (kbd "C-c u i"))
   (remove-hook 'org-mode-hool #'org-modern-indent-mode)
   (remove-hook 'org-mode-hook #'jme-org-style-org))
 
