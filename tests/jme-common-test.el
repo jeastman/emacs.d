@@ -19,6 +19,15 @@
 (jme-common-defconfiguration jme-test-config
   "Test configuration for jme-common docstring coverage.")
 
+(jme-common-defconfiguration jme-test-config-nil-doc
+  nil)
+
+(jme-common-defconfiguration jme-test-config-no-arg-doc
+  "Custom doc without argument details.")
+
+(jme-common-defconfiguration jme-test-config-with-arg-doc
+  "Custom doc with ARG details.")
+
 (ert-deftest jme-common-default-value-for-symbol-no-default ()
   (let ((sym (make-symbol "jme-test--no-default")))
     (should (eq (jme-common-default-value-for-symbol sym)
@@ -41,10 +50,27 @@
 
 (ert-deftest jme-common-defconfiguration-docstring-uses-getter-form ()
   (let ((doc (documentation 'jme-test-config)))
-    (should (string-match-p "Toggle configuration jme-test-config" doc))
+    (should (string-match-p "Test configuration for jme-common docstring coverage" doc))
     (should (string-match-p
              "default-value[^)]*jme-test-config"
              doc))))
+
+(ert-deftest jme-common-defconfiguration-docstring-doc-nil ()
+  (let ((doc (documentation 'jme-test-config-nil-doc)))
+    (should (string-match-p
+             "Toggle configuration jme-test-config-nil-doc"
+             doc))
+    (should (string-match-p "ARG is the prefix argument" doc))))
+
+(ert-deftest jme-common-defconfiguration-docstring-arg-paragraph-added ()
+  (let ((doc (documentation 'jme-test-config-no-arg-doc)))
+    (should (string-match-p "Custom doc without argument details" doc))
+    (should (string-match-p "ARG is the prefix argument" doc))))
+
+(ert-deftest jme-common-defconfiguration-docstring-arg-paragraph-not-added ()
+  (let ((doc (documentation 'jme-test-config-with-arg-doc)))
+    (should (string-match-p "Custom doc with ARG details" doc))
+    (should (not (string-match-p "ARG is the prefix argument" doc)))))
 
 (provide 'jme-common-test)
 ;;; jme-common-test.el ends here.
