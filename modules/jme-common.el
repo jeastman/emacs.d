@@ -39,7 +39,7 @@ either customize it (see the Info node 'Easy Customization')
 or call the function `%s'." pretty-name pretty-name pretty-name))
 
 (defun jme-common--config-arg-docstring (pretty-name)
-  "Generate docstring paragraph for configuration argument."
+  "Generate docstring paragraph for configuration argument PRETTY-NAME."
   (format "ARG is the prefix argument.  If called interactively with no prefix,
 toggle the %s configuration.  If ARG is positive, enable the configuration,
 and if it is zero or negative, disable the configuration.
@@ -183,6 +183,13 @@ If a default value cannot be found for a symbol, it is skipped."
     (let ((value (jme-common-default-value-for-symbol symbol)))
       (unless (eq value jme-common--no-default)
         (set-default symbol value)))))
+
+(defun jme-common-customize-set-variables (settings)
+  "Set SETTINGS using `customize-set-variable`.
+SETTINGS should be a list of (SYMBOL VALUE) pairs.  VALUE should be the
+evaluated value (do not quote list values)."
+  (dolist (setting settings)
+    (customize-set-variable (car setting) (cadr setting))))
 
 (defmacro jme-common-autoload (fun package)
   "Autoload FUN for PACKAGE.
