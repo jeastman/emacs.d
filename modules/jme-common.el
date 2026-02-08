@@ -38,10 +38,10 @@ Setting this varibale directly does not take effect;
 either customize it (see the info mode 'Easy Cusomization')
 or call the function `%s'." pretty-name pretty-name pretty-name))
 
-(defun jme-common--config-fn-docstring (pretty-name getter)
+(defun jme-common--config-fn-docstring (pretty-name getter-string)
   "Generate docstring for configuration.
 PRETTY-NAME is the fomatted name.
-GETTER is the symbol to evaluate to retrieve the state of the
+GETTER-STRING is the form to evaluate to retrieve the state of the
 configuration."
   (format "Toggle configuration %s on or off.
 
@@ -54,7 +54,7 @@ configuration if ARG is nil, omitted, or is a positive number.  Disable
 the configuration if ARG is a negative number.
 
 To check whether the configuration is enabled, evaluate `%s'."
-          pretty-name pretty-name getter))
+          pretty-name pretty-name getter-string))
 
 (defmacro jme-common-defconfiguration (config doc &optional body)
   "Define a new configuration CONFIG.
@@ -117,7 +117,9 @@ named CONFIG--disable is checked for and executed."
          :type 'boolean
          :group 'jme-customizations)
        (defun ,configfun (&optional arg)
-         ,(jme-common--config-fn-docstring config config)
+         ,(jme-common--config-fn-docstring pretty-name
+                                           (format "%S"
+                                                   `(default-value ',config)))
          (interactive (list (if current-prefix-arg
                                 (prefix-numeric-value current-prefix-arg)
                               'toggle)))
@@ -149,6 +151,8 @@ named CONFIG--disable is checked for and executed."
   "Fallback configuration disable."
   (message "Configuration disabled."))
 
+(defconst jme-common--no-default (make-symbol "jme-common--no-default"))
+
 (defun jme-common-default-value-for-symbol (symbol)
   "Look for the default value for SYMBOL.
 Checks the system for a value to use as the default for SYMBOL.  If SYMBOL
@@ -157,15 +161,15 @@ If no value can be found for SYMBOL, nil is returned."
   (let ((std-value (get symbol 'standard-value)))
     (if std-value
         (eval (car std-value))
-      nil)))
+      jme-common--no-default)))
 
 (defun jme-common-revert-symbols (symbol-list)
   "Set the default value for each symbol in SYMBOL-LIST.
 If a default value cannot be found for a symbol, it is skipped."
   (dolist (symbol symbol-list)
     (let ((value (jme-common-default-value-for-symbol symbol)))
-      (if value
-          (set symbol value)))))
+      (unless (eq value jme-common--no-default)
+        (set-default symbol value)))))
 
 (defmacro jme-common-autoload (fun package)
   "Autoload FUN for PACKAGE.
@@ -196,8 +200,8 @@ Ensures function FUN is not alreay bound."
   `(propertize ,string 'face (list ,@properties)))
 
 (defun jme-common-remove-from-list (list element)
-  "Remove from LIST the specified ELEMENT (destructive)."
-  (setq list (delete element list)))
+  "Return LIST with the specified ELEMENT removed (destructive)."
+  (delete element list))
 
 (defun jme-common-safe-unload-feature (feature)
   "Attempts to unload FEATURE.
