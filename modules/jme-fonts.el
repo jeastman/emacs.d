@@ -28,12 +28,7 @@
 ;;; Code:
 
 ;;; Customization options
-(require 'straight)
 (require 'jme-common)
-(straight-use-package 'nerd-icons)
-(when (display-graphic-p)
-  (straight-use-package 'all-the-icons)
-  (require 'all-the-icons))
 
 (defcustom jme-fonts-typeface-config-alist
   '((default . ( :fixed-pitch-family "FiraCode Nerd Font"
@@ -86,14 +81,42 @@ and nil is returned."
 
 (defun jme-fonts--set-fonts-prompt ()
   "Prompt for the font configuration (used by jme-fonts-set-font-config)."
-  (let ((def (nth 1 jme-fonts--font-config-hist)))
+  (let ((def (or (and jme-fonts--current-config
+                      (symbol-name jme-fonts--current-config))
+                 (car jme-fonts--font-config-hist)
+                 "default")))
     (completing-read
      (format "Select font configuration [%s]: " def)
-     (mapcar #'car jme-fonts-typeface-config-alist)
+     (mapcar (lambda (entry) (symbol-name (car entry)))
+             jme-fonts-typeface-config-alist)
      nil t nil 'jme-fonts--font-config-hist def)))
 
 (defvar jme-fonts--current-config nil
   "Current font typeface attribute collection name.")
+
+(defconst jme-fonts--managed-faces '(default fixed-pitch variable-pitch)
+  "Faces managed by `jme-fonts-set-font-config'.")
+
+(defvar jme-fonts--saved-face-attributes nil
+  "Saved face attributes to restore when font configuration is disabled.")
+
+(defun jme-fonts--snapshot-managed-faces ()
+  "Capture baseline face attributes for `jme-fonts--managed-faces'."
+  (unless jme-fonts--saved-face-attributes
+    (setq jme-fonts--saved-face-attributes
+          (mapcar (lambda (face)
+                    (cons face
+                          (list :family (face-attribute face :family nil t)
+                                :weight (face-attribute face :weight nil t)
+                                :height (face-attribute face :height nil t))))
+                  jme-fonts--managed-faces))))
+
+(defun jme-fonts--restore-managed-faces ()
+  "Restore face attributes captured by `jme-fonts--snapshot-managed-faces'."
+  (dolist (entry jme-fonts--saved-face-attributes)
+    (let ((face (car entry))
+          (attributes (cdr entry)))
+      (apply #'set-face-attribute face nil attributes))))
 
 (defun jme-fonts-set-font-config (config)
   "Set fonts based on CONFIG.
@@ -105,22 +128,25 @@ in the car of a cons cell in `jme-fonts-typeface-config-alist'."
   (interactive (list (jme-fonts--set-fonts-prompt)))
   (when window-system
     (let* ((fonts (if (stringp config) (intern config) config))
-           (properties (alist-get fonts jme-fonts-typeface-config-alist))
-           (fixed-pitch-family (plist-get properties :fixed-pitch-family))
-           (fixed-pitch-height (plist-get properties :fixed-pitch-height))
-           (fixed-pitch-weight (plist-get properties :fixed-pitch-weight))
-           (variable-pitch-family (plist-get properties :variable-pitch-family))
-           (variable-pitch-height (plist-get properties :variable-pitch-height))
-           (variable-pitch-weight (plist-get properties :variable-pitch-weight)))
-      (if (jme-fonts--apply-face-attribute
-           'default fixed-pitch-family fixed-pitch-weight fixed-pitch-height)
-          (if (jme-fonts--apply-face-attribute
-               'fixed-pitch fixed-pitch-family fixed-pitch-weight fixed-pitch-height)
-              (if (jme-fonts--apply-face-attribute
-                   'variable-pitch variable-pitch-family variable-pitch-weight variable-pitch-height)
-                  (progn
-                    (add-to-history 'jme-fonts--font-config-hist (format "%s" config))
-                    (setq jme-fonts--current-config (format "%s" config)))))))))
+           (properties (alist-get fonts jme-fonts-typeface-config-alist)))
+      (unless properties
+        (user-error "Unknown font config: %s" config))
+      (let* ((fixed-pitch-family (plist-get properties :fixed-pitch-family))
+             (fixed-pitch-height (plist-get properties :fixed-pitch-height))
+             (fixed-pitch-weight (plist-get properties :fixed-pitch-weight))
+             (variable-pitch-family (plist-get properties :variable-pitch-family))
+             (variable-pitch-height (plist-get properties :variable-pitch-height))
+             (variable-pitch-weight (plist-get properties :variable-pitch-weight)))
+        (jme-fonts--snapshot-managed-faces)
+        (if (jme-fonts--apply-face-attribute
+             'default fixed-pitch-family fixed-pitch-weight fixed-pitch-height)
+            (if (jme-fonts--apply-face-attribute
+                 'fixed-pitch fixed-pitch-family fixed-pitch-weight fixed-pitch-height)
+                (if (jme-fonts--apply-face-attribute
+                     'variable-pitch variable-pitch-family variable-pitch-weight variable-pitch-height)
+                    (progn
+                      (add-to-history 'jme-fonts--font-config-hist (symbol-name fonts))
+                      (setq jme-fonts--current-config fonts)))))))))
 
 (defun jme-fonts--enable ()
   "Enable font configuration.
@@ -130,10 +156,12 @@ Expects `default' to be a value in `jme-fonts-typeface-config-alist'."
 
 (defun jme-fonts--disable ()
   "Disable font configuration."
-  ;; TODO disable fonts
-  )
+  (when jme-fonts--saved-face-attributes
+    (jme-fonts--restore-managed-faces)
+    (setq jme-fonts--saved-face-attributes nil))
+  (setq jme-fonts--current-config nil))
 
-(defun jme-fonts-unload-funtion ()
+(defun jme-fonts-unload-function ()
   "Revert preferred font configuration."
   (jme-fonts--disable))
 
