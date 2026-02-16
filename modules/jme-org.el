@@ -37,6 +37,10 @@
 
 (defalias 'archive-done-tasks 'jme-org-archive-done-tasks)
 
+(defconst jme-org--safe-local-after-save-entry
+  '(after-save-hook archive-done-tasks)
+  "Safe local variable entry used to allow automatic task archiving.")
+
 (defcustom jme-org-archive-expiry-days 14
   "The number of days after which a completed task should be auto-archived.
 This can be 0 for immediate, or a floating point value."
@@ -46,17 +50,19 @@ This can be 0 for immediate, or a floating point value."
 
 ;;; See the following - friendly handling of capture-specific frame
 ;;; https://www.diegoberrocal.com/blog/2015/08/19/org-protocol/
-(defadvice org-capture
-    (after make-full-window-frame activate)
-  "Advise capture to be the only window when used as a popup."
-  (if (equal "emacs-capture" (frame-parameter nil 'name))
-      (delete-other-windows)))
+(defun jme-org--capture-popup-frame-p ()
+  "Return non-nil when current frame is a dedicated capture frame."
+  (equal "emacs-capture" (frame-parameter nil 'name)))
 
-(defadvice org-capture-finalize
-    (after delete-capture-frame activate)
-  "Advise capture to close the frame when done."
-  (if (equal "emacs-capture" (frame-parameter nil 'name))
-      (delete-frame)))
+(defun jme-org--org-capture-make-full-window-frame-advice (&rest _args)
+  "Make `org-capture' the only window when used as a popup."
+  (when (jme-org--capture-popup-frame-p)
+    (delete-other-windows)))
+
+(defun jme-org--org-capture-delete-capture-frame-advice (&rest _args)
+  "Close capture frame after `org-capture-finalize'."
+  (when (jme-org--capture-popup-frame-p)
+    (delete-frame)))
 
 (defun jme-insert-uuid-at-point ()
   "Insert a new UUID at the current point."
@@ -75,7 +81,7 @@ This can be 0 for immediate, or a floating point value."
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                  ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                 ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
+                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
   (add-to-list 'org-latex-classes
                '("zimbraorgspec" "\\documentclass[10pt,oneside,article]{zimbraorgspec}"
                  ("\\chapter{%s}" . "\\chapter*{%s}")
@@ -83,7 +89,7 @@ This can be 0 for immediate, or a floating point value."
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                  ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                 ("\\subparagraph{%s}" . "\\subparagrah*{%s}")))
+                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
   (setq  org-latex-pdf-process
          '("latexmk -shell-escape -bibtex -pdf %f")))
 
@@ -138,7 +144,7 @@ This can be 0 for immediate, or a floating point value."
              "* TODO Discussion with %^{Who} %^g\nSCHEDULED: %^{When}T\n" :immediate-finish t)
             ("P" "Project meeting" entry (file+olp ,calendar-file "Meetings" "Project Meetings")
              "* TODO %^{Project} %^g\nSCHEDULED: %^{When}T\n" :immediate-finish t)
-            ("e" "Event" entry (file+olp ,calendar-file "Meetings" "Events")
+            ("E" "Event" entry (file+olp ,calendar-file "Meetings" "Events")
              "* TODO %^{What} %^g\nSCHEDULED: %^{When}T\n:PROPERTIES:\n:CATEGORY: %^{Type|Meeting|Event|Other}\n:END:\n" :immediate-finish t)
             ("p" "Protocol" entry (file+headline ,task-file "Inbox")
              "* %^{Title}\n:PROPERTIES:\n:CREATED:  %U\n:END:\nSource: %:annotation\n #+begin_quote\n%i\n#+end_quote\n\n%?")
@@ -182,7 +188,7 @@ This can be 0 for immediate, or a floating point value."
   (save-excursion
     (goto-char (point-min))
     (let ((done-regexp
-           (concat "\\* \\(" (regexp-opt org-done-keywords) "\\) ")))
+           (concat "^\\*+ \\(" (regexp-opt org-done-keywords) "\\) ")))
       (while (re-search-forward done-regexp nil t)
         (let ((end (save-excursion
                      (outline-next-heading)
@@ -281,19 +287,28 @@ This can be 0 for immediate, or a floating point value."
                             (sequence "RISK(r)" "|" "MITIGATED(i@)"))))
 
   (org-babel-do-load-languages
-   'org-babal-load-languages
-   'org-babal-load-languages)
+   'org-babel-load-languages
+   org-babel-load-languages)
 
   (jme-org--configure-latex)
   (jme-org--configure-capture)
 
-  (custom-set-variables '(safe-local-variable-values
-                          (quote ((after-save-hook archive-done-tasks)))))
+  (unless (member jme-org--safe-local-after-save-entry
+                  (default-value 'safe-local-variable-values))
+    (setq-default safe-local-variable-values
+                  (cons jme-org--safe-local-after-save-entry
+                        (default-value 'safe-local-variable-values))))
 
   (org-clock-persistence-insinuate)  ; set clocks up to persist
 
   (add-hook 'org-mode-hook #'jme-org-style-org)
-  (add-hook 'org-mode-hook #'org-modern-indent-mode 90)
+  (add-hook 'org-mode-hook #'org-modern-indent-mode)
+  (unless (advice-member-p #'jme-org--org-capture-make-full-window-frame-advice
+                           #'org-capture)
+    (advice-add 'org-capture :after #'jme-org--org-capture-make-full-window-frame-advice))
+  (unless (advice-member-p #'jme-org--org-capture-delete-capture-frame-advice
+                           #'org-capture-finalize)
+    (advice-add 'org-capture-finalize :after #'jme-org--org-capture-delete-capture-frame-advice))
 
   ;; Org-modern customization
   (custom-set-variables
@@ -314,18 +329,19 @@ This can be 0 for immediate, or a floating point value."
 
 (defun jme-org--disable ()
   "Disable org configuration."
-  ;; TODO
-  (custom-set-variables
-   '(safe-local-variable-values nil)
-   '((sequence "TODO" "DONE")))
+  (setq-default safe-local-variable-values
+                (delete jme-org--safe-local-after-save-entry
+                        (default-value 'safe-local-variable-values)))
   (defvar org-mode-map)
   (define-key org-mode-map (kbd "C-c t") nil)
   (global-unset-key (kbd "C-c l"))
   (global-unset-key (kbd "C-c L"))
   (global-unset-key (kbd "C-c c"))
   (global-unset-key (kbd "C-c u i"))
-  (remove-hook 'org-mode-hool #'org-modern-indent-mode)
-  (remove-hook 'org-mode-hook #'jme-org-style-org))
+  (remove-hook 'org-mode-hook #'org-modern-indent-mode)
+  (remove-hook 'org-mode-hook #'jme-org-style-org)
+  (advice-remove 'org-capture #'jme-org--org-capture-make-full-window-frame-advice)
+  (advice-remove 'org-capture-finalize #'jme-org--org-capture-delete-capture-frame-advice))
 
 (defun jme-org-unload-function ()
   "Unload org configuration."
