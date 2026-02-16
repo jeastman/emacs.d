@@ -79,6 +79,15 @@
   "Holds the start time of the last command initiated.
 This value is used to determine the duration of the command.")
 
+(defvar-local jme-shell--cached-vc-status nil
+  "Cached VC prompt segment for the current Eshell buffer.")
+
+(defvar-local jme-shell--cached-vc-status-dir nil
+  "Directory used to compute `jme-shell--cached-vc-status'.")
+
+(defvar-local jme-shell--cached-vc-status-dirty t
+  "Non-nil when VC prompt cache should be recomputed.")
+
 (defvar jme-shell--minimum-diff-seconds 3
   "Threshold of seconds to display command duration.
 If the duration is less than this value, no duration is displayed.")
@@ -86,7 +95,8 @@ If the duration is less than this value, no duration is displayed.")
 (defun jme-shell--pre-command-function ()
   "Register start time before each command is invoked.
 Intended to be used by `eshell-pre-command-hook'"
-  (setq jme-shell--last-command-start (current-time)))
+  (setq jme-shell--last-command-start (current-time)
+        jme-shell--cached-vc-status-dirty t))
 
 (defun jme-shell--time-diff (start-time end-time)
   "Format time difference between START-TIME and END-TIME.
@@ -188,16 +198,21 @@ output of git status."
   ;; git "clean" vs. "unclean"
   ;; git branch name
   ;; TODO: abbreviate filename further
-  (let ((dir (abbreviate-file-name (eshell/pwd)))
-        (duration (jme-shell--time-diff jme-shell--last-command-start (current-time)))
-        (status (jme-shell--current-vc-status))
+  (let* ((dir (abbreviate-file-name (eshell/pwd)))
+         (duration (jme-shell--time-diff jme-shell--last-command-start (current-time)))
+         (status (if (and (not jme-shell--cached-vc-status-dirty)
+                          (equal dir jme-shell--cached-vc-status-dir))
+                     jme-shell--cached-vc-status
+                   (setq jme-shell--cached-vc-status-dir dir
+                         jme-shell--cached-vc-status-dirty nil
+                         jme-shell--cached-vc-status (jme-shell--current-vc-status))))
         (prompt (if (= (user-uid) 0) "# " "> "))
         (last-status (if (> eshell-last-command-status 0)
                          (jme-common-with-face "✘" 'jme-shell-prompt-exit-fail)
                        (jme-common-with-face " " 'jme-shell-prompt-exit-success))))
     (concat dir " " status duration "\n" last-status prompt)))
 
-(defconst jme-shell--prompt-regexp "^[^$\n]*[✘]?> ")
+(defconst jme-shell--prompt-regexp "^[^$\n]*[✘ ]?[>#] ")
 
 ;; Adapted from
 ;; http://www.howardism.org/Technical/Emacs/eshell-fun.html
@@ -256,16 +271,16 @@ if not terminate the shell."
   (add-hook 'eshell-pre-command-hook #'eshell-save-some-history)
   ;; update the command time.
   (add-hook 'eshell-pre-command-hook #'jme-shell--pre-command-function)
-  (with-eval-after-load 'eshell
+  (with-eval-after-load 'esh-mode
     ;; Truncate buffer for performance
-    (add-to-list 'eshell-output-filter-functions #'eshell-truncate-buffer)
+    (add-hook 'eshell-output-filter-functions #'eshell-truncate-buffer)
     (define-key eshell-mode-map (kbd "C-d") #'jme-shell-quit-or-delete-char)
-
     ;; Aliases
-    (eshell/alias "ff" "find-file $1")
-    (eshell/alias "fo" "find-file-other-window $1")
-    (eshell/alias "d" "dired $1")
-    (eshell/alias "ll" "lsd $1"))
+    (with-eval-after-load 'em-alias
+      (eshell/alias "ff" "find-file $1")
+      (eshell/alias "fo" "find-file-other-window $1")
+      (eshell/alias "d" "dired $1")
+      (eshell/alias "ll" "lsd $1")))
 
   ;; Keybindings
   (global-set-key (kbd "C-!") 'jme-shell-window-popup)
@@ -281,13 +296,15 @@ if not terminate the shell."
   (remove-hook 'eshell-pre-command-hook #'eshell-save-some-history)
   (remove-hook 'eshell-pre-command-hook #'jme-shell--pre-command-function)
   (remove-hook 'eshell-first-time-mode-hook #'jme-shell--configure-eshell)
-  (jme-common-remove-from-list eshell-output-filter-functions 'eshell-truncate-buffer)
-  ;; (setq eshell-output-filter-functions
-  ;;       (delete 'eshell-truncate-buffer
-  ;;               eshell-output-filter-functions))
+  (when (boundp 'eshell-output-filter-functions)
+    (setq eshell-output-filter-functions
+          (jme-common-remove-from-list
+           eshell-output-filter-functions
+           'eshell-truncate-buffer)))
   (global-unset-key (kbd "C-!"))
   ;; Just clear "C-d" from eshell map, since it exists in global map
-  (define-key eshell-mode-map (kbd "C-d") nil))
+  (when (boundp 'eshell-mode-map)
+    (define-key eshell-mode-map (kbd "C-d") nil)))
 
 (jme-common-defconfiguration jme-shell "Shell configuration")
 
